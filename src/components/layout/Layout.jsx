@@ -1,27 +1,12 @@
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { useState } from 'react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 rounded-lg bg-white shadow-lg text-gray-600 hover:text-primary transition-colors"
-        >
-          {isSidebarOpen ? (
-            <XMarkIcon className="h-6 w-6" />
-          ) : (
-            <Bars3Icon className="h-6 w-6" />
-          )}
-        </button>
-      </div>
-
       {/* Sidebar */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity lg:hidden ${
@@ -40,7 +25,7 @@ const Layout = ({ children }) => {
 
       {/* Main content */}
       <div className="lg:ml-64 transition-all duration-300">
-        <Header />
+        <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
         <main className="p-4 md:p-6">{children}</main>
       </div>
     </div>
