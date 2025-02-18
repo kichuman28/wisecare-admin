@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 // Replace this with your Firebase configuration
 const firebaseConfig = {
@@ -10,14 +11,16 @@ const firebaseConfig = {
     messagingSenderId: "623753415843",
     appId: "1:623753415843:web:bb6f22b30f3edcd46e4316",
     measurementId: "G-7T5CVBZVV3"
-  };
+};
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 console.log('Firebase initialized successfully');
 
 // Initialize Firestore
-const db = getFirestore(app);
+export const db = getFirestore(app);
 console.log('Firestore initialized successfully');
 
-export { db }; 
+// Initialize Auth
+export const auth = getAuth(app);
+console.log('Firebase Auth initialized successfully'); 
