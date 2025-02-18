@@ -168,7 +168,7 @@ const UsersPage = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-          ${user.provider === 'google' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+          ${user.provider === 'google' ? 'bg-[#A9B5DF] text-[#2D336B]' : 'bg-gray-100 text-gray-800'}`}>
           {user.provider || 'email'}
         </span>
       </td>
@@ -178,7 +178,7 @@ const UsersPage = () => {
             setItemToDelete({ id: user.id, type: 'user', name: user.displayName });
             setIsDeleteModalOpen(true);
           }}
-          className="text-red-600 hover:text-red-900"
+          className="text-[#7886C7] hover:text-[#2D336B]"
         >
           <TrashIcon className="h-5 w-5" />
         </button>
@@ -203,7 +203,7 @@ const UsersPage = () => {
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#A9B5DF] text-[#2D336B]">
           {responder.role}
         </span>
       </td>
@@ -216,7 +216,7 @@ const UsersPage = () => {
             setEditingResponder(responder);
             setIsEditModalOpen(true);
           }}
-          className="text-blue-600 hover:text-blue-900 mr-4"
+          className="text-[#7886C7] hover:text-[#2D336B] mr-4"
         >
           <PencilIcon className="h-5 w-5" />
         </button>
@@ -225,7 +225,7 @@ const UsersPage = () => {
             setItemToDelete({ id: responder.id, type: 'responder', name: responder.name });
             setIsDeleteModalOpen(true);
           }}
-          className="text-red-600 hover:text-red-900"
+          className="text-[#7886C7] hover:text-[#2D336B]"
         >
           <TrashIcon className="h-5 w-5" />
         </button>
@@ -269,13 +269,13 @@ const UsersPage = () => {
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <UserGroupIcon className="h-8 w-8 text-gray-600 mr-3" />
+            <UserGroupIcon className="h-8 w-8 text-primary mr-3" />
             <h1 className="text-2xl font-semibold text-gray-800">User Management</h1>
           </div>
           {selectedTab === 1 && (
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
               Add New Responder
@@ -284,39 +284,39 @@ const UsersPage = () => {
         </div>
 
         <Tab.Group onChange={setSelectedTab}>
-          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 p-1 mb-6">
+          <Tab.List className="flex space-x-1 rounded-xl bg-primary-light/20 p-1 mb-6">
             <Tab className={({ selected }) =>
-              `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
+              `w-full rounded-lg py-2.5 text-sm font-medium leading-5
               ${selected 
-                ? 'bg-white shadow'
-                : 'text-blue-600 hover:bg-white/[0.12] hover:text-blue-700'}`
+                ? 'bg-white shadow text-primary'
+                : 'text-primary-hover hover:bg-white/[0.12] hover:text-primary'}`
             }>
               Users
             </Tab>
             <Tab className={({ selected }) =>
-              `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
+              `w-full rounded-lg py-2.5 text-sm font-medium leading-5
               ${selected 
-                ? 'bg-white shadow'
-                : 'text-blue-600 hover:bg-white/[0.12] hover:text-blue-700'}`
+                ? 'bg-white shadow text-primary'
+                : 'text-primary-hover hover:bg-white/[0.12] hover:text-primary'}`
             }>
               Responders
             </Tab>
           </Tab.List>
 
           {/* Filters */}
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <div className="bg-background-secondary p-4 rounded-lg shadow-sm mb-6">
             <div className="flex gap-4">
               <input
                 type="text"
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover"
               />
               <select 
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover"
               >
                 <option value="">All Roles</option>
                 <option value="hero">Hero</option>
@@ -421,7 +421,7 @@ const UsersPage = () => {
                           <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2 disabled:bg-primary-light"
                           >
                             {isSubmitting ? 'Adding...' : 'Add Responder'}
                           </button>
@@ -480,7 +480,7 @@ const UsersPage = () => {
                         <button
                           type="button"
                           onClick={() => setIsDeleteModalOpen(false)}
-                          className="inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          className="inline-flex justify-center rounded-md border border-[#A9B5DF] px-4 py-2 text-sm font-medium text-[#2D336B] hover:bg-[#FFF2F2] focus:outline-none focus:ring-2 focus:ring-[#7886C7] focus:ring-offset-2"
                         >
                           Cancel
                         </button>
@@ -600,7 +600,7 @@ const UsersPage = () => {
                           <button
                             type="submit"
                             disabled={isEditing}
-                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2 disabled:bg-primary-light"
                           >
                             {isEditing ? 'Saving...' : 'Save Changes'}
                           </button>

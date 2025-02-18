@@ -1,12 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       colors: {
+        primary: {
+          DEFAULT: '#2D336B', // dark blue
+          hover: '#7886C7',   // medium blue
+          light: '#A9B5DF',   // light blue
+        },
+        background: {
+          DEFAULT: '#ffffff', // white instead of light pink
+          secondary: '#f8f9fa',
+        },
         teal: {
           600: '#008080',
         },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React from 'react';
 import Layout from '../components/layout/Layout';
 import {
   DocumentTextIcon,
@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const ContentPage = () => {
-  const [content] = useState([
+  const [content] = React.useState([
     {
       id: 1,
       title: 'Fall Prevention Guide',
@@ -67,82 +67,61 @@ const ContentPage = () => {
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <DocumentTextIcon className="h-8 w-8 text-gray-600 mr-3" />
+            <DocumentTextIcon className="h-8 w-8 text-primary mr-3" />
             <h1 className="text-2xl font-semibold text-gray-800">Content Management</h1>
           </div>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+          >
             <PlusIcon className="h-5 w-5 mr-2" />
             Add New Content
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-          <div className="flex gap-4">
-            <input
-              type="text"
-              placeholder="Search content..."
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <select className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">All Categories</option>
-              <option value="safety">Safety</option>
-              <option value="health">Health</option>
-              <option value="nutrition">Nutrition</option>
-              <option value="mental-health">Mental Health</option>
-            </select>
-            <select className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">All Types</option>
-              <option value="pdf">PDF</option>
-              <option value="video">Video</option>
-              <option value="article">Article</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {content.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center">
-                    {getTypeIcon(item.type)}
-                    <div className="ml-3">
-                      <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                      <p className="text-sm text-gray-500">{item.category}</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                    {item.type}
-                  </span>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm text-gray-600">
-                    By {item.author}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Published on {new Date(item.published).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {item.views} views
-                  </p>
-                </div>
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search content..."
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover"
+                />
               </div>
-
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                <div className="flex justify-between">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View Details
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                    Edit
-                  </button>
-                </div>
+              <div className="ml-4">
+                <select className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover">
+                  <option value="">All Categories</option>
+                  <option value="articles">Articles</option>
+                  <option value="news">News</option>
+                  <option value="updates">Updates</option>
+                </select>
               </div>
             </div>
-          ))}
+
+            {/* Content List */}
+            <div className="space-y-4">
+              {content.map((item) => (
+                <div key={item.id} className="p-4 border rounded-lg hover:border-primary-light transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-medium text-primary">{item.title}</h3>
+                      <p className="text-gray-600 mt-1">{item.category}</p>
+                      <div className="flex items-center mt-2 text-sm text-gray-500">
+                        <span className="bg-primary-light/20 text-primary px-2 py-1 rounded-full text-xs">
+                          {item.type}
+                        </span>
+                        <span className="ml-4">Published: {new Date(item.published).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button className="text-primary-hover hover:text-primary">Edit</button>
+                      <button className="text-red-500 hover:text-red-700">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

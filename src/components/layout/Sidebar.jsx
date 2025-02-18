@@ -44,7 +44,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed h-full w-64 bg-[#1E2837] text-white flex flex-col">
+    <div className="fixed h-full w-64 bg-primary text-white flex flex-col">
       <nav className="flex-1 mt-6 px-3">
         <div className="space-y-1.5">
           {menuItems.map((item) => (
@@ -52,8 +52,8 @@ const Sidebar = () => {
               <div
                 className={`group flex items-center px-4 py-2.5 rounded-lg transition-all duration-300 ease-in-out cursor-pointer
                   ${location.pathname === item.path
-                    ? 'bg-white/15 text-white shadow-lg shadow-white/10'
-                    : 'text-gray-400 hover:bg-white/10 hover:text-white'
+                    ? 'bg-primary-hover text-white shadow-lg shadow-primary-light/20'
+                    : 'text-white hover:bg-primary-light/20 hover:text-white'
                   }
                   ${hoveredItem === item.name ? 'scale-[1.02] transform' : ''}
                 `}
@@ -64,7 +64,7 @@ const Sidebar = () => {
                 <div className="relative flex items-center w-full">
                   <div className={`
                     flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300
-                    ${location.pathname === item.path ? 'bg-white/10' : 'group-hover:bg-white/5'}
+                    ${location.pathname === item.path ? 'bg-primary-light/20' : 'group-hover:bg-primary-light/10'}
                   `}>
                     <item.icon className={`h-5 w-5 transition-transform duration-300 ${
                       hoveredItem === item.name ? 'scale-110' : ''
@@ -74,7 +74,7 @@ const Sidebar = () => {
                   
                   {/* Active indicator */}
                   {location.pathname === item.path && (
-                    <div className="absolute left-0 w-1 h-full bg-blue-500 rounded-r-full transform -translate-x-4" />
+                    <div className="absolute left-0 w-1 h-full bg-white rounded-r-full transform -translate-x-4" />
                   )}
                 </div>
               </div>
@@ -87,13 +87,13 @@ const Sidebar = () => {
       <div className="px-3 pb-6">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300 ease-in-out group"
+          className="flex items-center w-full px-4 py-2.5 text-sm text-white hover:text-white hover:bg-primary-light/20 rounded-lg transition-all duration-300 ease-in-out group"
           onMouseEnter={() => setHoveredItem('logout')}
           onMouseLeave={() => setHoveredItem(null)}
         >
           <div className={`
             flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300
-            group-hover:bg-white/5
+            group-hover:bg-primary-light/10
           `}>
             <ArrowRightOnRectangleIcon className={`h-5 w-5 transition-transform duration-300 ${
               hoveredItem === 'logout' ? 'translate-x-1' : ''

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { collection, query, orderBy, onSnapshot, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import Layout from '../components/layout/Layout';
@@ -11,7 +11,9 @@ import {
   DevicePhoneMobileIcon,
   BoltIcon, // Changed from BatteryIcon to BoltIcon
   ClockIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  BellAlertIcon
 } from '@heroicons/react/24/outline';
 
 const SOSAlertsPage = () => {
@@ -124,177 +126,314 @@ const SOSAlertsPage = () => {
 
   const AlertCard = ({ alert }) => {
     const [selectedResponderId, setSelectedResponderId] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
     const user = users[alert.userId] || {};
 
+    const filteredResponders = responders.filter(responder => 
+      responder.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      responder.role.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const selectedResponder = responders.find(r => r.id === selectedResponderId);
+
+    const handleSelectResponder = (responderId) => {
+      setSelectedResponderId(responderId);
+      setSearchQuery('');
+      setIsOpen(false);
+    };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
-        {/* Status and Timestamp Header */}
-        <div className="flex items-center justify-between mb-4">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(alert.status)}`}>
-            {alert.status.toUpperCase()}
-          </span>
-          <span className="text-sm text-gray-500 flex items-center">
-            <ClockIcon className="h-4 w-4 mr-1" />
-            {formatTimestamp(alert.timestamp)}
-          </span>
+      <div className={`bg-white rounded-xl shadow-sm transition-all duration-200 hover:shadow-md mb-6 overflow-hidden
+        ${alert.status === 'pending' ? 'border-l-4 border-red-500' : 
+          alert.status === 'assigned' ? 'border-l-4 border-yellow-500' : 
+          alert.status === 'resolved' ? 'border-l-4 border-green-500' : ''}`}>
+        
+        {/* Status Header */}
+        <div className={`px-6 py-3 flex items-center justify-between
+          ${alert.status === 'pending' ? 'bg-red-50' : 
+            alert.status === 'assigned' ? 'bg-yellow-50' : 
+            alert.status === 'resolved' ? 'bg-green-50' : 'bg-gray-50'}`}>
+          <div className="flex items-center space-x-2">
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+              ${getStatusColor(alert.status)}`}>
+              {alert.status === 'pending' && <ExclamationTriangleIcon className="h-4 w-4 mr-1.5" />}
+              {alert.status === 'assigned' && <BellAlertIcon className="h-4 w-4 mr-1.5" />}
+              {alert.status === 'resolved' && <CheckCircleIcon className="h-4 w-4 mr-1.5" />}
+              {alert.status.toUpperCase()}
+            </span>
+            <span className="text-sm text-gray-600 flex items-center">
+              <ClockIcon className="h-4 w-4 mr-1.5" />
+              {formatTimestamp(alert.timestamp)}
+            </span>
+          </div>
         </div>
 
-        {/* Alert Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Left Column */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">User Information</h3>
-              <div className="flex items-center space-x-4">
+        <div className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* User Information */}
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4">
                 {user.photoURL ? (
                   <img 
                     src={user.photoURL} 
                     alt={user.displayName || 'User'} 
-                    className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                    className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-200"
                   />
                 ) : (
-                  <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-                    <UserIcon className="h-7 w-7 text-gray-600" />
+                  <div className="h-12 w-12 rounded-full bg-primary-light/20 flex items-center justify-center ring-2 ring-gray-200">
+                    <UserIcon className="h-6 w-6 text-primary" />
                   </div>
                 )}
-                <div>
-                  <p className="text-gray-900 font-medium text-lg">
-                    {user.displayName || 'Unknown User'}
-                  </p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
-                  <p className="text-xs text-gray-400">ID: {alert.userId}</p>
-                </div>
-              </div>
-              {user.phone && (
-                <p className="text-gray-600 mt-3 flex items-center">
-                  <PhoneIcon className="h-4 w-4 mr-2" />
-                  {user.phone}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Location</h3>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <MapPinIcon className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="text-gray-700 font-medium">Emergency Location</span>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Latitude: {alert.location?.latitude}<br />
-                  Longitude: {alert.location?.longitude}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Device Information</h3>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <DevicePhoneMobileIcon className="h-5 w-5 text-gray-500 mr-2" />
-                    <span className="text-gray-700">Model: {alert.deviceInfo?.model}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <BoltIcon className="h-5 w-5 text-gray-500 mr-2" />
-                    <span className="text-gray-700">Battery: {alert.deviceInfo?.batteryLevel}%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="h-5 w-5 flex items-center justify-center mr-2">
-                      <span className="text-xs font-medium text-gray-500">OS</span>
-                    </div>
-                    <span className="text-gray-700">Version: {alert.deviceInfo?.osVersion}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Responder Assignment Section */}
-        <div className="border-t pt-4">
-          {alert.status === 'pending' ? (
-            <div className="bg-red-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold text-red-900 mb-3">Emergency Response Required</h3>
-              <div className="flex items-end gap-4">
                 <div className="flex-1">
-                  <label htmlFor={`responder-${alert.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                    Select Responder
-                  </label>
-                  <select
-                    id={`responder-${alert.id}`}
-                    value={selectedResponderId}
-                    onChange={(e) => setSelectedResponderId(e.target.value)}
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
-                  >
-                    <option value="">Choose a responder...</option>
-                    {responders.map(responder => (
-                      <option key={responder.id} value={responder.id}>
-                        {responder.name} - {responder.role}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button
-                  onClick={() => {
-                    if (selectedResponderId) {
-                      handleAssignResponder(alert.id, selectedResponderId);
-                    }
-                  }}
-                  disabled={!selectedResponderId}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 
-                           disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  Assign Responder
-                </button>
-              </div>
-            </div>
-          ) : alert.status === 'assigned' ? (
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold text-yellow-900 mb-3">Assigned Responder</h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <UserIcon className="h-8 w-8 text-yellow-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">{alert.responder?.name}</p>
-                    <p className="text-sm text-gray-600">{alert.responder?.role}</p>
-                  </div>
-                  {alert.responder?.phone && (
-                    <a
-                      href={`tel:${alert.responder.phone}`}
-                      className="flex items-center text-blue-600 hover:text-blue-800"
-                    >
-                      <PhoneIcon className="h-5 w-5 mr-1" />
-                      {alert.responder.phone}
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {user.displayName || 'Unknown User'}
+                  </h3>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                  {user.phone && (
+                    <a href={`tel:${user.phone}`} className="mt-1 text-sm text-primary-hover hover:text-primary flex items-center">
+                      <PhoneIcon className="h-4 w-4 mr-1.5" />
+                      {user.phone}
                     </a>
                   )}
                 </div>
-                <button
-                  onClick={() => handleResolveAlert(alert.id)}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg 
-                           hover:bg-green-700 transition-colors"
-                >
-                  <CheckCircleIcon className="h-5 w-5 mr-2" />
-                  Mark as Resolved
-                </button>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center mb-2">
+                  <MapPinIcon className="h-5 w-5 text-gray-500 mr-2" />
+                  <span className="text-sm font-medium text-gray-900">Emergency Location</span>
+                </div>
+                <div className="space-y-1 ml-7">
+                  <p className="text-sm text-gray-600">
+                    Latitude: {alert.location?.latitude}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Longitude: {alert.location?.longitude}
+                  </p>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                    {alert.status === 'resolved' ? 'Resolved by' : 'Status'}
-                  </h3>
-                  <p className="text-gray-600">{alert.responder?.name || alert.status}</p>
-                  {alert.resolvedAt && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Resolved at: {formatTimestamp(alert.resolvedAt)}
+
+            {/* Device Information */}
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Device Information</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <DevicePhoneMobileIcon className="h-5 w-5 text-gray-500 mr-3" />
+                    <span>Model: {alert.deviceInfo?.model}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <BoltIcon className="h-5 w-5 text-gray-500 mr-3" />
+                    <span>Battery: {alert.deviceInfo?.batteryLevel}%</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <div className="h-5 w-5 flex items-center justify-center mr-3">
+                      <span className="text-xs font-medium text-gray-500">OS</span>
+                    </div>
+                    <span>Version: {alert.deviceInfo?.osVersion}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Responder Assignment Section */}
+          {alert.status === 'pending' && (
+            <div className="mt-6">
+              <div className="bg-red-50 rounded-lg p-6 border border-red-100">
+                <div className="flex items-center mb-4">
+                  <ExclamationTriangleIcon className="h-5 w-5 text-red-600 mr-2" />
+                  <h3 className="text-lg font-medium text-red-900">Emergency Response Required</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="relative" ref={dropdownRef}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Available Responder
+                    </label>
+                    <div className="relative">
+                      <div
+                        className="relative w-full bg-white rounded-lg border border-gray-300 shadow-sm pl-3 pr-10 py-2 cursor-text
+                                 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500"
+                        onClick={() => setIsOpen(true)}
+                      >
+                        <input
+                          type="text"
+                          className="w-full border-none p-0 focus:ring-0 text-sm"
+                          placeholder={selectedResponder ? '' : "Search and select a responder..."}
+                          value={searchQuery}
+                          onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setIsOpen(true);
+                          }}
+                          onFocus={() => setIsOpen(true)}
+                        />
+                        {selectedResponder && !searchQuery && (
+                          <div className="absolute inset-0 flex items-center pointer-events-none pl-3">
+                          <div className="flex items-center">
+                              <div className="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center">
+                                <UserIcon className="h-4 w-4 text-red-600" />
+                            </div>
+                              <div className="ml-2">
+                              <p className="text-sm font-medium text-gray-900">{selectedResponder.name}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+                          <button
+                            type="button"
+                            className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                            onClick={() => setIsOpen(!isOpen)}
+                          >
+                            <svg className={`h-5 w-5 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                      </button>
+                            </div>
+                          </div>
+                          
+                      {/* Dropdown Panel */}
+                      {isOpen && (
+                        <div className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                          <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50">
+                            {filteredResponders.length === 0 ? (
+                              <div className="px-4 py-3 text-sm text-gray-500">
+                                No responders found
+                              </div>
+                            ) : (
+                              filteredResponders.map(responder => (
+                                <button
+                                  key={responder.id}
+                                  onClick={() => handleSelectResponder(responder.id)}
+                                  className={`w-full text-left px-4 py-3 hover:bg-red-50 transition-colors duration-150
+                                    ${selectedResponderId === responder.id ? 'bg-red-50' : ''}
+                                    flex items-center justify-between`}
+                                >
+                                  <div className="flex items-center min-w-0">
+                                    <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                                      <UserIcon className="h-5 w-5 text-red-600" />
+                                    </div>
+                                    <div className="ml-3 flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 truncate">{responder.name}</p>
+                                      <div className="flex items-center space-x-2">
+                                        <span className="text-xs text-gray-500">{responder.role}</span>
+                                        {responder.phone && (
+                                          <span className="text-xs text-gray-500 flex items-center">
+                                            <PhoneIcon className="h-3 w-3 mr-1" />
+                                            {responder.phone}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {selectedResponderId === responder.id && (
+                                    <CheckCircleIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
+                                  )}
+                                </button>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (selectedResponderId) {
+                        handleAssignResponder(alert.id, selectedResponderId);
+                      }
+                    }}
+                    disabled={!selectedResponderId}
+                    className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 
+                             disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors
+                             focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
+                             flex items-center justify-center space-x-2 text-sm font-medium"
+                  >
+                    <UserIcon className="h-5 w-5" />
+                    <span>Assign Selected Responder</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {alert.status === 'assigned' && (
+            <div className="mt-6">
+              <div className="bg-yellow-50 rounded-lg p-6 border border-yellow-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                      <UserIcon className="h-6 w-6 text-yellow-700" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-yellow-900">Assigned Responder</h4>
+                      <p className="text-lg font-semibold text-gray-900 mt-1">{alert.responder?.name}</p>
+                      <p className="text-sm text-gray-600">{alert.responder?.role}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    {alert.responder?.phone && (
+                      <a
+                        href={`tel:${alert.responder.phone}`}
+                        className="inline-flex items-center px-4 py-2 border border-yellow-300 rounded-lg
+                                 text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100
+                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                      >
+                        <PhoneIcon className="h-5 w-5 mr-2" />
+                        Contact Responder
+                      </a>
+                    )}
+                    <button
+                      onClick={() => handleResolveAlert(alert.id)}
+                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg
+                               text-sm font-medium text-white bg-green-600 hover:bg-green-700
+                               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      <CheckCircleIcon className="h-5 w-5 mr-2" />
+                      Mark as Resolved
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {alert.status === 'resolved' && (
+            <div className="mt-6">
+              <div className="bg-green-50 rounded-lg p-6 border border-green-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center">
+                      <CheckCircleIcon className="h-5 w-5 text-green-600 mr-2" />
+                      <h4 className="text-lg font-medium text-green-900">
+                        Alert Resolved
+                      </h4>
+                    </div>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Resolved by: {alert.responder?.name}
                     </p>
-                  )}
+                    {alert.resolvedAt && (
+                      <p className="text-sm text-gray-500">
+                        Resolution Time: {formatTimestamp(alert.resolvedAt)}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

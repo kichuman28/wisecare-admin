@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React from 'react';
 import Layout from '../components/layout/Layout';
 import { ChartBarIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import {
@@ -14,93 +14,125 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  AreaChart,
+  Area
 } from 'recharts';
 
 const ReportsPage = () => {
-  // Sample data for charts
-  const alertsData = [
-    { month: 'Jan', alerts: 12 },
-    { month: 'Feb', alerts: 19 },
-    { month: 'Mar', alerts: 15 },
-    { month: 'Apr', alerts: 21 },
-    { month: 'May', alerts: 18 },
-    { month: 'Jun', alerts: 24 }
-  ];
-
-  const deviceUsageData = [
-    { name: 'Fall Detector', value: 35 },
-    { name: 'Heart Monitor', value: 25 },
-    { name: 'Emergency Button', value: 20 },
-    { name: 'Motion Sensor', value: 15 },
-    { name: 'Other', value: 5 }
-  ];
-
+  // User Activity Data
   const userActivityData = [
-    { day: 'Mon', active: 45, inactive: 15 },
-    { day: 'Tue', active: 50, inactive: 10 },
-    { day: 'Wed', active: 48, inactive: 12 },
-    { day: 'Thu', active: 52, inactive: 8 },
-    { day: 'Fri', active: 47, inactive: 13 },
-    { day: 'Sat', active: 43, inactive: 17 },
-    { day: 'Sun', active: 40, inactive: 20 }
+    { month: 'Jan', activeUsers: 2100, newUsers: 400 },
+    { month: 'Feb', activeUsers: 2400, newUsers: 450 },
+    { month: 'Mar', activeUsers: 2200, newUsers: 420 },
+    { month: 'Apr', activeUsers: 2800, newUsers: 500 },
+    { month: 'May', activeUsers: 3100, newUsers: 550 },
+    { month: 'Jun', activeUsers: 3400, newUsers: 600 }
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  // SOS Alerts Data
+  const alertsData = [
+    { date: '1', alerts: 12, responseTime: 4.2 },
+    { date: '2', alerts: 19, responseTime: 3.8 },
+    { date: '3', alerts: 15, responseTime: 4.5 },
+    { date: '4', alerts: 21, responseTime: 3.2 },
+    { date: '5', alerts: 18, responseTime: 3.9 },
+    { date: '6', alerts: 24, responseTime: 3.1 },
+    { date: '7', alerts: 16, responseTime: 3.6 }
+  ];
+
+  // Device Distribution Data
+  const deviceData = [
+    { name: 'Fall Detectors', value: 35, color: '#2D336B' },
+    { name: 'Heart Monitors', value: 25, color: '#7886C7' },
+    { name: 'Emergency Buttons', value: 20, color: '#A9B5DF' },
+    { name: 'Motion Sensors', value: 15, color: '#B4BDEA' },
+    { name: 'Other Devices', value: 5, color: '#C3CAF5' }
+  ];
+
+  // Alert Types Distribution
+  const alertTypesData = [
+    { name: 'Falls', value: 40 },
+    { name: 'Heart Rate', value: 25 },
+    { name: 'Manual SOS', value: 20 },
+    { name: 'Inactivity', value: 15 }
+  ];
 
   return (
     <Layout>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <ChartBarIcon className="h-8 w-8 text-gray-600 mr-3" />
-            <h1 className="text-2xl font-semibold text-gray-800">Reports & Analytics</h1>
+            <ChartBarIcon className="h-8 w-8 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-gray-800">Analytics Dashboard</h1>
           </div>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+          >
             <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
-            Export Report
+            Export Reports
           </button>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          {[
-            { title: 'Total Users', value: '1,234', change: '+5.2%' },
-            { title: 'Active Devices', value: '987', change: '+3.1%' },
-            { title: 'Total Alerts', value: '109', change: '-2.3%' },
-            { title: 'Response Rate', value: '98.5%', change: '+0.5%' }
-          ].map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-sm font-medium text-gray-500">{stat.title}</h3>
-              <div className="mt-2 flex items-baseline">
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                <span className={`ml-2 text-sm font-medium ${
-                  stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {stat.change}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Alerts Trend */}
+          {/* User Activity Chart */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Alerts Trend</h2>
+            <h2 className="text-lg font-medium text-primary mb-4">User Activity</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={alertsData}>
+                <AreaChart data={userActivityData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="alerts"
-                    stroke="#3B82F6"
+                  <Area 
+                    type="monotone" 
+                    dataKey="activeUsers" 
+                    name="Active Users"
+                    stroke="#2D336B" 
+                    fill="#2D336B" 
+                    fillOpacity={0.1}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="newUsers" 
+                    name="New Users"
+                    stroke="#7886C7" 
+                    fill="#7886C7" 
+                    fillOpacity={0.1}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* SOS Alerts Chart */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-medium text-primary mb-4">SOS Alerts Overview</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={alertsData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis yAxisId="left" />
+                  <YAxis yAxisId="right" orientation="right" />
+                  <Tooltip />
+                  <Legend />
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="alerts" 
+                    name="Number of Alerts"
+                    stroke="#2D336B" 
+                    strokeWidth={2}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="responseTime" 
+                    name="Avg Response Time (min)"
+                    stroke="#7886C7" 
                     strokeWidth={2}
                   />
                 </LineChart>
@@ -108,92 +140,92 @@ const ReportsPage = () => {
             </div>
           </div>
 
-          {/* Device Usage Distribution */}
+          {/* Device Distribution Chart */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Device Usage Distribution</h2>
+            <h2 className="text-lg font-medium text-primary mb-4">Device Distribution</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={deviceUsageData}
+                    data={deviceData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    innerRadius={60}
                     outerRadius={100}
-                    fill="#8884d8"
+                    paddingAngle={5}
                     dataKey="value"
                   >
-                    {deviceUsageData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {deviceData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* User Activity */}
+          {/* Alert Types Chart */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Weekly User Activity</h2>
+            <h2 className="text-lg font-medium text-primary mb-4">Alert Types Distribution</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={userActivityData}>
+                <BarChart data={alertTypesData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
+                  <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="active" fill="#4ADE80" name="Active Users" />
-                  <Bar dataKey="inactive" fill="#FB7185" name="Inactive Users" />
+                  <Bar 
+                    dataKey="value" 
+                    name="Percentage" 
+                    fill="#2D336B"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Recent Reports */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Reports</h2>
-            <div className="space-y-4">
-              {[
-                {
-                  title: 'Monthly Activity Summary',
-                  date: '2024-03-15',
-                  type: 'PDF',
-                  size: '2.4 MB'
-                },
-                {
-                  title: 'Device Performance Analysis',
-                  date: '2024-03-10',
-                  type: 'Excel',
-                  size: '1.8 MB'
-                },
-                {
-                  title: 'User Engagement Report',
-                  date: '2024-03-05',
-                  type: 'PDF',
-                  size: '3.1 MB'
-                }
-              ].map((report, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                >
-                  <div>
-                    <h3 className="font-medium text-gray-900">{report.title}</h3>
-                    <p className="text-sm text-gray-500">
-                      {new Date(report.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-500">{report.size}</span>
-                    <button className="text-blue-600 hover:text-blue-800">
-                      <ArrowDownTrayIcon className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+          {/* Recent Reports Table */}
+          <div className="bg-white rounded-lg shadow-sm p-6 lg:col-span-2">
+            <h2 className="text-lg font-medium text-primary mb-4">Recent Reports</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {[
+                    { name: 'Monthly Activity Summary', date: '2024-03-01', type: 'Analytics' },
+                    { name: 'User Engagement Report', date: '2024-03-01', type: 'Analytics' },
+                    { name: 'Emergency Response Times', date: '2024-02-29', type: 'Performance' }
+                  ].map((report, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {report.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {report.date}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="bg-primary-light/20 text-primary px-2 py-1 rounded-full text-xs">
+                          {report.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                        <button className="text-primary-hover hover:text-primary">Download</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

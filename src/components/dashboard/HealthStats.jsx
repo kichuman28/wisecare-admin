@@ -1,82 +1,71 @@
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import React from 'react';
+import { 
+  HeartIcon, 
+  ArrowTrendingUpIcon, 
+  ArrowTrendingDownIcon 
+} from '@heroicons/react/24/outline';
 
 const HealthStats = () => {
-  // Sample data for the mini charts
-  const data = Array(10).fill().map((_, i) => ({
-    value: Math.random() * 30 + 60
-  }));
-
   const stats = [
     {
-      name: 'Heart Rate',
+      id: 1,
+      name: 'Average Heart Rate',
       value: '72',
-      unit: 'BPM',
-      status: 'Normal',
-      color: 'text-rose-600',
-      bgColor: 'bg-rose-50',
-      data: data
+      unit: 'bpm',
+      change: '+2.3%',
+      trend: 'up'
     },
     {
+      id: 2,
       name: 'Blood Pressure',
       value: '120/80',
-      unit: '',
-      status: 'Normal',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      data: data
+      unit: 'mmHg',
+      change: '-1.5%',
+      trend: 'down'
     },
     {
-      name: 'Oxygen Level',
+      id: 3,
+      name: 'Blood Oxygen',
       value: '98',
       unit: '%',
-      status: 'Normal',
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
-      data: data
-    },
-    {
-      name: 'Temperature',
-      value: '98.6',
-      unit: '°F',
-      status: 'Normal',
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
-      data: data
+      change: '+0.5%',
+      trend: 'up'
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat) => (
-        <div
-          key={stat.name}
-          className={`${stat.bgColor} rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200`}
-        >
-          <h3 className="text-gray-600 text-sm font-medium">{stat.name}</h3>
-          <div className="mt-2 flex items-end justify-between">
-            <div>
-              <p className={`text-3xl font-bold ${stat.color}`}>
-                {stat.value}
-                <span className="text-lg ml-1">{stat.unit}</span>
-              </p>
-              <p className="text-emerald-600 text-sm font-medium mt-1">{stat.status}</p>
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="flex items-center mb-4">
+        <HeartIcon className="h-6 w-6 text-primary mr-2" />
+        <h2 className="text-lg font-medium text-primary">Health Statistics</h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat) => (
+          <div key={stat.id} className="p-4 rounded-lg bg-primary-light/10">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+              {stat.trend === 'up' ? (
+                <ArrowTrendingUpIcon className="h-4 w-4 text-green-600" />
+              ) : (
+                <ArrowTrendingDownIcon className="h-4 w-4 text-red-600" />
+              )}
             </div>
-            <div className="h-16 w-24">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={stat.data}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke={stat.color.replace('text-', 'rgb(').replace('-600', ')')}
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="mt-2 flex items-baseline">
+              <p className="text-2xl font-semibold text-primary">{stat.value}</p>
+              <p className="ml-1 text-sm text-gray-600">{stat.unit}</p>
+            </div>
+            <div className="mt-2">
+              <span className={`text-sm ${
+                stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {stat.change}
+              </span>
+              <span className="text-sm text-gray-500 ml-1">from last check</span>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
