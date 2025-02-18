@@ -17,7 +17,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
-  const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   const menuItems = [
     { name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
@@ -27,16 +27,11 @@ const Sidebar = () => {
     { name: 'Content', icon: DocumentTextIcon, path: '/content' },
     { name: 'Services', icon: WrenchScrewdriverIcon, path: '/services' },
     { name: 'Reports', icon: ChartBarIcon, path: '/reports' },
-    { name: 'Settings', icon: Cog6ToothIcon, path: '/settings', hasDropdown: true }
+    { name: 'Settings', icon: Cog6ToothIcon, path: '/settings' }
   ];
 
   const handleNavigation = (item) => {
-    if (item.hasDropdown) {
-      setShowSettingsDropdown(!showSettingsDropdown);
-    } else {
-      navigate(item.path);
-      setShowSettingsDropdown(false);
-    }
+    navigate(item.path);
   };
 
   const handleLogout = async () => {
@@ -49,37 +44,64 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed h-full w-64 bg-[#1E2837] text-white">
-      <nav className="mt-6 px-3">
-        {menuItems.map((item) => (
-          <div key={item.name}>
-            <div
-              className={`flex items-center px-4 py-2.5 mb-1 cursor-pointer rounded-lg transition-colors ${
-                location.pathname === item.path
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-              onClick={() => handleNavigation(item)}
-            >
-              <item.icon className="h-5 w-5 mr-3" />
-              <span className="text-sm">{item.name}</span>
-            </div>
-
-            {/* Settings Dropdown */}
-            {item.name === 'Settings' && showSettingsDropdown && (
-              <div className="ml-12 mt-1 space-y-1">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg w-full"
-                >
-                  <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
-                  Logout
-                </button>
+    <div className="fixed h-full w-64 bg-[#1E2837] text-white flex flex-col">
+      <nav className="flex-1 mt-6 px-3">
+        <div className="space-y-1.5">
+          {menuItems.map((item) => (
+            <div key={item.name} className="relative">
+              <div
+                className={`group flex items-center px-4 py-2.5 rounded-lg transition-all duration-300 ease-in-out cursor-pointer
+                  ${location.pathname === item.path
+                    ? 'bg-white/15 text-white shadow-lg shadow-white/10'
+                    : 'text-gray-400 hover:bg-white/10 hover:text-white'
+                  }
+                  ${hoveredItem === item.name ? 'scale-[1.02] transform' : ''}
+                `}
+                onClick={() => handleNavigation(item)}
+                onMouseEnter={() => setHoveredItem(item.name)}
+                onMouseLeave={() => setHoveredItem(null)}
+              >
+                <div className="relative flex items-center w-full">
+                  <div className={`
+                    flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300
+                    ${location.pathname === item.path ? 'bg-white/10' : 'group-hover:bg-white/5'}
+                  `}>
+                    <item.icon className={`h-5 w-5 transition-transform duration-300 ${
+                      hoveredItem === item.name ? 'scale-110' : ''
+                    }`} />
+                  </div>
+                  <span className="ml-3 text-sm font-medium">{item.name}</span>
+                  
+                  {/* Active indicator */}
+                  {location.pathname === item.path && (
+                    <div className="absolute left-0 w-1 h-full bg-blue-500 rounded-r-full transform -translate-x-4" />
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </nav>
+
+      {/* Logout button at bottom */}
+      <div className="px-3 pb-6">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300 ease-in-out group"
+          onMouseEnter={() => setHoveredItem('logout')}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <div className={`
+            flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300
+            group-hover:bg-white/5
+          `}>
+            <ArrowRightOnRectangleIcon className={`h-5 w-5 transition-transform duration-300 ${
+              hoveredItem === 'logout' ? 'translate-x-1' : ''
+            }`} />
+          </div>
+          <span className="ml-3 font-medium">Logout</span>
+        </button>
+      </div>
     </div>
   );
 };
