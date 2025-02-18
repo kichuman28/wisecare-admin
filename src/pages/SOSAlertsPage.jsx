@@ -144,40 +144,72 @@ const SOSAlertsPage = () => {
           {/* Left Column */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">User Information</h3>
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  <UserIcon className="h-5 w-5 text-gray-600" />
-                </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">User Information</h3>
+              <div className="flex items-center space-x-4">
+                {user.photoURL ? (
+                  <img 
+                    src={user.photoURL} 
+                    alt={user.displayName || 'User'} 
+                    className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                  />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                    <UserIcon className="h-7 w-7 text-gray-600" />
+                  </div>
+                )}
                 <div>
-                  <p className="text-gray-900 font-medium">{user.name || 'Unknown User'}</p>
-                  <p className="text-sm text-gray-500">ID: {alert.userId}</p>
+                  <p className="text-gray-900 font-medium text-lg">
+                    {user.displayName || 'Unknown User'}
+                  </p>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <p className="text-xs text-gray-400">ID: {alert.userId}</p>
                 </div>
               </div>
               {user.phone && (
-                <p className="text-gray-600 mt-1 flex items-center">
-                  <PhoneIcon className="h-4 w-4 mr-1" />
+                <p className="text-gray-600 mt-3 flex items-center">
+                  <PhoneIcon className="h-4 w-4 mr-2" />
                   {user.phone}
                 </p>
               )}
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Location</h3>
-              <p className="text-gray-600">
-                Latitude: {alert.location?.latitude}<br />
-                Longitude: {alert.location?.longitude}
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Location</h3>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <MapPinIcon className="h-5 w-5 text-gray-500 mr-2" />
+                  <span className="text-gray-700 font-medium">Emergency Location</span>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Latitude: {alert.location?.latitude}<br />
+                  Longitude: {alert.location?.longitude}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Right Column */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Device Information</h3>
-              <p className="text-gray-600">Model: {alert.deviceInfo?.model}</p>
-              <p className="text-gray-600">Battery: {alert.deviceInfo?.batteryLevel}%</p>
-              <p className="text-gray-600">OS Version: {alert.deviceInfo?.osVersion}</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Device Information</h3>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <DevicePhoneMobileIcon className="h-5 w-5 text-gray-500 mr-2" />
+                    <span className="text-gray-700">Model: {alert.deviceInfo?.model}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <BoltIcon className="h-5 w-5 text-gray-500 mr-2" />
+                    <span className="text-gray-700">Battery: {alert.deviceInfo?.batteryLevel}%</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="h-5 w-5 flex items-center justify-center mr-2">
+                      <span className="text-xs font-medium text-gray-500">OS</span>
+                    </div>
+                    <span className="text-gray-700">Version: {alert.deviceInfo?.osVersion}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

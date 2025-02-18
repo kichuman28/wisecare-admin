@@ -9,7 +9,7 @@ const SOSToast = ({ show, onClose, alert, user }) => {
   // Play alert sound when toast appears
   useEffect(() => {
     if (show) {
-      const audio = new Audio('/alert.mp3'); // You'll need to add this sound file
+      const audio = new Audio('/alert.mp3');
       audio.play().catch(e => console.log('Audio play failed:', e));
     }
   }, [show]);
@@ -53,16 +53,24 @@ const SOSToast = ({ show, onClose, alert, user }) => {
                 <h3 className="text-xl font-bold text-red-600 mb-2">
                   Immediate Assistance Required
                 </h3>
-                <div className="flex items-center space-x-2">
-                  <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
-                    <UserIcon className="h-5 w-5 text-red-600" />
-                  </div>
+                <div className="flex items-center space-x-3">
+                  {user?.photoURL ? (
+                    <img 
+                      src={user.photoURL} 
+                      alt={user.displayName || 'User'} 
+                      className="h-10 w-10 rounded-full object-cover border-2 border-red-100"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                      <UserIcon className="h-6 w-6 text-red-600" />
+                    </div>
+                  )}
                   <div>
                     <p className="text-gray-900 font-medium">
-                      {user?.name || 'Unknown User'}
+                      {user?.displayName || 'Unknown User'}
                     </p>
                     <p className="text-sm text-gray-600">
-                      ID: {alert?.userId || 'Unknown'}
+                      {user?.email || `ID: ${alert?.userId || 'Unknown'}`}
                     </p>
                   </div>
                 </div>
