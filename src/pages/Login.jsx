@@ -4,7 +4,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 // Import the illustration
-import oldManIllustration from '../assets/animation/old-man.png';
+import oldManIllustration from '../assets/images/old-man.png';
 
 const Login = () => {
   const navigate = useNavigate();
