@@ -8,28 +8,37 @@ import QuickActions from '../components/dashboard/QuickActions';
 const Dashboard = () => {
   return (
     <Layout>
-      <div className="p-6">
-        <div className="flex items-center mb-6">
-          <HomeIcon className="h-8 w-8 text-primary mr-3" />
-          <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+      <div className="p-4 md:p-6">
+        <div className="flex items-center mb-4 md:mb-6">
+          <HomeIcon className="h-6 w-6 md:h-8 md:w-8 text-primary mr-2 md:mr-3" />
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-800">Dashboard</h1>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Stats Cards */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-medium text-primary mb-2">Active Users</h3>
-            <p className="text-3xl font-bold text-primary-hover">2,345</p>
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 className="text-base md:text-lg font-medium text-primary mb-2">Active Users</h3>
+            <p className="text-2xl md:text-3xl font-bold text-primary-hover">2,345</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-medium text-primary mb-2">Active Devices</h3>
-            <p className="text-3xl font-bold text-primary-hover">1,234</p>
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 className="text-base md:text-lg font-medium text-primary mb-2">Active Devices</h3>
+            <p className="text-2xl md:text-3xl font-bold text-primary-hover">1,234</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 className="text-lg font-medium text-primary mb-2">SOS Alerts</h3>
-            <p className="text-3xl font-bold text-primary-hover">15</p>
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 className="text-base md:text-lg font-medium text-primary mb-2">SOS Alerts</h3>
+            <p className="text-2xl md:text-3xl font-bold text-primary-hover">15</p>
           </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <StatsOverview />
+          <RecentActivity />
+        </div>
+
+        <div className="mt-6">
+          <QuickActions />
         </div>
       </div>
     </Layout>

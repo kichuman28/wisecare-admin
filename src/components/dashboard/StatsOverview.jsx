@@ -35,20 +35,20 @@ const StatsOverview = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {stats.map((stat) => (
-        <div key={stat.id} className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+        <div key={stat.id} className="bg-white rounded-lg shadow-sm p-4 md:p-6 border border-gray-100">
           <div className="flex items-center">
-            <div className="p-3 rounded-lg bg-primary-light/10">
-              <stat.icon className="h-6 w-6 text-primary" />
+            <div className="p-2 md:p-3 rounded-lg bg-primary-light/10">
+              <stat.icon className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
-            <div className="ml-4">
+            <div className="ml-3 md:ml-4">
               <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-              <p className="text-2xl font-semibold text-primary">{stat.value}</p>
+              <p className="text-xl md:text-2xl font-semibold text-primary">{stat.value}</p>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <ClockIcon className="h-4 w-4 text-gray-400 mr-1" />
+          <div className="mt-3 md:mt-4 flex items-center text-xs md:text-sm">
+            <ClockIcon className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 mr-1" />
             <span className="text-gray-600">{stat.timeframe}</span>
             <span className={`ml-2 ${
               stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
