@@ -17,6 +17,7 @@ import {
 const SOSAlertsPage = () => {
   const [alerts, setAlerts] = useState([]);
   const [responders, setResponders] = useState([]);
+  const [users, setUsers] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,9 +46,20 @@ const SOSAlertsPage = () => {
       setResponders(respondersData);
     });
 
+    // Listen for users
+    const usersQuery = query(collection(db, 'users'));
+    const unsubscribeUsers = onSnapshot(usersQuery, (snapshot) => {
+      const usersData = {};
+      snapshot.docs.forEach(doc => {
+        usersData[doc.id] = doc.data();
+      });
+      setUsers(usersData);
+    });
+
     return () => {
       unsubscribeAlerts();
       unsubscribeResponders();
+      unsubscribeUsers();
     };
   }, []);
 
@@ -112,6 +124,7 @@ const SOSAlertsPage = () => {
 
   const AlertCard = ({ alert }) => {
     const [selectedResponderId, setSelectedResponderId] = useState('');
+    const user = users[alert.userId] || {};
 
     return (
       <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
@@ -132,7 +145,21 @@ const SOSAlertsPage = () => {
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">User Information</h3>
-              <p className="text-gray-600">ID: {alert.userId}</p>
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+                  <UserIcon className="h-5 w-5 text-gray-600" />
+                </div>
+                <div>
+                  <p className="text-gray-900 font-medium">{user.name || 'Unknown User'}</p>
+                  <p className="text-sm text-gray-500">ID: {alert.userId}</p>
+                </div>
+              </div>
+              {user.phone && (
+                <p className="text-gray-600 mt-1 flex items-center">
+                  <PhoneIcon className="h-4 w-4 mr-1" />
+                  {user.phone}
+                </p>
+              )}
             </div>
 
             <div>

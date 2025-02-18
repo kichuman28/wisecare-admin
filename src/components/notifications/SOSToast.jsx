@@ -1,9 +1,9 @@
 import { Fragment, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
-import { BellAlertIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { BellAlertIcon, XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
-const SOSToast = ({ show, onClose, alert }) => {
+const SOSToast = ({ show, onClose, alert, user }) => {
   const navigate = useNavigate();
 
   // Play alert sound when toast appears
@@ -53,11 +53,21 @@ const SOSToast = ({ show, onClose, alert }) => {
                 <h3 className="text-xl font-bold text-red-600 mb-2">
                   Immediate Assistance Required
                 </h3>
-                <p className="text-gray-700 font-medium">
-                  User {alert?.userId || 'Unknown'} has triggered an emergency alert
-                </p>
+                <div className="flex items-center space-x-2">
+                  <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                    <UserIcon className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-gray-900 font-medium">
+                      {user?.name || 'Unknown User'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      ID: {alert?.userId || 'Unknown'}
+                    </p>
+                  </div>
+                </div>
                 {alert?.location && (
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-gray-600 mt-3">
                     Location: {alert.location.latitude}, {alert.location.longitude}
                   </p>
                 )}

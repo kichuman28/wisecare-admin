@@ -19,9 +19,22 @@ import SettingsPage from './pages/SettingsPage';
 const ToastWrapper = ({ children }) => {
   const [showToast, setShowToast] = useState(false);
   const [currentAlert, setCurrentAlert] = useState(null);
+  const [users, setUsers] = useState({});
   const location = useLocation();
 
   useEffect(() => {
+    // Listen for users
+    const unsubscribeUsers = onSnapshot(
+      collection(db, 'users'),
+      (snapshot) => {
+        const usersData = {};
+        snapshot.docs.forEach(doc => {
+          usersData[doc.id] = doc.data();
+        });
+        setUsers(usersData);
+      }
+    );
+
     // Listen for new SOS alerts
     const oneMinuteAgo = new Date();
     oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
@@ -57,8 +70,9 @@ const ToastWrapper = ({ children }) => {
     });
 
     return () => {
-      console.log('Cleaning up Firestore listener');
+      console.log('Cleaning up Firestore listeners');
       unsubscribe();
+      unsubscribeUsers();
     };
   }, []);
 
@@ -76,6 +90,7 @@ const ToastWrapper = ({ children }) => {
         show={showToast}
         onClose={() => setShowToast(false)}
         alert={currentAlert}
+        user={currentAlert ? users[currentAlert.userId] : null}
       />
     </>
   );
