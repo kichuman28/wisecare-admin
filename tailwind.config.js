@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Quicksand', 'Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         primary: {
           DEFAULT: '#2D336B', // dark blue

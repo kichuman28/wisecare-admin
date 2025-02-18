@@ -79,10 +79,10 @@ const Login = () => {
               className="w-4/5 h-auto object-contain"
             />
           </div>
-          <h2 className="text-white text-3xl font-bold text-center mt-8">
+          <h2 className="text-white text-4xl font-bold text-center mt-8 tracking-tight">
             Welcome to WiseCare Admin
           </h2>
-          <p className="text-primary-light text-center mt-4">
+          <p className="text-primary-light text-center mt-4 text-lg font-medium tracking-wide">
             Manage your healthcare services efficiently and securely
           </p>
         </div>
@@ -92,24 +92,24 @@ const Login = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="max-w-md w-full space-y-8">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-bold text-primary">
+            <h2 className="mt-6 text-center text-4xl font-bold text-primary tracking-tight">
               Sign in to WiseCare
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-3 text-center text-base text-gray-600 font-medium">
               Access your admin dashboard
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium">
               {error}
             </div>
           )}
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email-address" className="block text-sm font-semibold text-gray-700">
                   Email address
                 </label>
                 <input
@@ -120,13 +120,13 @@ const Login = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover sm:text-sm"
+                  className="mt-1 appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-base"
                   placeholder="Enter your email"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
                   Password
                 </label>
                 <div className="mt-1 relative">
@@ -138,7 +138,7 @@ const Login = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover sm:text-sm pr-10"
+                    className="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-base pr-10"
                     placeholder="Enter your password"
                   />
                   <button
@@ -164,13 +164,13 @@ const Login = () => {
                   type="checkbox"
                   className="h-4 w-4 text-primary focus:ring-primary-hover border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="remember-me" className="ml-2 block text-sm font-medium text-gray-700">
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-primary hover:text-primary-hover">
+                <a href="#" className="font-semibold text-primary hover:text-primary-hover transition-colors">
                   Forgot password?
                 </a>
               </div>
@@ -180,7 +180,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-hover transition-colors duration-200 disabled:bg-primary-light disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-semibold rounded-lg text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-hover transition-all duration-200 disabled:bg-primary-light disabled:cursor-not-allowed shadow-sm hover:shadow-md"
               >
                 {loading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -192,10 +192,10 @@ const Login = () => {
               </button>
             </div>
 
-            <div className="mt-4 text-center text-sm text-gray-600">
-              <p>Demo credentials:</p>
-              <p className="font-medium">Email: admin@wisecare.in</p>
-              <p className="font-medium">Password: admin123</p>
+            <div className="mt-4 text-center space-y-1">
+              <p className="text-sm text-gray-600 font-medium">Demo credentials:</p>
+              <p className="text-sm font-semibold text-primary">Email: admin@wisecare.in</p>
+              <p className="text-sm font-semibold text-primary">Password: admin123</p>
             </div>
           </form>
         </div>
