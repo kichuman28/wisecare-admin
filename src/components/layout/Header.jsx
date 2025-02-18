@@ -4,7 +4,7 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm h-16 flex items-center justify-between px-8 border-b border-gray-100">
       <div className="flex items-center flex-1">
-        <h2 className="text-2xl font-semibold text-gray-800">Dashboard</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">Wise Care</h2>
         <div className="ml-8 relative flex-1 max-w-md">
           <input
             type="text"
