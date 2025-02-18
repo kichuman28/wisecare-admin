@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { collection, query, orderBy, onSnapshot, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import Layout from '../components/layout/Layout';
-import { Tab } from '@headlessui/react';
+import { Tab, Dialog, Transition } from '@headlessui/react';
 import { 
   BellIcon, 
   UserIcon, 
@@ -13,7 +13,8 @@ import {
   ClockIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-  BellAlertIcon
+  BellAlertIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 const SOSAlertsPage = () => {
@@ -126,9 +127,8 @@ const SOSAlertsPage = () => {
 
   const AlertCard = ({ alert }) => {
     const [selectedResponderId, setSelectedResponderId] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
     const user = users[alert.userId] || {};
 
     const filteredResponders = responders.filter(responder => 
@@ -141,20 +141,8 @@ const SOSAlertsPage = () => {
     const handleSelectResponder = (responderId) => {
       setSelectedResponderId(responderId);
       setSearchQuery('');
-      setIsOpen(false);
+      setIsModalOpen(false);
     };
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setIsOpen(false);
-        }
-      };
-
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     return (
       <div className={`bg-white rounded-xl shadow-sm transition-all duration-200 hover:shadow-md mb-4 sm:mb-6 overflow-hidden
@@ -261,96 +249,28 @@ const SOSAlertsPage = () => {
                   <h3 className="text-base sm:text-lg font-medium text-red-900">Emergency Response Required</h3>
                 </div>
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="relative" ref={dropdownRef}>
+                  <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                       Select Available Responder
                     </label>
-                    <div className="relative">
-                      <div
-                        className="relative w-full bg-white rounded-lg border border-gray-300 shadow-sm pl-3 pr-10 py-2 cursor-text
-                                 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500"
-                        onClick={() => setIsOpen(true)}
-                      >
-                        <input
-                          type="text"
-                          className="w-full border-none p-0 focus:ring-0 text-xs sm:text-sm"
-                          placeholder={selectedResponder ? '' : "Search and select a responder..."}
-                          value={searchQuery}
-                          onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setIsOpen(true);
-                          }}
-                          onFocus={() => setIsOpen(true)}
-                        />
-                        {selectedResponder && !searchQuery && (
-                          <div className="absolute inset-0 flex items-center pointer-events-none pl-3">
-                            <div className="flex items-center">
-                              <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-red-100 flex items-center justify-center">
-                                <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
-                              </div>
-                              <div className="ml-2">
-                                <p className="text-xs sm:text-sm font-medium text-gray-900">{selectedResponder.name}</p>
-                              </div>
-                            </div>
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className="w-full flex items-center px-3 py-2 rounded-lg border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      {selectedResponder ? (
+                        <div className="flex items-center flex-1">
+                          <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <UserIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
                           </div>
-                        )}
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-                          <button
-                            type="button"
-                            className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                            onClick={() => setIsOpen(!isOpen)}
-                          >
-                            <svg className={`h-5 w-5 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                      </button>
-                            </div>
-                          </div>
-                          
-                      {/* Dropdown Panel */}
-                      {isOpen && (
-                        <div className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-                          <div className="max-h-48 sm:max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50">
-                            {filteredResponders.length === 0 ? (
-                              <div className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500">
-                                No responders found
-                              </div>
-                            ) : (
-                              filteredResponders.map(responder => (
-                                <button
-                                  key={responder.id}
-                                  onClick={() => handleSelectResponder(responder.id)}
-                                  className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 hover:bg-red-50 transition-colors duration-150
-                                    ${selectedResponderId === responder.id ? 'bg-red-50' : ''}
-                                    flex items-center justify-between`}
-                                >
-                                  <div className="flex items-center min-w-0">
-                                    <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-red-100 flex items-center justify-center">
-                                      <UserIcon className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                                    </div>
-                                    <div className="ml-2 sm:ml-3 flex-1 min-w-0">
-                                      <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{responder.name}</p>
-                                      <div className="flex items-center space-x-2">
-                                        <span className="text-2xs sm:text-xs text-gray-500">{responder.role}</span>
-                                        {responder.phone && (
-                                          <span className="text-2xs sm:text-xs text-gray-500 flex items-center">
-                                            <PhoneIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
-                                            {responder.phone}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {selectedResponderId === responder.id && (
-                                    <CheckCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0" />
-                                  )}
-                                </button>
-                              ))
-                            )}
+                          <div className="ml-3 flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{selectedResponder.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{selectedResponder.role}</p>
                           </div>
                         </div>
+                      ) : (
+                        <span className="text-sm text-gray-500">Click to select a responder...</span>
                       )}
-                    </div>
+                    </button>
                   </div>
 
                   <button
@@ -439,6 +359,117 @@ const SOSAlertsPage = () => {
             </div>
           )}
         </div>
+
+        {/* Responder Selection Modal */}
+        <Transition appear show={isModalOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={() => setIsModalOpen(false)}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg font-medium leading-6 text-gray-900 mb-4"
+                    >
+                      Select Responder
+                    </Dialog.Title>
+
+                    <div className="mb-4">
+                      <div className="relative">
+                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                        <input
+                          type="text"
+                          placeholder="Search responders..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="max-h-[60vh] overflow-y-auto">
+                      <div className="space-y-2">
+                        {filteredResponders.length === 0 ? (
+                          <p className="text-center text-sm text-gray-500 py-4">No responders found</p>
+                        ) : (
+                          filteredResponders.map((responder) => (
+                            <button
+                              key={responder.id}
+                              onClick={() => handleSelectResponder(responder.id)}
+                              className={`w-full flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors
+                                ${selectedResponderId === responder.id ? 'bg-red-50 ring-2 ring-red-500' : ''}
+                              `}
+                            >
+                              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                <UserIcon className="h-5 w-5 text-red-600" />
+                              </div>
+                              <div className="ml-3 flex-1 text-left">
+                                <p className="text-sm font-medium text-gray-900">{responder.name}</p>
+                                <div className="flex items-center mt-1">
+                                  <span className="text-xs text-gray-500">{responder.role}</span>
+                                  {responder.phone && (
+                                    <>
+                                      <span className="mx-2 text-gray-300">•</span>
+                                      <span className="text-xs text-gray-500 flex items-center">
+                                        <PhoneIcon className="h-3 w-3 mr-1" />
+                                        {responder.phone}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                              {selectedResponderId === responder.id && (
+                                <CheckCircleIcon className="h-5 w-5 text-red-600 flex-shrink-0 ml-3" />
+                              )}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end space-x-3">
+                      <button
+                        type="button"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        onClick={() => setIsModalOpen(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                        onClick={() => setIsModalOpen(false)}
+                        disabled={!selectedResponderId}
+                      >
+                        Confirm Selection
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition>
       </div>
     );
   };
