@@ -68,8 +68,26 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
       {/* Left side - Illustration */}
+      <div className="lg:hidden w-full bg-primary py-8 px-4">
+        <div className="max-w-xs mx-auto">
+          <div className="flex justify-center">
+            <img
+              src={oldManIllustration}
+              alt="Elderly person using a mobile device"
+              className="w-3/4 h-auto object-contain"
+            />
+          </div>
+          <h2 className="text-white text-2xl font-bold text-center mt-4 tracking-tight">
+            Welcome to WiseCare Admin
+          </h2>
+          <p className="text-primary-light text-center mt-2 text-base font-medium tracking-wide">
+            Manage your healthcare services efficiently and securely
+          </p>
+        </div>
+      </div>
+
       <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-8">
@@ -89,13 +107,13 @@ const Login = () => {
       </div>
 
       {/* Right side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-6 lg:p-8">
+        <div className="max-w-md w-full space-y-6 lg:space-y-8">
           <div>
-            <h2 className="mt-6 text-center text-4xl font-bold text-primary tracking-tight">
+            <h2 className="mt-2 lg:mt-6 text-center text-3xl lg:text-4xl font-bold text-primary tracking-tight">
               Sign in to WiseCare
             </h2>
-            <p className="mt-3 text-center text-base text-gray-600 font-medium">
+            <p className="mt-2 lg:mt-3 text-center text-sm lg:text-base text-gray-600 font-medium">
               Access your admin dashboard
             </p>
           </div>
@@ -106,8 +124,8 @@ const Login = () => {
             </div>
           )}
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-5">
+          <form className="mt-6 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4 lg:space-y-5">
               <div>
                 <label htmlFor="email-address" className="block text-sm font-semibold text-gray-700">
                   Email address
@@ -120,7 +138,7 @@ const Login = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="mt-1 appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-base"
+                  className="mt-1 appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-sm lg:text-base"
                   placeholder="Enter your email"
                 />
               </div>
@@ -138,7 +156,7 @@ const Login = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-base pr-10"
+                    className="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-sm lg:text-base pr-10"
                     placeholder="Enter your password"
                   />
                   <button
@@ -156,7 +174,7 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
               <div className="flex items-center">
                 <input
                   id="remember-me"
@@ -180,7 +198,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-semibold rounded-lg text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-hover transition-all duration-200 disabled:bg-primary-light disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                className="group relative w-full flex justify-center py-2.5 lg:py-3 px-4 border border-transparent text-sm lg:text-base font-semibold rounded-lg text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-hover transition-all duration-200 disabled:bg-primary-light disabled:cursor-not-allowed shadow-sm hover:shadow-md"
               >
                 {loading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -204,4 +222,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

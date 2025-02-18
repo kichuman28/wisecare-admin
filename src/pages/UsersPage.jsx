@@ -136,8 +136,8 @@ const UsersPage = () => {
 
   const UserRow = ({ user }) => (
     <tr className="hover:bg-gray-50 transition-colors">
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
+      <td className="px-3 sm:px-6 py-4 whitespace-normal sm:whitespace-nowrap">
+        <div className="flex flex-col sm:flex-row sm:items-center">
           {user.photoURL ? (
             <img 
               src={user.photoURL} 
@@ -151,28 +151,28 @@ const UsersPage = () => {
               </span>
             </div>
           )}
-          <div className="ml-4">
+          <div className="mt-2 sm:mt-0 sm:ml-4">
             <div className="text-sm font-medium text-gray-900">{user.displayName}</div>
             <div className="text-sm text-gray-500 flex items-center">
               <EnvelopeIcon className="h-4 w-4 mr-1" />
-              {user.email}
+              <span className="break-all">{user.email}</span>
             </div>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900">
           {formatDate(user.lastLoginAt)}
         </div>
         <div className="text-xs text-gray-500">Last login</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
           ${user.provider === 'google' ? 'bg-[#A9B5DF] text-[#2D336B]' : 'bg-gray-100 text-gray-800'}`}>
           {user.provider || 'email'}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <button 
           onClick={() => {
             setItemToDelete({ id: user.id, type: 'user', name: user.displayName });
@@ -188,29 +188,29 @@ const UsersPage = () => {
 
   const ResponderRow = ({ responder }) => (
     <tr className="hover:bg-gray-50 transition-colors">
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
+      <td className="px-3 sm:px-6 py-4 whitespace-normal sm:whitespace-nowrap">
+        <div className="flex flex-col sm:flex-row sm:items-center">
           <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
             <ShieldCheckIcon className="h-6 w-6 text-green-600" />
           </div>
-          <div className="ml-4">
+          <div className="mt-2 sm:mt-0 sm:ml-4">
             <div className="text-sm font-medium text-gray-900">{responder.name}</div>
             <div className="text-sm text-gray-500 flex items-center">
               <PhoneIcon className="h-4 w-4 mr-1" />
-              {responder.phone}
+              <span className="break-all">{responder.phone}</span>
             </div>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
         <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#A9B5DF] text-[#2D336B]">
           {responder.role}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
         <span className="text-sm text-gray-500">ID: {responder.id}</span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <button 
           onClick={() => {
             setEditingResponder(responder);
@@ -266,20 +266,20 @@ const UsersPage = () => {
 
   return (
     <Layout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="p-3 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
           <div className="flex items-center">
             <UserGroupIcon className="h-8 w-8 text-primary mr-3" />
-            <h1 className="text-2xl font-semibold text-gray-800">User Management</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">User Management</h1>
           </div>
           {selectedTab === 1 && (
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+              className="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors w-full sm:w-auto"
             >
-            <PlusIcon className="h-5 w-5 mr-2" />
+              <PlusIcon className="h-5 w-5 mr-2" />
               Add New Responder
-          </button>
+            </button>
           )}
         </div>
 
@@ -305,9 +305,9 @@ const UsersPage = () => {
 
           {/* Filters */}
           <div className="bg-background-secondary p-4 rounded-lg shadow-sm mb-6">
-          <div className="flex gap-4">
-            <input
-              type="text"
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="text"
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -318,13 +318,13 @@ const UsersPage = () => {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover"
               >
-              <option value="">All Roles</option>
+                <option value="">All Roles</option>
                 <option value="hero">Hero</option>
                 <option value="admin">Admin</option>
                 <option value="responder">Responder</option>
-            </select>
+              </select>
+            </div>
           </div>
-        </div>
 
           {/* Add Responder Modal */}
           <Transition appear show={isModalOpen} as={Fragment}>
@@ -615,59 +615,59 @@ const UsersPage = () => {
 
           <Tab.Panels>
             <Tab.Panel>
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         User Details
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Active
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      </th>
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Last Active
+                      </th>
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Provider
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
                     {filterData(users, 'user').map((user) => (
                       <UserRow key={user.id} user={user} />
                     ))}
                   </tbody>
                 </table>
-                      </div>
+              </div>
             </Tab.Panel>
 
             <Tab.Panel>
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Responder Details
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Role
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         ID
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                       </th>
-                </tr>
+                    </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filterData(responders, 'responder').map((responder) => (
                       <ResponderRow key={responder.id} responder={responder} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>

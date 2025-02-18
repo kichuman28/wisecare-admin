@@ -60,32 +60,32 @@ const ReportsPage = () => {
 
   return (
     <Layout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="p-3 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
           <div className="flex items-center">
             <ChartBarIcon className="h-8 w-8 text-primary mr-3" />
-            <h1 className="text-2xl font-semibold text-gray-800">Analytics Dashboard</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Analytics Dashboard</h1>
           </div>
           <button 
-            className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+            className="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors w-full sm:w-auto"
           >
             <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
             Export Reports
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* User Activity Chart */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-medium text-primary mb-4">User Activity</h2>
-            <div className="h-80">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-medium text-primary mb-4">User Activity</h2>
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={userActivityData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Area 
                     type="monotone" 
                     dataKey="activeUsers" 
@@ -108,17 +108,17 @@ const ReportsPage = () => {
           </div>
 
           {/* SOS Alerts Chart */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-medium text-primary mb-4">SOS Alerts Overview</h2>
-            <div className="h-80">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-medium text-primary mb-4">SOS Alerts Overview</h2>
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={alertsData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis yAxisId="left" />
-                  <YAxis yAxisId="right" orientation="right" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Line 
                     yAxisId="left"
                     type="monotone" 
@@ -141,17 +141,17 @@ const ReportsPage = () => {
           </div>
 
           {/* Device Distribution Chart */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-medium text-primary mb-4">Device Distribution</h2>
-            <div className="h-80">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-medium text-primary mb-4">Device Distribution</h2>
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={deviceData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
+                    innerRadius={45}
+                    outerRadius={80}
                     paddingAngle={5}
                     dataKey="value"
                   >
@@ -160,23 +160,23 @@ const ReportsPage = () => {
                     ))}
                   </Pie>
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Alert Types Chart */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-medium text-primary mb-4">Alert Types Distribution</h2>
-            <div className="h-80">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-medium text-primary mb-4">Alert Types Distribution</h2>
+            <div className="h-64 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={alertTypesData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Bar 
                     dataKey="value" 
                     name="Percentage" 
@@ -189,16 +189,16 @@ const ReportsPage = () => {
           </div>
 
           {/* Recent Reports Table */}
-          <div className="bg-white rounded-lg shadow-sm p-6 lg:col-span-2">
-            <h2 className="text-lg font-medium text-primary mb-4">Recent Reports</h2>
-            <div className="overflow-x-auto">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 lg:col-span-2">
+            <h2 className="text-base sm:text-lg font-medium text-primary mb-4">Recent Reports</h2>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
               <table className="min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Name</th>
+                    <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Generated</th>
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -208,18 +208,18 @@ const ReportsPage = () => {
                     { name: 'Emergency Response Times', date: '2024-02-29', type: 'Performance' }
                   ].map((report, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 sm:px-6 py-4 whitespace-normal sm:whitespace-nowrap text-xs sm:text-sm text-gray-900">
                         {report.name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {report.date}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                         <span className="bg-primary-light/20 text-primary px-2 py-1 rounded-full text-xs">
                           {report.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-xs sm:text-sm">
                         <button className="text-primary-hover hover:text-primary">Download</button>
                       </td>
                     </tr>
