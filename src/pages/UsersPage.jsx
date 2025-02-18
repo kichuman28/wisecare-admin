@@ -277,9 +277,9 @@ const UsersPage = () => {
               onClick={() => setIsModalOpen(true)}
               className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
             >
-              <PlusIcon className="h-5 w-5 mr-2" />
+            <PlusIcon className="h-5 w-5 mr-2" />
               Add New Responder
-            </button>
+          </button>
           )}
         </div>
 
@@ -305,9 +305,9 @@ const UsersPage = () => {
 
           {/* Filters */}
           <div className="bg-background-secondary p-4 rounded-lg shadow-sm mb-6">
-            <div className="flex gap-4">
-              <input
-                type="text"
+          <div className="flex gap-4">
+            <input
+              type="text"
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -318,13 +318,13 @@ const UsersPage = () => {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover"
               >
-                <option value="">All Roles</option>
+              <option value="">All Roles</option>
                 <option value="hero">Hero</option>
                 <option value="admin">Admin</option>
                 <option value="responder">Responder</option>
-              </select>
-            </div>
+            </select>
           </div>
+        </div>
 
           {/* Add Responder Modal */}
           <Transition appear show={isModalOpen} as={Fragment}>
@@ -615,31 +615,31 @@ const UsersPage = () => {
 
           <Tab.Panels>
             <Tab.Panel>
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         User Details
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Last Active
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Last Active
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Provider
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
                     {filterData(users, 'user').map((user) => (
                       <UserRow key={user.id} user={user} />
                     ))}
                   </tbody>
                 </table>
-              </div>
+                      </div>
             </Tab.Panel>
 
             <Tab.Panel>
@@ -659,15 +659,15 @@ const UsersPage = () => {
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                       </th>
-                    </tr>
+                </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filterData(responders, 'responder').map((responder) => (
                       <ResponderRow key={responder.id} responder={responder} />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
