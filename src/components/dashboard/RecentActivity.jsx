@@ -38,20 +38,21 @@ const RecentActivity = () => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-lg font-medium text-primary mb-4">Recent Activity</h2>
+    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+      <h2 className="text-base sm:text-lg font-medium text-primary mb-4">Recent Activity</h2>
       <div className="space-y-4">
         {activities.map((activity) => (
-          <div key={activity.id} className="flex items-start space-x-4">
-            <div className={`p-2 rounded-lg ${activity.iconClass}`}>
-              <activity.icon className="h-5 w-5" />
+          <div key={activity.id} className="flex items-start space-x-3 sm:space-x-4">
+            <div className={`p-2 rounded-lg flex-shrink-0 ${activity.iconClass}`}>
+              <activity.icon className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900">
-                {activity.user} <span className="text-gray-600">{activity.action}</span>
+              <p className="text-sm font-medium text-gray-900 break-words">
+                <span className="text-primary">{activity.user}</span>{' '}
+                <span className="text-gray-600">{activity.action}</span>
               </p>
-              <div className="flex items-center mt-1 text-sm text-gray-500">
-                <ClockIcon className="h-4 w-4 mr-1" />
+              <div className="flex items-center mt-1 text-xs sm:text-sm text-gray-500">
+                <ClockIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
                 {activity.time}
               </div>
             </div>

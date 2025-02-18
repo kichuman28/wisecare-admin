@@ -42,15 +42,17 @@ const StatsOverview = () => {
             <div className="p-2 md:p-3 rounded-lg bg-primary-light/10">
               <stat.icon className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
-            <div className="ml-3 md:ml-4">
-              <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-              <p className="text-xl md:text-2xl font-semibold text-primary">{stat.value}</p>
+            <div className="ml-3 md:ml-4 min-w-0">
+              <p className="text-sm font-medium text-gray-600 truncate">{stat.name}</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-primary">{stat.value}</p>
             </div>
           </div>
-          <div className="mt-3 md:mt-4 flex items-center text-xs md:text-sm">
-            <ClockIcon className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 mr-1" />
-            <span className="text-gray-600">{stat.timeframe}</span>
-            <span className={`ml-2 ${
+          <div className="mt-3 md:mt-4 flex flex-wrap items-center gap-2 text-xs md:text-sm">
+            <div className="flex items-center">
+              <ClockIcon className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 mr-1" />
+              <span className="text-gray-600">{stat.timeframe}</span>
+            </div>
+            <span className={`${
               stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
             }`}>
               {stat.change}
