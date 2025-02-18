@@ -1,0 +1,11 @@
+# Install core UI dependencies
+npm install @heroicons/react @headlessui/react
+
+# Install routing and data visualization
+npm install react-router-dom recharts
+
+# Install additional useful packages
+npm install framer-motion  # For smooth animations
+npm install @tanstack/react-query  # For data fetching
+npm install date-fns  # For date formatting
+npm install chart.js react-chartjs-2  # Alternative charting library 
