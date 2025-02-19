@@ -5,7 +5,8 @@ import {
   signOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
-import { app } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { app, db } from '../firebase';
 
 const AuthContext = createContext({});
 
@@ -13,12 +14,34 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth(app);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      
+      if (user) {
+        // Fetch user data from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            console.log('Auth Context - User Data:', data); // Debug log
+            setUserData(data);
+          } else {
+            console.log('Auth Context - No user document found'); // Debug log
+            setUserData(null);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          setUserData(null);
+        }
+      } else {
+        setUserData(null);
+      }
+      
       setLoading(false);
     });
 
@@ -39,6 +62,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setUser(null);
+      setUserData(null);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -46,6 +70,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    userData,
     loading,
     login,
     logout

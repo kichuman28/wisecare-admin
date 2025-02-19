@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from './firebase';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './admin_panel/components/ProtectedRoute';
 import Login from './Login';
 import Dashboard from './admin_panel/pages/Dashboard';
@@ -15,6 +15,7 @@ import ServicesPage from './admin_panel/pages/ServicesPage';
 import ReportsPage from './admin_panel/pages/ReportsPage';
 import SettingsPage from './admin_panel/pages/SettingsPage';
 import ConsultationBooking from './admin_panel/pages/ConsultationBooking';
+import DoctorDashboard from './doctor_panel/pages/dashboard/doctor_dashboard';
 
 // Wrapper component to handle location-aware toast display
 const ToastWrapper = ({ children }) => {
@@ -97,6 +98,43 @@ const ToastWrapper = ({ children }) => {
   );
 };
 
+// Protected route that checks for doctor role
+const DoctorProtectedRoute = ({ children }) => {
+  const { user, userData, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Debug logs
+  console.log('Doctor Protected Route - User Data:', userData);
+  console.log('Doctor Protected Route - Role:', userData?.role);
+
+  // Strict equality check for doctor role
+  const isDoctor = userData?.role === "doctor";
+  console.log('Doctor Protected Route - Is Doctor?', isDoctor);
+
+  if (!isDoctor) {
+    console.log('Access denied: Not a doctor account', { 
+      hasUserData: !!userData, 
+      role: userData?.role,
+      roleType: typeof userData?.role
+    });
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
 function App() {
   return (
     <Router>
@@ -106,7 +144,20 @@ function App() {
             {/* Public route */}
             <Route path="/login" element={<Login />} />
             
-            {/* Protected routes */}
+            {/* Doctor Protected Routes - Place these before admin routes for proper matching */}
+            <Route
+              path="/doctor/*"
+              element={
+                <DoctorProtectedRoute>
+                  <Routes>
+                    <Route path="dashboard" element={<DoctorDashboard />} />
+                    {/* Add other doctor routes here */}
+                  </Routes>
+                </DoctorProtectedRoute>
+              }
+            />
+            
+            {/* Admin Protected routes */}
             <Route
               path="/dashboard"
               element={
@@ -187,12 +238,36 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Redirect root based on user role */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  {({ userData }) => (
+                    <Navigate
+                      to={userData?.role === "doctor" ? '/doctor/dashboard' : '/dashboard'}
+                      replace
+                    />
+                  )}
+                </ProtectedRoute>
+              }
+            />
             
-            {/* Redirect root to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
-            {/* Catch all other routes and redirect to dashboard */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            {/* Catch all other routes and redirect to appropriate dashboard */}
+            <Route
+              path="*"
+              element={
+                <ProtectedRoute>
+                  {({ userData }) => (
+                    <Navigate
+                      to={userData?.role === "doctor" ? '/doctor/dashboard' : '/dashboard'}
+                      replace
+                    />
+                  )}
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </ToastWrapper>
       </AuthProvider>

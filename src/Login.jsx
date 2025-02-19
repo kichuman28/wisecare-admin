@@ -6,6 +6,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './firebase';
 import OldManIllustration from './admin_panel/components/illustrations/OldManIllustration';
 import ladyDoctorImage from './assets/images/lady-doctor.png';
+import { getDoc, doc, setDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 // Add animation styles
 const slideInLeft = "animate-[slide-in-left_0.5s_ease-out]";
@@ -16,12 +18,14 @@ const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    doctorName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isDoctorLogin, setIsDoctorLogin] = useState(false);
+  const [isFirstTimeDoctor, setIsFirstTimeDoctor] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,10 +49,109 @@ const Login = () => {
       return;
     }
 
+    // Additional validation for first-time doctor login
+    if (isFirstTimeDoctor && !formData.doctorName.trim()) {
+      setError('Please enter your name');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Sign in with Firebase
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      navigate('/dashboard');
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const uid = userCredential.user.uid;
+      
+      // Get user data from Firestore
+      const userDoc = await getDoc(doc(db, 'users', uid));
+      
+      if (!userDoc.exists() && isDoctorLogin) {
+        if (!isFirstTimeDoctor) {
+          // First time - show name input
+          setIsFirstTimeDoctor(true);
+          setLoading(false);
+          return;
+        }
+
+        // Create user and doctor documents with the provided name
+        const doctorData = {
+          name: formData.doctorName.trim(),
+          email: formData.email,
+          role: "doctor",  // Ensure consistent string format
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        // Create user document
+        await setDoc(doc(db, 'users', uid), doctorData);
+
+        // Create doctor document with detailed information
+        const doctorDetailsData = {
+          name: formData.doctorName.trim(),
+          email: formData.email,
+          specialization: 'General Physician',
+          imageUrl: 'https://picsum.photos/200',
+          about: 'Experienced healthcare professional dedicated to patient care.',
+          rating: 5.0,
+          experience: 0,
+          patientsServed: 0,
+          availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          availableTimeSlots: {
+            'Monday': ['09:00', '10:00', '11:00', '14:00', '15:00'],
+            'Tuesday': ['09:00', '10:00', '11:00', '14:00', '15:00'],
+            'Wednesday': ['09:00', '10:00', '11:00', '14:00', '15:00'],
+            'Thursday': ['09:00', '10:00', '11:00', '14:00', '15:00'],
+            'Friday': ['09:00', '10:00', '11:00', '14:00', '15:00'],
+          },
+          consultationFee: 100.0,
+          isAvailable: true,
+          uid: uid,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        await setDoc(doc(db, 'doctors', uid), doctorDetailsData);
+
+        console.log('Created doctor documents, signing out...'); // Debug log
+        await auth.signOut(); // Sign out after creating documents
+        setError('Registration complete! Please log in with your credentials.');
+        setIsFirstTimeDoctor(false);
+        setLoading(false);
+        return;
+      }
+
+      // Reset first-time doctor state
+      setIsFirstTimeDoctor(false);
+
+      // For existing users, check roles
+      const userData = userDoc.data();
+      console.log('User data from Firestore:', userData); // Debug log
+
+      // Strict equality check for doctor role
+      const isDoctor = userData?.role === "doctor";
+      console.log('Is doctor?', isDoctor, 'Role:', userData?.role, 'Type:', typeof userData?.role); // Debug log
+
+      if (isDoctorLogin && !isDoctor) {
+        setError('Access denied. This login is for doctors only.');
+        await auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      if (!isDoctorLogin && isDoctor) {
+        setError('Please use the doctor login option.');
+        await auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      // Navigate based on role
+      if (isDoctor) {
+        console.log('Navigating to doctor dashboard'); // Debug log
+        navigate('/doctor/dashboard');
+      } else {
+        console.log('Navigating to admin dashboard'); // Debug log
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error('Login error:', err);
       switch (err.code) {
@@ -76,8 +179,9 @@ const Login = () => {
 
   const toggleLoginType = () => {
     setIsDoctorLogin(prev => !prev);
+    setIsFirstTimeDoctor(false);
     setError('');
-    setFormData({ email: '', password: '' });
+    setFormData({ email: '', password: '', doctorName: '' });
   };
 
   const renderLoginForm = () => (
@@ -99,6 +203,24 @@ const Login = () => {
 
       <form className="mt-6 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-4 lg:space-y-5">
+          {isFirstTimeDoctor && (
+            <div>
+              <label htmlFor="doctor-name" className="block text-sm font-semibold text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="doctor-name"
+                name="doctorName"
+                type="text"
+                required
+                value={formData.doctorName}
+                onChange={handleChange}
+                className="mt-1 appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-hover focus:border-primary-hover text-sm lg:text-base"
+                placeholder="Enter your full name (e.g., Dr. John Smith)"
+              />
+            </div>
+          )}
+
           <div>
             <label htmlFor="email-address" className="block text-sm font-semibold text-gray-700">
               Email address
@@ -179,7 +301,7 @@ const Login = () => {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             ) : null}
-            {loading ? 'Signing in...' : `Sign in as ${isDoctorLogin ? 'Doctor' : 'Admin'}`}
+            {loading ? 'Signing in...' : isFirstTimeDoctor ? 'Complete Registration' : `Sign in as ${isDoctorLogin ? 'Doctor' : 'Admin'}`}
           </button>
         </div>
 
