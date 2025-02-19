@@ -7,6 +7,11 @@ import { auth } from '../config/firebase';
 import OldManIllustration from '../components/illustrations/OldManIllustration';
 import ladyDoctorImage from '../assets/images/lady-doctor.png';
 
+// Add animation styles
+const slideInLeft = "animate-[slide-in-left_0.5s_ease-out]";
+const slideInRight = "animate-[slide-in-right_0.5s_ease-out]";
+const fadeIn = "animate-[fade-in_0.5s_ease-out]";
+
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -76,7 +81,7 @@ const Login = () => {
   };
 
   const renderLoginForm = () => (
-    <div className="max-w-md w-full space-y-6 lg:space-y-8">
+    <div className={`max-w-md w-full space-y-6 lg:space-y-8 ${fadeIn}`}>
       <div>
         <h2 className="mt-2 lg:mt-6 text-center text-3xl lg:text-4xl font-bold text-primary tracking-tight">
           {isDoctorLogin ? 'Doctor Login' : 'Sign in to WiseCare'}
@@ -190,81 +195,135 @@ const Login = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row relative">
-      {/* Login Type Toggle */}
+    <div className="h-screen bg-background overflow-hidden relative">
+      <style>
+        {`
+          @keyframes slide-in-left {
+            0% {
+              transform: translateX(-100%);
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          @keyframes slide-in-right {
+            0% {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          @keyframes fade-in {
+            0% {
+              opacity: 0;
+              transform: scale(0.95);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          @keyframes rotate-scale {
+            0% {
+              transform: rotate(0deg) scale(1);
+            }
+            50% {
+              transform: rotate(180deg) scale(0.8);
+            }
+            100% {
+              transform: rotate(360deg) scale(1);
+            }
+          }
+          .animate-rotate-scale {
+            animation: rotate-scale 0.5s ease-out;
+          }
+          .transition-all-smooth {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+        `}
+      </style>
+
+      {/* Login Type Toggle with animation */}
       <button
         onClick={toggleLoginType}
-        className="absolute top-4 right-4 z-10 flex items-center space-x-2 px-4 py-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200 border border-primary/20"
+        className="absolute top-4 right-4 z-10 flex items-center space-x-2 px-4 py-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all-smooth border border-primary/20 hover:bg-primary hover:text-white group"
       >
-        <UserIcon className="h-5 w-5 text-primary" />
-        <span className="text-sm font-medium text-primary">
+        <UserIcon className="h-5 w-5 text-primary group-hover:text-white transition-all-smooth" />
+        <span className="text-sm font-medium text-primary group-hover:text-white transition-all-smooth">
           {isDoctorLogin ? 'Switch to Admin' : 'Switch to Doctor'}
         </span>
       </button>
 
-      {isDoctorLogin ? (
-        <>
-          {/* Left side - Login Form for Doctor */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-            {renderLoginForm()}
-          </div>
-
-          {/* Right side - Doctor Illustration */}
-          <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
-            <div className="w-full max-w-md">
-              <div className="flex justify-center mb-8">
-                <img
-                  src={ladyDoctorImage}
-                  alt="Doctor illustration"
-                  className="w-4/5 h-auto object-contain"
-                />
-              </div>
-              <h2 className="text-white text-4xl font-bold text-center mt-8 tracking-tight">
-                Welcome to WiseCare
-              </h2>
-              <p className="text-primary-light text-center mt-4 text-lg font-medium tracking-wide">
-                Provide the best care for your patients
-              </p>
+      <div className="h-full flex flex-col lg:flex-row">
+        {isDoctorLogin ? (
+          <>
+            {/* Left side - Login Form for Doctor */}
+            <div className={`h-full w-full lg:w-1/2 flex items-center justify-center p-8 ${slideInLeft}`}>
+              {renderLoginForm()}
             </div>
-          </div>
-        </>
-      ) : (
-        <>
-          {/* Left side - Illustration for Admin */}
-          <div className="lg:hidden w-full bg-primary py-8 px-4">
-            <div className="max-w-xs mx-auto">
-              <div className="flex justify-center">
-                <OldManIllustration className="w-3/4 h-auto" />
-              </div>
-              <h2 className="text-white text-2xl font-bold text-center mt-4 tracking-tight">
-                Welcome to WiseCare Admin
-              </h2>
-              <p className="text-primary-light text-center mt-2 text-base font-medium tracking-wide">
-                Manage your healthcare services efficiently and securely
-              </p>
-            </div>
-          </div>
 
-          <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
-            <div className="w-full max-w-md">
-              <div className="flex justify-center mb-8">
-                <OldManIllustration className="w-4/5 h-auto" />
+            {/* Right side - Doctor Illustration */}
+            <div className={`hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12 ${slideInRight}`}>
+              <div className="w-full max-w-md">
+                <div className={`flex justify-center mb-8 ${fadeIn}`}>
+                  <img
+                    src={ladyDoctorImage}
+                    alt="Doctor illustration"
+                    className="w-4/5 h-auto object-contain transform transition-transform duration-700 hover:scale-105"
+                  />
+                </div>
+                <h2 className={`text-white text-4xl font-bold text-center mt-8 tracking-tight ${fadeIn}`}>
+                  Welcome to WiseCare
+                </h2>
+                <p className={`text-primary-light text-center mt-4 text-lg font-medium tracking-wide ${fadeIn}`}>
+                  Provide the best care for your patients
+                </p>
               </div>
-              <h2 className="text-white text-4xl font-bold text-center mt-8 tracking-tight">
-                Welcome to WiseCare Admin
-              </h2>
-              <p className="text-primary-light text-center mt-4 text-lg font-medium tracking-wide">
-                Manage your healthcare services efficiently and securely
-              </p>
             </div>
-          </div>
+          </>
+        ) : (
+          <>
+            {/* Left side - Illustration for Admin */}
+            <div className={`lg:hidden w-full bg-primary py-8 px-4 ${slideInLeft}`}>
+              <div className="max-w-xs mx-auto">
+                <div className={`flex justify-center ${fadeIn}`}>
+                  <OldManIllustration className="w-3/4 h-auto transform transition-transform duration-700 hover:scale-105" />
+                </div>
+                <h2 className={`text-white text-2xl font-bold text-center mt-4 tracking-tight ${fadeIn}`}>
+                  Welcome to WiseCare Admin
+                </h2>
+                <p className={`text-primary-light text-center mt-2 text-base font-medium tracking-wide ${fadeIn}`}>
+                  Manage your healthcare services efficiently and securely
+                </p>
+              </div>
+            </div>
 
-          {/* Right side - Login Form for Admin */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-            {renderLoginForm()}
-          </div>
-        </>
-      )}
+            <div className={`hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12 ${slideInLeft}`}>
+              <div className="w-full max-w-md">
+                <div className={`flex justify-center mb-8 ${fadeIn}`}>
+                  <OldManIllustration className="w-4/5 h-auto transform transition-transform duration-700 hover:scale-105" />
+                </div>
+                <h2 className={`text-white text-4xl font-bold text-center mt-8 tracking-tight ${fadeIn}`}>
+                  Welcome to WiseCare Admin
+                </h2>
+                <p className={`text-primary-light text-center mt-4 text-lg font-medium tracking-wide ${fadeIn}`}>
+                  Manage your healthcare services efficiently and securely
+                </p>
+              </div>
+            </div>
+
+            {/* Right side - Login Form for Admin */}
+            <div className={`h-full w-full lg:w-1/2 flex items-center justify-center p-8 ${slideInRight}`}>
+              {renderLoginForm()}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
