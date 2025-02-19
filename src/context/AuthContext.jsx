@@ -5,7 +5,7 @@ import {
   signOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
-import { app } from '../config/firebase';
+import { app } from '../firebase';
 
 const AuthContext = createContext({});
 

@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { UserIcon } from '@heroicons/react/24/solid';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
-import OldManIllustration from '../components/illustrations/OldManIllustration';
-import ladyDoctorImage from '../assets/images/lady-doctor.png';
+import { auth } from './firebase';
+import OldManIllustration from './admin_panel/components/illustrations/OldManIllustration';
+import ladyDoctorImage from './assets/images/lady-doctor.png';
 
 // Add animation styles
 const slideInLeft = "animate-[slide-in-left_0.5s_ease-out]";

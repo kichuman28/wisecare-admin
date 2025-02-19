@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
-import { db } from './config/firebase';
+import { db } from './firebase';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import SOSAlertsPage from './pages/SOSAlertsPage';
-import SOSToast from './components/notifications/SOSToast';
-import UsersPage from './pages/UsersPage';
-import DevicesPage from './pages/DevicesPage';
-import ContentPage from './pages/ContentPage';
-import ServicesPage from './pages/ServicesPage';
-import ReportsPage from './pages/ReportsPage';
-import SettingsPage from './pages/SettingsPage';
-import ConsultationBooking from './pages/ConsultationBooking';
+import ProtectedRoute from './admin_panel/components/ProtectedRoute';
+import Login from './Login';
+import Dashboard from './admin_panel/pages/Dashboard';
+import SOSAlertsPage from './admin_panel/pages/SOSAlertsPage';
+import SOSToast from './admin_panel/components/notifications/SOSToast';
+import UsersPage from './admin_panel/pages/UsersPage';
+import DevicesPage from './admin_panel/pages/DevicesPage';
+import ContentPage from './admin_panel/pages/ContentPage';
+import ServicesPage from './admin_panel/pages/ServicesPage';
+import ReportsPage from './admin_panel/pages/ReportsPage';
+import SettingsPage from './admin_panel/pages/SettingsPage';
+import ConsultationBooking from './admin_panel/pages/ConsultationBooking';
 
 // Wrapper component to handle location-aware toast display
 const ToastWrapper = ({ children }) => {

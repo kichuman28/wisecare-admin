@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { collection, query, orderBy, onSnapshot, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../../firebase';
 import Layout from '../components/layout/Layout';
 import { Tab, Dialog, Transition } from '@headlessui/react';
 import { 
