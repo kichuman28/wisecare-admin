@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
-// Import the illustration
-import oldManIllustration from '../assets/images/old-man.png';
+import OldManIllustration from '../components/illustrations/OldManIllustration';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -73,11 +72,7 @@ const Login = () => {
       <div className="lg:hidden w-full bg-primary py-8 px-4">
         <div className="max-w-xs mx-auto">
           <div className="flex justify-center">
-            <img
-              src={oldManIllustration}
-              alt="Elderly person using a mobile device"
-              className="w-3/4 h-auto object-contain"
-            />
+            <OldManIllustration className="w-3/4 h-auto" />
           </div>
           <h2 className="text-white text-2xl font-bold text-center mt-4 tracking-tight">
             Welcome to WiseCare Admin
@@ -91,11 +86,7 @@ const Login = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-8">
-            <img
-              src={oldManIllustration}
-              alt="Elderly person using a mobile device"
-              className="w-4/5 h-auto object-contain"
-            />
+            <OldManIllustration className="w-4/5 h-auto" />
           </div>
           <h2 className="text-white text-4xl font-bold text-center mt-8 tracking-tight">
             Welcome to WiseCare Admin
@@ -107,7 +98,7 @@ const Login = () => {
       </div>
 
       {/* Right side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-6 lg:p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="max-w-md w-full space-y-6 lg:space-y-8">
           <div>
             <h2 className="mt-2 lg:mt-6 text-center text-3xl lg:text-4xl font-bold text-primary tracking-tight">
