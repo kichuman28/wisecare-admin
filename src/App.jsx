@@ -14,6 +14,7 @@ import ContentPage from './pages/ContentPage';
 import ServicesPage from './pages/ServicesPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import ConsultationBooking from './pages/ConsultationBooking';
 
 // Wrapper component to handle location-aware toast display
 const ToastWrapper = ({ children }) => {
@@ -156,6 +157,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ServicesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/services/consultation-booking"
+              element={
+                <ProtectedRoute>
+                  <ConsultationBooking />
                 </ProtectedRoute>
               }
             />

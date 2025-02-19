@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { 
   WrenchScrewdriverIcon, 
@@ -90,7 +91,19 @@ const services = [
 ];
 
 const ServicesPage = () => {
+  const navigate = useNavigate();
   const totalActiveUsers = services.reduce((sum, service) => sum + service.activeUsers, 0);
+
+  const handleServiceClick = (serviceName) => {
+    switch(serviceName.toLowerCase()) {
+      case 'consultation booking':
+        navigate('/services/consultation-booking');
+        break;
+      // Add other service routes as they become available
+      default:
+        break;
+    }
+  };
 
   return (
     <Layout>
@@ -127,7 +140,8 @@ const ServicesPage = () => {
             return (
               <div 
                 key={service.id} 
-                className={`relative group rounded-2xl border-2 p-6 transition-all duration-300 hover:shadow-lg ${colorClasses[service.color]}`}
+                className={`relative group rounded-2xl border-2 p-6 transition-all duration-300 hover:shadow-lg cursor-pointer ${colorClasses[service.color]}`}
+                onClick={() => handleServiceClick(service.name)}
               >
                 <div className="absolute top-4 right-4">
                   <button className="p-2 rounded-lg bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white">
