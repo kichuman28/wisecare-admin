@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DoctorLayout from '../../components/layout/doctor_layout';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 import { 
   MagnifyingGlassIcon,
   DocumentIcon,
@@ -9,97 +11,365 @@ import {
   CalendarIcon,
   ArrowDownTrayIcon,
   EyeIcon,
-  TrashIcon
+  TrashIcon,
+  UserCircleIcon,
+  ClockIcon,
+  XMarkIcon,
+//   PillIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../firebase';
+import { useAuth } from '../../../context/AuthContext';
+import { format } from 'date-fns';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+
+const ViewPrescriptionModal = ({ isOpen, onClose, record, patient }) => {
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Prescription', 105, 20, { align: 'center' });
+    
+    // Add patient info
+    doc.setFontSize(12);
+    doc.text(`Patient: ${patient?.displayName}`, 20, 40);
+    doc.text(`Patient ID: ${record.patientId}`, 20, 50);
+    doc.text(`Date: ${format(record.createdAt, 'MMMM d, yyyy')}`, 20, 60);
+    doc.text(`Follow-up: ${format(new Date(record.followUpDate), 'MMMM d, yyyy')}`, 20, 70);
+
+    // Add diagnosis and symptoms
+    doc.setFontSize(14);
+    doc.text('Diagnosis:', 20, 90);
+    doc.setFontSize(12);
+    doc.text(record.diagnosis, 20, 100);
+
+    doc.setFontSize(14);
+    doc.text('Symptoms:', 20, 120);
+    doc.setFontSize(12);
+    doc.text(record.symptoms, 20, 130);
+
+    // Add medicines table
+    if (record.medicines && record.medicines.length > 0) {
+      doc.setFontSize(14);
+      doc.text('Prescribed Medicines:', 20, 150);
+      
+      const tableData = record.medicines.map(medicine => [
+        medicine.name,
+        medicine.dosage,
+        medicine.frequency,
+        `${medicine.duration} days`
+      ]);
+
+      doc.autoTable({
+        startY: 160,
+        head: [['Medicine', 'Dosage', 'Frequency', 'Duration']],
+        body: tableData,
+        margin: { top: 20 },
+        styles: { fontSize: 12 }
+      });
+    }
+
+    // Add instructions
+    const finalY = doc.previousAutoTable ? doc.previousAutoTable.finalY + 20 : 200;
+    doc.setFontSize(14);
+    doc.text('Instructions:', 20, finalY);
+    doc.setFontSize(12);
+    doc.text(record.instructions, 20, finalY + 10);
+
+    // Save the PDF
+    doc.save(`prescription-${record.id}.pdf`);
+  };
+
+  return (
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black bg-opacity-25" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+                <div className="flex items-center justify-between mb-6">
+                  <Dialog.Title className="text-lg font-medium text-gray-900">
+                    Prescription Details
+                  </Dialog.Title>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleDownloadPDF}
+                      className="flex items-center space-x-2 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all"
+                    >
+                      <ArrowDownTrayIcon className="h-5 w-5" />
+                      <span>Download PDF</span>
+                    </button>
+                    <button
+                      onClick={onClose}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+                    >
+                      <XMarkIcon className="h-5 w-5 text-gray-500" />
+                    </button>
+                  </div>
+                </div>
+
+                <div id="prescription-content" className="space-y-6 bg-white p-6">
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-6 border-b border-gray-200">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">{patient?.displayName}</h2>
+                      <p className="text-sm text-gray-500">Patient ID: {record.patientId}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500">Date: {format(record.createdAt, 'MMMM d, yyyy')}</p>
+                      <p className="text-sm text-gray-500">Follow-up: {format(new Date(record.followUpDate), 'MMMM d, yyyy')}</p>
+                    </div>
+                  </div>
+
+                  {/* Diagnosis & Symptoms */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Diagnosis</h3>
+                      <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{record.diagnosis}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Symptoms</h3>
+                      <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{record.symptoms}</p>
+                    </div>
+                  </div>
+
+                  {/* Medicines */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Prescribed Medicines</h3>
+                    <div className="space-y-3">
+                      {record.medicines?.map((medicine, index) => (
+                        <div key={index} className="bg-gray-50 rounded-lg p-4">
+                          <div className="grid grid-cols-4 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-500">Medicine</p>
+                              <p className="font-medium text-gray-900">{medicine.name}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Dosage</p>
+                              <p className="font-medium text-gray-900">{medicine.dosage}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Frequency</p>
+                              <p className="font-medium text-gray-900">{medicine.frequency}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Duration</p>
+                              <p className="font-medium text-gray-900">{medicine.duration} days</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Instructions */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Instructions</h3>
+                    <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{record.instructions}</p>
+                  </div>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+};
 
 const DoctorRecords = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [patients, setPatients] = useState({});
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const { user } = useAuth();
 
-  // Sample records data
-  const records = [
-    {
-      id: 1,
-      patientName: "Sarah Johnson",
-      type: "Prescription",
-      category: "medications",
-      date: "Feb 15, 2024",
-      size: "245 KB",
-      status: "Signed",
-      description: "Blood pressure medication prescription"
-    },
-    {
-      id: 2,
-      patientName: "Michael Brown",
-      type: "Lab Report",
-      category: "tests",
-      date: "Feb 14, 2024",
-      size: "1.2 MB",
-      status: "Completed",
-      description: "Blood sugar level test results"
-    },
-    {
-      id: 3,
-      patientName: "Emma Davis",
-      type: "Medical Certificate",
-      category: "certificates",
-      date: "Feb 13, 2024",
-      size: "180 KB",
-      status: "Signed",
-      description: "Fitness certificate for work"
-    },
-    {
-      id: 4,
-      patientName: "James Wilson",
-      type: "Treatment Plan",
-      category: "treatments",
-      date: "Feb 12, 2024",
-      size: "350 KB",
-      status: "Draft",
-      description: "Diabetes management plan"
+  const handleDownloadPDF = (record, patient) => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Prescription', 105, 20, { align: 'center' });
+    
+    // Add patient info
+    doc.setFontSize(12);
+    doc.text(`Patient: ${patient?.displayName}`, 20, 40);
+    doc.text(`Patient ID: ${record.patientId}`, 20, 50);
+    doc.text(`Date: ${format(record.createdAt, 'MMMM d, yyyy')}`, 20, 60);
+    doc.text(`Follow-up: ${format(new Date(record.followUpDate), 'MMMM d, yyyy')}`, 20, 70);
+
+    // Add diagnosis and symptoms
+    doc.setFontSize(14);
+    doc.text('Diagnosis:', 20, 90);
+    doc.setFontSize(12);
+    doc.text(record.diagnosis, 20, 100);
+
+    doc.setFontSize(14);
+    doc.text('Symptoms:', 20, 120);
+    doc.setFontSize(12);
+    doc.text(record.symptoms, 20, 130);
+
+    // Add medicines table
+    if (record.medicines && record.medicines.length > 0) {
+      doc.setFontSize(14);
+      doc.text('Prescribed Medicines:', 20, 150);
+      
+      const tableData = record.medicines.map(medicine => [
+        medicine.name,
+        medicine.dosage,
+        medicine.frequency,
+        `${medicine.duration} days`
+      ]);
+
+      doc.autoTable({
+        startY: 160,
+        head: [['Medicine', 'Dosage', 'Frequency', 'Duration']],
+        body: tableData,
+        margin: { top: 20 },
+        styles: { fontSize: 12 }
+      });
     }
-  ];
+
+    // Add instructions
+    const finalY = doc.previousAutoTable ? doc.previousAutoTable.finalY + 20 : 200;
+    doc.setFontSize(14);
+    doc.text('Instructions:', 20, finalY);
+    doc.setFontSize(12);
+    doc.text(record.instructions, 20, finalY + 10);
+
+    // Save the PDF
+    doc.save(`prescription-${record.id}.pdf`);
+  };
+
+  useEffect(() => {
+    const fetchRecords = async () => {
+      try {
+        setLoading(true);
+        const prescriptionsRef = collection(db, 'prescriptions');
+        const q = query(
+          prescriptionsRef,
+          where('doctorId', '==', user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const prescriptionsData = [];
+        const patientIds = new Set();
+
+        querySnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          prescriptionsData.push({
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate(),
+            type: 'Prescription'
+          });
+          patientIds.add(data.patientId);
+        });
+
+        // Fetch patient details
+        const patientsData = {};
+        for (const patientId of patientIds) {
+          const patientDoc = await getDoc(doc(db, 'users', patientId));
+          if (patientDoc.exists()) {
+            patientsData[patientId] = patientDoc.data();
+          }
+        }
+
+        setRecords(prescriptionsData);
+        setPatients(patientsData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching records:', error);
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchRecords();
+    }
+  }, [user]);
 
   const categories = [
-    { id: 'all', name: 'All Records', count: records.length },
-    { id: 'medications', name: 'Prescriptions', count: records.filter(r => r.category === 'medications').length },
-    { id: 'tests', name: 'Lab Reports', count: records.filter(r => r.category === 'tests').length },
-    { id: 'certificates', name: 'Certificates', count: records.filter(r => r.category === 'certificates').length },
-    { id: 'treatments', name: 'Treatment Plans', count: records.filter(r => r.category === 'treatments').length }
+    { id: 'all', name: 'All Records', icon: DocumentIcon },
+    { id: 'prescriptions', name: 'Prescriptions', icon: DocumentTextIcon },
+    { id: 'reports', name: 'Lab Reports', icon: DocumentArrowUpIcon },
+    { id: 'certificates', name: 'Certificates', icon: DocumentIcon }
   ];
 
-  const filteredRecords = records.filter(record => 
-    (selectedCategory === 'all' || record.category === selectedCategory) &&
-    (record.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     record.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     record.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredRecords = records.filter(record => {
+    // First check if search query matches
+    const searchMatches = 
+      patients[record.patientId]?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.diagnosis?.toLowerCase().includes(searchQuery.toLowerCase());
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Signed':
-        return 'bg-green-50 text-green-700';
-      case 'Completed':
-        return 'bg-blue-50 text-blue-700';
-      case 'Draft':
-        return 'bg-yellow-50 text-yellow-700';
-      default:
-        return 'bg-gray-50 text-gray-700';
+    // Then check category
+    let categoryMatches = true;
+    if (selectedCategory !== 'all') {
+      switch (selectedCategory) {
+        case 'prescriptions':
+          categoryMatches = record.type === 'Prescription';
+          break;
+        case 'reports':
+          categoryMatches = record.type === 'Lab Report';
+          break;
+        case 'certificates':
+          categoryMatches = record.type === 'Certificate';
+          break;
+        default:
+          categoryMatches = true;
+      }
     }
+
+    return searchMatches && categoryMatches;
+  });
+
+  const getStatusColor = (medicines) => {
+    if (!medicines || medicines.length === 0) return 'bg-yellow-50 text-yellow-700';
+    return 'bg-green-50 text-green-700';
   };
 
-  const getDocumentIcon = (type) => {
-    switch (type) {
-      case 'Prescription':
-        return <DocumentTextIcon className="h-6 w-6 text-blue-500" />;
-      case 'Lab Report':
-        return <DocumentIcon className="h-6 w-6 text-green-500" />;
-      case 'Medical Certificate':
-        return <DocumentArrowUpIcon className="h-6 w-6 text-purple-500" />;
-      default:
-        return <DocumentIcon className="h-6 w-6 text-gray-500" />;
-    }
+  const getFileSize = (medicines) => {
+    // Calculate an estimated file size based on content
+    const baseSize = 20; // Base size in KB
+    const medicineSize = medicines ? medicines.length * 5 : 0;
+    return `${baseSize + medicineSize} KB`;
   };
+
+  if (loading) {
+    return (
+      <DoctorLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </DoctorLayout>
+    );
+  }
 
   return (
     <DoctorLayout>
@@ -111,11 +381,37 @@ const DoctorRecords = () => {
               <h1 className="text-2xl font-bold text-gray-900">Medical Records</h1>
               <p className="mt-1 text-gray-600">Manage and access patient medical records</p>
             </div>
-            <button className="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all flex items-center space-x-2">
+            <button className="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all flex items-center space-x-2">
               <DocumentArrowUpIcon className="h-5 w-5" />
               <span>Upload New Record</span>
             </button>
           </div>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {categories.map((category) => (
+            <div key={category.id} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+              <div className="flex items-center space-x-3">
+                <div className={`p-3 ${
+                  category.id === 'all' ? 'bg-primary/10 text-primary' :
+                  category.id === 'prescriptions' ? 'bg-green-50 text-green-600' :
+                  category.id === 'reports' ? 'bg-blue-50 text-blue-600' :
+                  'bg-purple-50 text-purple-600'
+                } rounded-lg`}>
+                  <category.icon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">{category.name}</h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {category.id === 'all' ? records.length :
+                     category.id === 'prescriptions' ? records.filter(r => r.type === 'Prescription').length :
+                     0}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Main Content */}
@@ -137,13 +433,15 @@ const DoctorRecords = () => {
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <FolderIcon className="h-5 w-5" />
+                    <category.icon className="h-5 w-5" />
                     <span className="text-sm font-medium">{category.name}</span>
                   </div>
                   <span className={`text-sm ${
                     selectedCategory === category.id ? 'bg-white/20' : 'bg-gray-100'
                   } px-2 py-0.5 rounded-full`}>
-                    {category.count}
+                    {category.id === 'all' ? records.length :
+                     category.id === 'prescriptions' ? records.filter(r => r.type === 'Prescription').length :
+                     0}
                   </span>
                 </button>
               ))}
@@ -167,47 +465,86 @@ const DoctorRecords = () => {
               </div>
 
               <div className="divide-y divide-gray-100">
-                {filteredRecords.map((record) => (
-                  <div key={record.id} className="p-4 hover:bg-gray-50 transition-all">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4">
-                        <div className="p-2 bg-gray-50 rounded-lg">
-                          {getDocumentIcon(record.type)}
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-900">{record.patientName}</h3>
-                          <p className="mt-1 text-sm text-gray-600">{record.description}</p>
-                          <div className="mt-2 flex items-center space-x-4">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
-                              {record.status}
-                            </span>
-                            <span className="text-sm text-gray-500">{record.size}</span>
-                            <div className="flex items-center text-sm text-gray-500">
-                              <CalendarIcon className="h-4 w-4 mr-1" />
-                              {record.date}
+                {filteredRecords.length === 0 ? (
+                  <div className="p-6 text-center">
+                    <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto" />
+                    <h3 className="mt-4 text-lg font-medium text-gray-900">No records found</h3>
+                    <p className="mt-1 text-gray-500">No medical records match your search criteria.</p>
+                  </div>
+                ) : (
+                  filteredRecords.map((record) => {
+                    const patient = patients[record.patientId];
+                    return (
+                      <div key={record.id} className="p-4 hover:bg-gray-50 transition-all">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start space-x-4">
+                            <div className="p-2 bg-gray-50 rounded-lg">
+                              <DocumentTextIcon className="h-6 w-6 text-primary" />
                             </div>
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <h3 className="font-medium text-gray-900">{patient?.displayName}</h3>
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(record.medicines)}`}>
+                                  {record.medicines?.length ? `${record.medicines.length} Medicines` : 'No Medicines'}
+                                </span>
+                              </div>
+                              <p className="mt-1 text-sm text-gray-600">{record.diagnosis}</p>
+                              <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+                                <div className="flex items-center">
+                                  <ClockIcon className="h-4 w-4 mr-1" />
+                                  {format(record.createdAt, 'MMM d, yyyy')}
+                                </div>
+                                <div className="flex items-center">
+                                  <CalendarIcon className="h-4 w-4 mr-1" />
+                                  Follow-up: {format(new Date(record.followUpDate), 'MMM d, yyyy')}
+                                </div>
+                                <span>{getFileSize(record.medicines)}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button 
+                              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all"
+                              onClick={() => {
+                                setSelectedRecord(record);
+                                setIsViewModalOpen(true);
+                              }}
+                            >
+                              <EyeIcon className="h-5 w-5" />
+                            </button>
+                            <button 
+                              onClick={() => handleDownloadPDF(record, patients[record.patientId])}
+                              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all"
+                            >
+                              <ArrowDownTrayIcon className="h-5 w-5" />
+                            </button>
+                            <button className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all">
+                              <TrashIcon className="h-5 w-5" />
+                            </button>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all">
-                          <EyeIcon className="h-5 w-5" />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all">
-                          <ArrowDownTrayIcon className="h-5 w-5" />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all">
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* View Prescription Modal */}
+      {selectedRecord && (
+        <ViewPrescriptionModal
+          isOpen={isViewModalOpen}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setSelectedRecord(null);
+          }}
+          record={selectedRecord}
+          patient={patients[selectedRecord.patientId]}
+        />
+      )}
     </DoctorLayout>
   );
 };
