@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import ProtectedRoute from '../admin_panel/components/ProtectedRoute';
 import Dashboard from '../admin_panel/pages/Dashboard';
 import SOSAlertsPage from '../admin_panel/pages/SOSAlertsPage';
 import UsersPage from '../admin_panel/pages/UsersPage';
@@ -15,83 +14,47 @@ const AdminRoutes = [
   <Route
     key="dashboard"
     path="/dashboard"
-    element={
-      <ProtectedRoute>
-        <Dashboard />
-      </ProtectedRoute>
-    }
+    element={<Dashboard />}
   />,
   <Route
     key="sos-alerts"
     path="/sos-alerts"
-    element={
-      <ProtectedRoute>
-        <SOSAlertsPage />
-      </ProtectedRoute>
-    }
+    element={<SOSAlertsPage />}
   />,
   <Route
     key="users"
     path="/users"
-    element={
-      <ProtectedRoute>
-        <UsersPage />
-      </ProtectedRoute>
-    }
+    element={<UsersPage />}
   />,
   <Route
     key="devices"
     path="/devices"
-    element={
-      <ProtectedRoute>
-        <DevicesPage />
-      </ProtectedRoute>
-    }
+    element={<DevicesPage />}
   />,
   <Route
     key="content"
     path="/content"
-    element={
-      <ProtectedRoute>
-        <ContentPage />
-      </ProtectedRoute>
-    }
+    element={<ContentPage />}
   />,
   <Route
     key="services"
     path="/services"
-    element={
-      <ProtectedRoute>
-        <ServicesPage />
-      </ProtectedRoute>
-    }
+    element={<ServicesPage />}
   />,
   <Route
     key="consultation-booking"
     path="/services/consultation-booking"
-    element={
-      <ProtectedRoute>
-        <ConsultationBooking />
-      </ProtectedRoute>
-    }
+    element={<ConsultationBooking />}
   />,
   <Route
     key="reports"
     path="/reports"
-    element={
-      <ProtectedRoute>
-        <ReportsPage />
-      </ProtectedRoute>
-    }
+    element={<ReportsPage />}
   />,
   <Route
     key="settings"
     path="/settings"
-    element={
-      <ProtectedRoute>
-        <SettingsPage />
-      </ProtectedRoute>
-    }
+    element={<SettingsPage />}
   />
 ];
 

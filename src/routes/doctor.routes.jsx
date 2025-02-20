@@ -7,48 +7,47 @@ import DoctorConsultations from '../doctor_panel/pages/consultations/doctor_cons
 import DoctorRecords from '../doctor_panel/pages/records/doctor_records';
 import DoctorMessages from '../doctor_panel/pages/messages/doctor_messages';
 import DoctorSettings from '../doctor_panel/pages/settings/doctor_settings';
-import DoctorProtectedRoute from './DoctorProtectedRoute';
 
 const DoctorRoutes = [
   <Route
     key="doctor"
     path="/doctor"
-    element={<DoctorProtectedRoute><DoctorDashboard /></DoctorProtectedRoute>}
+    element={<DoctorDashboard />}
   />,
   <Route
     key="doctor-dashboard"
     path="/doctor/dashboard"
-    element={<DoctorProtectedRoute><DoctorDashboard /></DoctorProtectedRoute>}
+    element={<DoctorDashboard />}
   />,
   <Route
     key="doctor-appointments"
     path="/doctor/appointments"
-    element={<DoctorProtectedRoute><DoctorAppointments /></DoctorProtectedRoute>}
+    element={<DoctorAppointments />}
   />,
   <Route
     key="doctor-patients"
     path="/doctor/patients"
-    element={<DoctorProtectedRoute><DoctorPatients /></DoctorProtectedRoute>}
+    element={<DoctorPatients />}
   />,
   <Route
     key="doctor-consultations"
     path="/doctor/consultations"
-    element={<DoctorProtectedRoute><DoctorConsultations /></DoctorProtectedRoute>}
+    element={<DoctorConsultations />}
   />,
   <Route
     key="doctor-records"
     path="/doctor/records"
-    element={<DoctorProtectedRoute><DoctorRecords /></DoctorProtectedRoute>}
+    element={<DoctorRecords />}
   />,
   <Route
     key="doctor-messages"
     path="/doctor/messages"
-    element={<DoctorProtectedRoute><DoctorMessages /></DoctorProtectedRoute>}
+    element={<DoctorMessages />}
   />,
   <Route
     key="doctor-settings"
     path="/doctor/settings"
-    element={<DoctorProtectedRoute><DoctorSettings /></DoctorProtectedRoute>}
+    element={<DoctorSettings />}
   />
 ];
 

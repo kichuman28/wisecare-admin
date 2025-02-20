@@ -1,15 +1,53 @@
 import React from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import Login from '../Login';
 import AdminRoutes from './admin.routes';
 import DoctorRoutes from './doctor.routes';
 import { useAuth } from '../context/AuthContext';
-import ProtectedRoute from '../admin_panel/components/ProtectedRoute';
 
 // Root redirect component
 const RootRedirect = () => {
   const { userData } = useAuth();
+  const location = useLocation();
+
+  if (!userData) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
   return <Navigate to={userData?.role === "doctor" ? '/doctor/dashboard' : '/dashboard'} replace />;
+};
+
+// Base Protected Route component
+const BaseProtectedRoute = ({ children, allowedRole = null }) => {
+  const { user, userData, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // If no specific role is required, just check for authentication
+  if (!allowedRole) {
+    return children;
+  }
+
+  // Check for specific role access
+  const hasAccess = userData?.role === allowedRole;
+  if (!hasAccess) {
+    // Redirect doctors to doctor dashboard and others to admin dashboard
+    const redirectPath = userData?.role === "doctor" ? "/doctor/dashboard" : "/dashboard";
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  return children;
 };
 
 const AppRoutes = () => {
@@ -18,19 +56,25 @@ const AppRoutes = () => {
       {/* Public route */}
       <Route path="/login" element={<Login />} />
       
-      {/* Doctor routes */}
-      {DoctorRoutes}
+      {/* Doctor routes - Protected with doctor role */}
+      {DoctorRoutes.map(route => ({
+        ...route,
+        element: <BaseProtectedRoute allowedRole="doctor">{route.props.element}</BaseProtectedRoute>
+      }))}
       
-      {/* Admin routes */}
-      {AdminRoutes}
+      {/* Admin routes - Protected with admin role */}
+      {AdminRoutes.map(route => ({
+        ...route,
+        element: <BaseProtectedRoute allowedRole="admin">{route.props.element}</BaseProtectedRoute>
+      }))}
 
       {/* Root redirect */}
       <Route
         path="/"
         element={
-          <ProtectedRoute>
+          <BaseProtectedRoute>
             <RootRedirect />
-          </ProtectedRoute>
+          </BaseProtectedRoute>
         }
       />
       
@@ -38,9 +82,9 @@ const AppRoutes = () => {
       <Route
         path="*"
         element={
-          <ProtectedRoute>
+          <BaseProtectedRoute>
             <RootRedirect />
-          </ProtectedRoute>
+          </BaseProtectedRoute>
         }
       />
     </Routes>
