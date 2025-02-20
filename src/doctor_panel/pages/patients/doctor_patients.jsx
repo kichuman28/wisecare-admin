@@ -11,13 +11,15 @@ import {
   ChartBarIcon,
   CheckCircleIcon,
   XCircleIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { useAuth } from '../../../context/AuthContext';
 import { format } from 'date-fns';
 import PrescriptionModal from '../../components/prescriptions/PrescriptionModal';
+import { useNavigate } from 'react-router-dom';
 
 const DoctorPatients = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +29,7 @@ const DoctorPatients = () => {
   const { user } = useAuth();
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [selectedPatientForPrescription, setSelectedPatientForPrescription] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -95,6 +98,10 @@ const DoctorPatients = () => {
   const handlePrescriptionClick = (patient) => {
     setSelectedPatientForPrescription(patient);
     setIsPrescriptionModalOpen(true);
+  };
+
+  const handleChatClick = (patient) => {
+    navigate('/doctor/messages', { state: { selectedPatient: patient } });
   };
 
   if (loading) {
@@ -225,24 +232,27 @@ const DoctorPatients = () => {
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {patient.completedVisits} completed
-                          </span>
-                          <span className="text-sm text-gray-400">•</span>
-                          <span className="text-sm font-medium text-gray-900">
-                            {patient.cancelledVisits} cancelled
-                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePrescriptionClick(patient);
+                            }}
+                            className="flex items-center space-x-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all text-sm"
+                          >
+                            <DocumentTextIcon className="h-4 w-4" />
+                            <span>Add Prescription</span>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleChatClick(patient);
+                            }}
+                            className="flex items-center space-x-2 px-3 py-1.5 bg-primary-light/20 text-primary rounded-lg hover:bg-primary-light/40 transition-all text-sm"
+                          >
+                            <ChatBubbleLeftRightIcon className="h-4 w-4" />
+                            <span>Chat</span>
+                          </button>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handlePrescriptionClick(patient);
-                          }}
-                          className="mt-2 flex items-center space-x-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all text-sm"
-                        >
-                          <DocumentTextIcon className="h-4 w-4" />
-                          <span>Add Prescription</span>
-                        </button>
                       </div>
                     </div>
                   </div>
