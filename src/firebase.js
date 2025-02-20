@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getDatabase } from 'firebase/database';
 
 // Replace this with your Firebase configuration
 const firebaseConfig = {
@@ -23,4 +24,16 @@ console.log('Firestore initialized successfully');
 
 // Initialize Auth
 export const auth = getAuth(app);
-console.log('Firebase Auth initialized successfully'); 
+console.log('Firebase Auth initialized successfully');
+
+// Initialize Realtime Database
+export const rtdb = getDatabase(app);
+console.log('Realtime Database initialized successfully');
+
+// Export all services as default export
+export default {
+    app,
+    auth,
+    db,
+    rtdb
+}; 

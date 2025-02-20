@@ -13,6 +13,8 @@
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.66.5",
+    "agora-access-token": "^2.0.4",
+    "agora-rtc-react": "^2.3.0",
     "chart.js": "^4.4.7",
     "date-fns": "^4.1.0",
     "firebase": "^11.3.1",

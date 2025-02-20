@@ -10,10 +10,16 @@ import {
   UserIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
+import VideoRoom from '../../components/video_call/VideoRoom';
+import { CallState } from '../../components/video_call/AgoraConfig';
 
 const DoctorConsultations = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showChat, setShowChat] = useState(false);
+  const [callState, setCallState] = useState(CallState.IDLE);
+  const [selectedConsultation, setSelectedConsultation] = useState(null);
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [videoEnabled, setVideoEnabled] = useState(true);
 
   // Sample consultations data
   const consultations = {
@@ -57,6 +63,32 @@ const DoctorConsultations = () => {
         status: "Completed"
       }
     ]
+  };
+
+  const handleJoinConsultation = (consultation) => {
+    setSelectedConsultation(consultation);
+    setAudioEnabled(true);
+    setVideoEnabled(true);
+  };
+
+  const handleError = (error) => {
+    console.error('Video call error:', error);
+    // Add proper error handling UI here
+    alert(`Video call error: ${error.message}`);
+  };
+
+  const toggleAudio = (tracks) => {
+    if (tracks?.[0]) {
+      tracks[0].setEnabled(!tracks[0].enabled);
+      setAudioEnabled(tracks[0].enabled);
+    }
+  };
+
+  const toggleVideo = (tracks) => {
+    if (tracks?.[1]) {
+      tracks[1].setEnabled(!tracks[1].enabled);
+      setVideoEnabled(tracks[1].enabled);
+    }
   };
 
   return (
@@ -128,7 +160,10 @@ const DoctorConsultations = () => {
                       </div>
                     </div>
                     {activeTab === 'upcoming' && (
-                      <button className="px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary-hover transition-all">
+                      <button 
+                        className="px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary-hover transition-all"
+                        onClick={() => handleJoinConsultation(consultation)}
+                      >
                         Join
                       </button>
                     )}
@@ -150,33 +185,53 @@ const DoctorConsultations = () => {
           {/* Video Consultation Area */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="aspect-video bg-gray-900 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <VideoCameraIcon className="h-16 w-16 text-gray-500 mx-auto" />
-                  <p className="mt-4 text-gray-400">No active consultation</p>
-                  <p className="text-sm text-gray-500">Join a consultation to start video call</p>
-                </div>
-              </div>
-              
-              {/* Video Controls */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center space-x-4">
-                <button className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-all">
-                  <MicrophoneIcon className="h-6 w-6" />
-                </button>
-                <button className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-all">
-                  <VideoCameraIcon className="h-6 w-6" />
-                </button>
-                <button className="p-4 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all">
-                  <PhoneIcon className="h-6 w-6" />
-                </button>
-              </div>
-
-              {/* Patient Preview */}
-              <div className="absolute bottom-6 right-6 w-48 aspect-video bg-gray-800 rounded-lg overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <UserIcon className="h-8 w-8 text-gray-500" />
-                </div>
-              </div>
+              <VideoRoom
+                patient={selectedConsultation}
+                onError={handleError}
+              >
+                {({ joinChannel, leaveChannel, callState, tracks }) => (
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center space-x-4 z-10">
+                    <button 
+                      className={`p-4 rounded-full ${
+                        callState === CallState.CONNECTED 
+                          ? audioEnabled ? 'bg-gray-800 text-white' : 'bg-red-500 text-white'
+                          : 'bg-gray-700 text-gray-400'
+                      } hover:bg-gray-700 transition-all`}
+                      onClick={() => toggleAudio(tracks)}
+                      disabled={callState !== CallState.CONNECTED}
+                    >
+                      <MicrophoneIcon className="h-6 w-6" />
+                    </button>
+                    <button 
+                      className={`p-4 rounded-full ${
+                        callState === CallState.CONNECTED 
+                          ? videoEnabled ? 'bg-gray-800 text-white' : 'bg-red-500 text-white'
+                          : 'bg-gray-700 text-gray-400'
+                      } hover:bg-gray-700 transition-all`}
+                      onClick={() => toggleVideo(tracks)}
+                      disabled={callState !== CallState.CONNECTED}
+                    >
+                      <VideoCameraIcon className="h-6 w-6" />
+                    </button>
+                    {callState === CallState.CONNECTED ? (
+                      <button 
+                        className="p-4 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all"
+                        onClick={leaveChannel}
+                      >
+                        <PhoneIcon className="h-6 w-6" />
+                      </button>
+                    ) : (
+                      <button 
+                        className="p-4 rounded-full bg-green-500 text-white hover:bg-green-600 transition-all"
+                        onClick={joinChannel}
+                        disabled={!selectedConsultation}
+                      >
+                        <PhoneIcon className="h-6 w-6" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </VideoRoom>
             </div>
 
             {/* Consultation Tools */}
