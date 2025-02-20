@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DoctorLayout from '../../components/layout/doctor_layout';
+import { useAuth } from '../../../context/AuthContext';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../../firebase';
 import {
   CalendarIcon,
   ClockIcon,
@@ -14,46 +17,78 @@ import {
 import { StarIcon } from '@heroicons/react/24/solid';
 
 const DoctorDashboard = () => {
-  const [upcomingAppointments] = useState([
-    {
-      id: 1,
-      patientName: "Mrs. Sarah Johnson",
-      age: 72,
-      appointmentType: "Regular Checkup",
-      time: "09:30 AM",
-      date: "Today",
-      status: "Confirmed",
-      notes: "Regular heart checkup, blood pressure monitoring",
-      isOnline: false
-    },
-    {
-      id: 2,
-      patientName: "Mr. Robert Wilson",
-      age: 68,
-      appointmentType: "Video Consultation",
-      time: "11:00 AM",
-      date: "Today",
-      status: "Upcoming",
-      notes: "Follow-up on medication adjustment",
-      isOnline: true
-    },
-    {
-      id: 3,
-      patientName: "Ms. Emily Brown",
-      age: 75,
-      appointmentType: "Emergency",
-      time: "02:30 PM",
-      date: "Today",
-      status: "Pending",
-      notes: "Severe joint pain, urgent consultation needed",
-      isOnline: false
+  const { user, userData } = useAuth();
+  const [doctorDetails, setDoctorDetails] = useState(null);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDoctorData = async () => {
+      try {
+        // Fetch doctor details
+        const doctorDoc = await getDocs(query(
+          collection(db, 'doctors'),
+          where('uid', '==', user.uid)
+        ));
+
+        if (!doctorDoc.empty) {
+          setDoctorDetails(doctorDoc.docs[0].data());
+        }
+
+        // Fetch upcoming appointments (you can implement this later)
+        // For now, we'll use static data
+        setUpcomingAppointments([
+          {
+            id: 1,
+            patientName: "Mrs. Sarah Johnson",
+            age: 72,
+            appointmentType: "Regular Checkup",
+            time: "09:30 AM",
+            date: "Today",
+            status: "Confirmed",
+            notes: "Regular heart checkup, blood pressure monitoring",
+            isOnline: false
+          },
+          {
+            id: 2,
+            patientName: "Mr. Robert Wilson",
+            age: 68,
+            appointmentType: "Video Consultation",
+            time: "11:00 AM",
+            date: "Today",
+            status: "Upcoming",
+            notes: "Follow-up on medication adjustment",
+            isOnline: true
+          },
+          {
+            id: 3,
+            patientName: "Ms. Emily Brown",
+            age: 75,
+            appointmentType: "Emergency",
+            time: "02:30 PM",
+            date: "Today",
+            status: "Pending",
+            notes: "Severe joint pain, urgent consultation needed",
+            isOnline: false
+          }
+        ]);
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching doctor data:', error);
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDoctorData();
     }
-  ]);
+  }, [user]);
 
   const stats = [
     {
       title: "Today's Patients",
-      value: "8",
+      value: upcomingAppointments.length.toString(),
       change: "+2",
       icon: UserGroupIcon,
       color: "blue"
@@ -67,19 +102,29 @@ const DoctorDashboard = () => {
     },
     {
       title: "Patient Satisfaction",
-      value: "4.9/5",
+      value: doctorDetails?.rating?.toFixed(1) + "/5" || "N/A",
       change: "+0.2",
       icon: StarIcon,
       color: "amber"
     },
     {
-      title: "Online Consultations",
-      value: "5",
+      title: "Total Patients",
+      value: doctorDetails?.patientsServed?.toString() || "0",
       change: "+3",
       icon: VideoCameraIcon,
       color: "purple"
     }
   ];
+
+  if (loading) {
+    return (
+      <DoctorLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </DoctorLayout>
+    );
+  }
 
   return (
     <DoctorLayout>
@@ -88,8 +133,8 @@ const DoctorDashboard = () => {
         <div className="bg-gradient-to-r from-primary to-primary-hover rounded-2xl p-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="text-white">
-              <h1 className="text-2xl font-bold">Welcome back, Dr. Smith</h1>
-              <p className="mt-1 text-primary-light">You have 8 appointments today</p>
+              <h1 className="text-2xl font-bold">Welcome back, {doctorDetails?.name || userData?.name}</h1>
+              <p className="mt-1 text-primary-light">You have {upcomingAppointments.length} appointments today</p>
             </div>
             <div className="mt-4 md:mt-0 flex items-center space-x-3">
               <button className="flex items-center px-4 py-2 bg-white text-primary rounded-lg hover:bg-primary-light transition-all">

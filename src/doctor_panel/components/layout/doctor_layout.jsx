@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../../firebase';
 import {
   CalendarIcon,
   UserGroupIcon,
@@ -15,8 +17,30 @@ import {
 const DoctorSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { user, userData, logout } = useAuth();
+  const [doctorDetails, setDoctorDetails] = useState(null);
   const [hoveredItem, setHoveredItem] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        const doctorDoc = await getDocs(query(
+          collection(db, 'doctors'),
+          where('uid', '==', user.uid)
+        ));
+
+        if (!doctorDoc.empty) {
+          setDoctorDetails(doctorDoc.docs[0].data());
+        }
+      } catch (error) {
+        console.error('Error fetching doctor details:', error);
+      }
+    };
+
+    if (user) {
+      fetchDoctorDetails();
+    }
+  }, [user]);
 
   const menuItems = [
     { name: 'Dashboard', icon: ChartBarIcon, path: '/doctor/dashboard' },
@@ -41,17 +65,25 @@ const DoctorSidebar = () => {
     }
   };
 
+  // Get doctor's initials
+  const getInitials = (name) => {
+    if (!name) return '';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
   return (
     <div className="fixed h-full w-64 bg-white shadow-lg border-r border-gray-100">
       {/* Doctor Profile Section */}
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center space-x-4">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-primary font-semibold text-lg">DS</span>
+            <span className="text-primary font-semibold text-lg">
+              {getInitials(doctorDetails?.name || userData?.name)}
+            </span>
           </div>
           <div>
-            <h2 className="text-gray-900 font-semibold">Dr. Smith</h2>
-            <p className="text-sm text-gray-500">Cardiologist</p>
+            <h2 className="text-gray-900 font-semibold">{doctorDetails?.name || userData?.name}</h2>
+            <p className="text-sm text-gray-500">{doctorDetails?.specialization || 'Doctor'}</p>
           </div>
         </div>
       </div>

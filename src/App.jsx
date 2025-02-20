@@ -16,6 +16,12 @@ import ReportsPage from './admin_panel/pages/ReportsPage';
 import SettingsPage from './admin_panel/pages/SettingsPage';
 import ConsultationBooking from './admin_panel/pages/ConsultationBooking';
 import DoctorDashboard from './doctor_panel/pages/dashboard/doctor_dashboard';
+import DoctorAppointments from './doctor_panel/pages/appointments/doctor_appointments';
+import DoctorPatients from './doctor_panel/pages/patients/doctor_patients';
+import DoctorConsultations from './doctor_panel/pages/consultations/doctor_consultations';
+import DoctorRecords from './doctor_panel/pages/records/doctor_records';
+import DoctorMessages from './doctor_panel/pages/messages/doctor_messages';
+import DoctorSettings from './doctor_panel/pages/settings/doctor_settings';
 
 // Wrapper component to handle location-aware toast display
 const ToastWrapper = ({ children }) => {
@@ -135,6 +141,12 @@ const DoctorProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Root redirect component
+const RootRedirect = () => {
+  const { userData } = useAuth();
+  return <Navigate to={userData?.role === "doctor" ? '/doctor/dashboard' : '/dashboard'} replace />;
+};
+
 function App() {
   return (
     <Router>
@@ -151,7 +163,12 @@ function App() {
                 <DoctorProtectedRoute>
                   <Routes>
                     <Route path="dashboard" element={<DoctorDashboard />} />
-                    {/* Add other doctor routes here */}
+                    <Route path="appointments" element={<DoctorAppointments />} />
+                    <Route path="patients" element={<DoctorPatients />} />
+                    <Route path="consultations" element={<DoctorConsultations />} />
+                    <Route path="records" element={<DoctorRecords />} />
+                    <Route path="messages" element={<DoctorMessages />} />
+                    <Route path="settings" element={<DoctorSettings />} />
                   </Routes>
                 </DoctorProtectedRoute>
               }
@@ -244,12 +261,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute>
-                  {({ userData }) => (
-                    <Navigate
-                      to={userData?.role === "doctor" ? '/doctor/dashboard' : '/dashboard'}
-                      replace
-                    />
-                  )}
+                  <RootRedirect />
                 </ProtectedRoute>
               }
             />
@@ -259,12 +271,7 @@ function App() {
               path="*"
               element={
                 <ProtectedRoute>
-                  {({ userData }) => (
-                    <Navigate
-                      to={userData?.role === "doctor" ? '/doctor/dashboard' : '/dashboard'}
-                      replace
-                    />
-                  )}
+                  <RootRedirect />
                 </ProtectedRoute>
               }
             />
