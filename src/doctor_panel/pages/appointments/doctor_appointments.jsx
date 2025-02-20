@@ -1,41 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DoctorLayout from '../../components/layout/doctor_layout';
-import { CalendarIcon, ClockIcon, VideoCameraIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { 
+  CalendarIcon, 
+  ClockIcon, 
+  VideoCameraIcon, 
+  PhoneIcon, 
+  MapPinIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClipboardDocumentCheckIcon,
+  ExclamationCircleIcon
+} from '@heroicons/react/24/outline';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../firebase';
+import { useAuth } from '../../../context/AuthContext';
+import { format, parseISO, isSameDay } from 'date-fns';
 
 const DoctorAppointments = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [view, setView] = useState('calendar'); // 'calendar' or 'list'
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [patients, setPatients] = useState({});
+  const { user } = useAuth();
 
-  // Sample appointments data
-  const appointments = [
-    {
-      id: 1,
-      patientName: "Sarah Johnson",
-      time: "09:30 AM",
-      type: "Video Consultation",
-      status: "Confirmed",
-      symptoms: "Frequent headaches and dizziness",
-      isOnline: true
-    },
-    {
-      id: 2,
-      patientName: "Michael Brown",
-      time: "11:00 AM",
-      type: "In-Person",
-      status: "Pending",
-      symptoms: "Regular checkup",
-      isOnline: false
-    },
-    {
-      id: 3,
-      patientName: "Emma Davis",
-      time: "02:30 PM",
-      type: "Phone Call",
-      status: "Confirmed",
-      symptoms: "Follow-up consultation",
-      isOnline: true
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        const appointmentsRef = collection(db, 'bookings');
+        const q = query(
+          appointmentsRef,
+          where('doctorId', '==', user.uid),
+          where('status', 'in', ['pending', 'confirmed', 'completed', 'cancelled'])
+        );
+
+        const querySnapshot = await getDocs(q);
+        const appointmentsData = [];
+        const patientIds = new Set();
+
+        querySnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          appointmentsData.push({
+            id: doc.id,
+            ...data,
+            appointmentDate: data.appointmentDate.toDate()
+          });
+          patientIds.add(data.userId);
+        });
+
+        // Fetch patient details
+        const patientsData = {};
+        for (const patientId of patientIds) {
+          const patientDoc = await getDoc(doc(db, 'users', patientId));
+          if (patientDoc.exists()) {
+            patientsData[patientId] = patientDoc.data();
+          }
+        }
+
+        setAppointments(appointmentsData);
+        setPatients(patientsData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchAppointments();
     }
-  ];
+  }, [user]);
 
   const generateCalendarDays = () => {
     const days = [];
@@ -49,20 +83,76 @@ const DoctorAppointments = () => {
   };
 
   const formatDate = (date) => {
-    return new Intl.DateTimeFormat('en-US', { 
-      weekday: 'short',
-      day: 'numeric',
-    }).format(date);
+    return format(date, 'EEE d');
   };
 
   const isToday = (date) => {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
+    return isSameDay(date, new Date());
   };
 
   const isSelected = (date) => {
-    return date.toDateString() === selectedDate.toDateString();
+    return isSameDay(date, selectedDate);
   };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'confirmed':
+        return 'bg-green-50 text-green-700';
+      case 'pending':
+        return 'bg-yellow-50 text-yellow-700';
+      case 'cancelled':
+        return 'bg-red-50 text-red-700';
+      case 'completed':
+        return 'bg-blue-50 text-blue-700';
+      default:
+        return 'bg-gray-50 text-gray-700';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'confirmed':
+        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+      case 'pending':
+        return <ExclamationCircleIcon className="h-5 w-5 text-yellow-500" />;
+      case 'cancelled':
+        return <XCircleIcon className="h-5 w-5 text-red-500" />;
+      case 'completed':
+        return <ClipboardDocumentCheckIcon className="h-5 w-5 text-blue-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const handleStatusUpdate = async (appointmentId, newStatus) => {
+    try {
+      const appointmentRef = doc(db, 'bookings', appointmentId);
+      await updateDoc(appointmentRef, {
+        status: newStatus
+      });
+
+      // Update local state
+      setAppointments(appointments.map(apt => 
+        apt.id === appointmentId ? { ...apt, status: newStatus } : apt
+      ));
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+    }
+  };
+
+  const filteredAppointments = appointments.filter(appointment => 
+    isSameDay(appointment.appointmentDate, selectedDate)
+  );
+
+  if (loading) {
+    return (
+      <DoctorLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </DoctorLayout>
+    );
+  }
 
   return (
     <DoctorLayout>
@@ -74,27 +164,13 @@ const DoctorAppointments = () => {
               <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
               <p className="mt-1 text-gray-600">Manage your upcoming appointments and schedule</p>
             </div>
-            <div className="mt-4 md:mt-0 flex items-center space-x-3">
-              <button 
-                onClick={() => setView('calendar')}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  view === 'calendar' 
-                    ? 'bg-primary text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Calendar View
-              </button>
-              <button 
-                onClick={() => setView('list')}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  view === 'list' 
-                    ? 'bg-primary text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                List View
-              </button>
+            <div className="mt-4 md:mt-0">
+              <div className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-lg">
+                <CalendarIcon className="h-5 w-5 mr-2" />
+                <span className="font-medium">
+                  {format(selectedDate, 'MMMM d, yyyy')}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -108,14 +184,14 @@ const DoctorAppointments = () => {
                 onClick={() => setSelectedDate(date)}
                 className={`flex flex-col items-center min-w-[80px] p-3 rounded-xl transition-all ${
                   isSelected(date)
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary text-white shadow-lg transform scale-105'
                     : isToday(date)
                     ? 'bg-primary/10 text-primary'
                     : 'hover:bg-gray-50'
                 }`}
               >
-                <span className="text-sm font-medium">{formatDate(date).split(' ')[0]}</span>
-                <span className="text-lg font-bold mt-1">{formatDate(date).split(' ')[1]}</span>
+                <span className="text-sm font-medium">{format(date, 'EEE')}</span>
+                <span className="text-lg font-bold mt-1">{format(date, 'd')}</span>
               </button>
             ))}
           </div>
@@ -125,76 +201,89 @@ const DoctorAppointments = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">
-              {selectedDate.toLocaleDateString('en-US', { 
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
+              {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </h2>
           </div>
 
           <div className="divide-y divide-gray-100">
-            {appointments.map((appointment) => (
-              <div key={appointment.id} className="p-6 hover:bg-gray-50 transition-all">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-semibold">
-                          {appointment.patientName.split(' ').map(n => n[0]).join('')}
-                        </span>
+            {filteredAppointments.length === 0 ? (
+              <div className="p-6 text-center">
+                <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto" />
+                <h3 className="mt-4 text-lg font-medium text-gray-900">No appointments scheduled</h3>
+                <p className="mt-1 text-gray-500">There are no appointments scheduled for this date.</p>
+              </div>
+            ) : (
+              filteredAppointments.map((appointment) => {
+                const patient = patients[appointment.userId] || {};
+                return (
+                  <div key={appointment.id} className="p-6 hover:bg-gray-50 transition-all">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-start space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-primary font-semibold">
+                              {patient.name ? patient.name.split(' ').map(n => n[0]).join('') : '??'}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{patient.name || 'Loading...'}</h3>
+                          <div className="mt-1 flex items-center space-x-2">
+                            <ClockIcon className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">{appointment.timeSlot}</span>
+                            <span className="text-sm text-gray-400">•</span>
+                            <span className="text-sm text-gray-600">₹{appointment.consultationFee}</span>
+                          </div>
+                          <div className="mt-2 flex items-center space-x-4">
+                            <span className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                              {getStatusIcon(appointment.status)}
+                              <span className="capitalize">{appointment.status}</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        {appointment.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleStatusUpdate(appointment.id, 'confirmed')}
+                              className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all text-sm"
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => handleStatusUpdate(appointment.id, 'cancelled')}
+                              className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
+                        {appointment.status === 'confirmed' && (
+                          <>
+                            <button
+                              onClick={() => handleStatusUpdate(appointment.id, 'completed')}
+                              className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all text-sm"
+                            >
+                              Complete
+                            </button>
+                            <button className="px-3 py-1 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all text-sm">
+                              Start Call
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{appointment.patientName}</h3>
-                      <div className="mt-1 flex items-center space-x-2">
-                        <ClockIcon className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">{appointment.time}</span>
+                    
+                    {appointment.notes && (
+                      <div className="mt-4 bg-gray-50 rounded-lg p-3">
+                        <p className="text-sm text-gray-600">{appointment.notes}</p>
                       </div>
-                      <div className="mt-2 flex items-center space-x-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          appointment.status === 'Confirmed' 
-                            ? 'bg-green-50 text-green-700'
-                            : 'bg-yellow-50 text-yellow-700'
-                        }`}>
-                          {appointment.status}
-                        </span>
-                        <span className="inline-flex items-center text-xs font-medium text-gray-600">
-                          {appointment.isOnline ? (
-                            appointment.type === 'Video Consultation' ? (
-                              <VideoCameraIcon className="h-4 w-4 mr-1 text-blue-500" />
-                            ) : (
-                              <PhoneIcon className="h-4 w-4 mr-1 text-green-500" />
-                            )
-                          ) : (
-                            <MapPinIcon className="h-4 w-4 mr-1 text-purple-500" />
-                          )}
-                          {appointment.type}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    {appointment.isOnline ? (
-                      <button className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all">
-                        {appointment.type === 'Video Consultation' ? 'Join Call' : 'Call Patient'}
-                      </button>
-                    ) : (
-                      <button className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all">
-                        View Details
-                      </button>
                     )}
                   </div>
-                </div>
-                
-                {appointment.symptoms && (
-                  <div className="mt-4 bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm text-gray-600">{appointment.symptoms}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
         </div>
       </div>
