@@ -10,12 +10,14 @@ import {
   ClipboardDocumentListIcon,
   ChartBarIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { useAuth } from '../../../context/AuthContext';
 import { format } from 'date-fns';
+import PrescriptionModal from '../../components/prescriptions/PrescriptionModal';
 
 const DoctorPatients = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,6 +25,8 @@ const DoctorPatients = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const { user } = useAuth();
+  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+  const [selectedPatientForPrescription, setSelectedPatientForPrescription] = useState(null);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -87,6 +91,11 @@ const DoctorPatients = () => {
     patient.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     patient.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handlePrescriptionClick = (patient) => {
+    setSelectedPatientForPrescription(patient);
+    setIsPrescriptionModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -224,6 +233,16 @@ const DoctorPatients = () => {
                             {patient.cancelledVisits} cancelled
                           </span>
                         </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePrescriptionClick(patient);
+                          }}
+                          className="mt-2 flex items-center space-x-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all text-sm"
+                        >
+                          <DocumentTextIcon className="h-4 w-4" />
+                          <span>Add Prescription</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -297,6 +316,19 @@ const DoctorPatients = () => {
           </div>
         </div>
       </div>
+
+      {/* Add the Prescription Modal */}
+      {selectedPatientForPrescription && (
+        <PrescriptionModal
+          isOpen={isPrescriptionModalOpen}
+          onClose={() => {
+            setIsPrescriptionModalOpen(false);
+            setSelectedPatientForPrescription(null);
+          }}
+          patient={selectedPatientForPrescription}
+          doctorId={user.uid}
+        />
+      )}
     </DoctorLayout>
   );
 };
