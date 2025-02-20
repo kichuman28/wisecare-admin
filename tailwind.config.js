@@ -15,7 +15,7 @@ module.exports = {
           light: '#A9B5DF',   // light blue
         },
         background: {
-          DEFAULT: '#ffffff', // white instead of light pink
+          DEFAULT: '#ffffff', 
           secondary: '#f8f9fa',
         },
         teal: {

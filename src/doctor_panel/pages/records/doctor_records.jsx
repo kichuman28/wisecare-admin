@@ -109,75 +109,75 @@ const ViewPrescriptionModal = ({ isOpen, onClose, record, patient }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-background-secondary p-6 shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-6">
-                  <Dialog.Title className="text-lg font-medium text-gray-900">
+                  <Dialog.Title className="text-lg font-medium text-deep-blue">
                     Prescription Details
                   </Dialog.Title>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={handleDownloadPDF}
-                      className="flex items-center space-x-2 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all"
+                      className="flex items-center space-x-2 px-4 py-2.5 bg-primary-light text-primary rounded-lg hover:bg-primary hover:text-white transition-all"
                     >
                       <ArrowDownTrayIcon className="h-5 w-5" />
                       <span>Download PDF</span>
                     </button>
                     <button
                       onClick={onClose}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+                      className="p-2 hover:bg-primary/10 rounded-lg transition-all"
                     >
-                      <XMarkIcon className="h-5 w-5 text-gray-500" />
+                      <XMarkIcon className="h-5 w-5 text-primary" />
                     </button>
                   </div>
                 </div>
 
-                <div id="prescription-content" className="space-y-6 bg-white p-6">
+                <div id="prescription-content" className="space-y-6 bg-white rounded-xl p-6 shadow-sm">
                   {/* Header */}
-                  <div className="flex items-center justify-between pb-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between pb-6 border-b border-primary-light/30">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">{patient?.displayName}</h2>
-                      <p className="text-sm text-gray-500">Patient ID: {record.patientId}</p>
+                      <h2 className="text-2xl font-bold text-deep-blue">{patient?.displayName}</h2>
+                      <p className="text-sm text-primary-hover">Patient ID: {record.patientId}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-500">Date: {format(record.createdAt, 'MMMM d, yyyy')}</p>
-                      <p className="text-sm text-gray-500">Follow-up: {format(new Date(record.followUpDate), 'MMMM d, yyyy')}</p>
+                      <p className="text-sm text-primary-hover">Date: {format(record.createdAt, 'MMMM d, yyyy')}</p>
+                      <p className="text-sm text-primary-hover">Follow-up: {format(new Date(record.followUpDate), 'MMMM d, yyyy')}</p>
                     </div>
                   </div>
 
                   {/* Diagnosis & Symptoms */}
                   <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Diagnosis</h3>
-                      <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{record.diagnosis}</p>
+                    <div className="bg-primary/5 rounded-xl p-4">
+                      <h3 className="text-sm font-medium text-primary mb-2">Diagnosis</h3>
+                      <p className="text-deep-blue bg-white rounded-lg p-3 shadow-sm">{record.diagnosis}</p>
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Symptoms</h3>
-                      <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{record.symptoms}</p>
+                    <div className="bg-primary/5 rounded-xl p-4">
+                      <h3 className="text-sm font-medium text-primary mb-2">Symptoms</h3>
+                      <p className="text-deep-blue bg-white rounded-lg p-3 shadow-sm">{record.symptoms}</p>
                     </div>
                   </div>
 
                   {/* Medicines */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Prescribed Medicines</h3>
+                  <div className="bg-primary/5 rounded-xl p-4">
+                    <h3 className="text-sm font-medium text-primary mb-3">Prescribed Medicines</h3>
                     <div className="space-y-3">
                       {record.medicines?.map((medicine, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-4">
+                        <div key={index} className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all">
                           <div className="grid grid-cols-4 gap-4">
                             <div>
-                              <p className="text-sm text-gray-500">Medicine</p>
-                              <p className="font-medium text-gray-900">{medicine.name}</p>
+                              <p className="text-sm text-primary-hover">Medicine</p>
+                              <p className="font-medium text-deep-blue">{medicine.name}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500">Dosage</p>
-                              <p className="font-medium text-gray-900">{medicine.dosage}</p>
+                              <p className="text-sm text-primary-hover">Dosage</p>
+                              <p className="font-medium text-deep-blue">{medicine.dosage}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500">Frequency</p>
-                              <p className="font-medium text-gray-900">{medicine.frequency}</p>
+                              <p className="text-sm text-primary-hover">Frequency</p>
+                              <p className="font-medium text-deep-blue">{medicine.frequency}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500">Duration</p>
-                              <p className="font-medium text-gray-900">{medicine.duration} days</p>
+                              <p className="text-sm text-primary-hover">Duration</p>
+                              <p className="font-medium text-deep-blue">{medicine.duration} days</p>
                             </div>
                           </div>
                         </div>
@@ -186,9 +186,9 @@ const ViewPrescriptionModal = ({ isOpen, onClose, record, patient }) => {
                   </div>
 
                   {/* Instructions */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Instructions</h3>
-                    <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{record.instructions}</p>
+                  <div className="bg-primary/5 rounded-xl p-4">
+                    <h3 className="text-sm font-medium text-primary mb-2">Instructions</h3>
+                    <p className="text-deep-blue bg-white rounded-lg p-3 shadow-sm">{record.instructions}</p>
                   </div>
                 </div>
               </Dialog.Panel>
@@ -375,13 +375,13 @@ const DoctorRecords = () => {
     <DoctorLayout>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-primary-light/20 rounded-2xl p-6 shadow-sm border border-primary-light">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Medical Records</h1>
-              <p className="mt-1 text-gray-600">Manage and access patient medical records</p>
+              <h1 className="text-2xl font-bold text-deep-blue">Medical Records</h1>
+              <p className="mt-1 text-primary-hover">Manage and access patient medical records</p>
             </div>
-            <button className="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all flex items-center space-x-2">
+            <button className="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all flex items-center space-x-2">
               <DocumentArrowUpIcon className="h-5 w-5" />
               <span>Upload New Record</span>
             </button>
@@ -391,19 +391,19 @@ const DoctorRecords = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {categories.map((category) => (
-            <div key={category.id} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+            <div key={category.id} className="bg-white rounded-xl p-6 border border-primary-light/30 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center space-x-3">
                 <div className={`p-3 ${
-                  category.id === 'all' ? 'bg-primary/10 text-primary' :
-                  category.id === 'prescriptions' ? 'bg-green-50 text-green-600' :
-                  category.id === 'reports' ? 'bg-blue-50 text-blue-600' :
-                  'bg-purple-50 text-purple-600'
+                  category.id === 'all' ? 'bg-primary-light text-primary' :
+                  category.id === 'prescriptions' ? 'bg-pastel-green/30 text-teal-600' :
+                  category.id === 'reports' ? 'bg-primary/10 text-primary-hover' :
+                  'bg-beige text-deep-blue'
                 } rounded-lg`}>
                   <category.icon className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">{category.name}</h3>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-sm font-medium text-primary-hover">{category.name}</h3>
+                  <p className="text-2xl font-bold text-deep-blue">
                     {category.id === 'all' ? records.length :
                      category.id === 'prescriptions' ? records.filter(r => r.type === 'Prescription').length :
                      0}
@@ -417,9 +417,9 @@ const DoctorRecords = () => {
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Categories Sidebar */}
-          <div className="lg:w-64 bg-white rounded-xl shadow-sm border border-gray-100 h-fit">
-            <div className="p-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">Categories</h2>
+          <div className="lg:w-64 bg-white rounded-xl shadow-sm border border-primary-light/30 h-fit">
+            <div className="p-4 border-b border-primary-light/30">
+              <h2 className="font-semibold text-deep-blue">Categories</h2>
             </div>
             <div className="p-2">
               {categories.map((category) => (
@@ -429,7 +429,7 @@ const DoctorRecords = () => {
                   className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
                     selectedCategory === category.id
                       ? 'bg-primary text-white'
-                      : 'hover:bg-gray-50 text-gray-600'
+                      : 'hover:bg-primary-light/20 text-primary-hover'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -437,7 +437,7 @@ const DoctorRecords = () => {
                     <span className="text-sm font-medium">{category.name}</span>
                   </div>
                   <span className={`text-sm ${
-                    selectedCategory === category.id ? 'bg-white/20' : 'bg-gray-100'
+                    selectedCategory === category.id ? 'bg-white/20' : 'bg-primary-light/30'
                   } px-2 py-0.5 rounded-full`}>
                     {category.id === 'all' ? records.length :
                      category.id === 'prescriptions' ? records.filter(r => r.type === 'Prescription').length :
@@ -450,21 +450,21 @@ const DoctorRecords = () => {
 
           {/* Records List */}
           <div className="flex-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
+            <div className="bg-white rounded-xl shadow-sm border border-primary-light/30 overflow-hidden">
+              <div className="p-4 border-b border-primary-light/30">
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search records..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="w-full pl-10 pr-4 py-2 border border-primary-light rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-primary-light/10"
                   />
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                 </div>
               </div>
 
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-primary-light/30">
                 {filteredRecords.length === 0 ? (
                   <div className="p-6 text-center">
                     <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto" />
@@ -475,10 +475,10 @@ const DoctorRecords = () => {
                   filteredRecords.map((record) => {
                     const patient = patients[record.patientId];
                     return (
-                      <div key={record.id} className="p-4 hover:bg-gray-50 transition-all">
+                      <div key={record.id} className="p-4 hover:bg-primary-light/10 transition-all">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start space-x-4">
-                            <div className="p-2 bg-gray-50 rounded-lg">
+                            <div className="p-2 bg-primary/5 rounded-lg">
                               <DocumentTextIcon className="h-6 w-6 text-primary" />
                             </div>
                             <div>
@@ -504,7 +504,7 @@ const DoctorRecords = () => {
                           </div>
                           <div className="flex items-center space-x-2">
                             <button 
-                              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all"
+                              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-primary-light/10 transition-all"
                               onClick={() => {
                                 setSelectedRecord(record);
                                 setIsViewModalOpen(true);
@@ -514,7 +514,7 @@ const DoctorRecords = () => {
                             </button>
                             <button 
                               onClick={() => handleDownloadPDF(record, patients[record.patientId])}
-                              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all"
+                              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-primary-light/10 transition-all"
                             >
                               <ArrowDownTrayIcon className="h-5 w-5" />
                             </button>
