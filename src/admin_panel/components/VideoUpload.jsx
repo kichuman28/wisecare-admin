@@ -73,8 +73,8 @@ const VideoUpload = () => {
     try {
       // Use relative URL when in development, full URL in production
       const apiUrl = import.meta.env.DEV 
-        ? '/api/process-video'
-        : `${import.meta.env.VITE_API_URL}/process-video`;
+        ? '/api/detect_fall'
+        : `${import.meta.env.VITE_API_URL}/detect_fall`;
       
       console.log('Sending request to:', apiUrl);
 
