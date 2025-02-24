@@ -1,5 +1,9 @@
 # WiseCare Admin Dashboard 🚀
 
+<p align="center">
+  <img src="src\assets\images\logo_no_text.png" alt="Wise Care Banner" width="150"/>
+</p>
+
 ![WiseCare Admin](https://img.shields.io/badge/WiseCare-Admin-blue)
 ![Version](https://img.shields.io/badge/version-1.0.0-green)
 ![React](https://img.shields.io/badge/React-19.0.0-61DAFB)
