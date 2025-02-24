@@ -10,7 +10,8 @@ import {
   WrenchScrewdriverIcon,
   ChartBarIcon,
   ComputerDesktopIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  VideoCameraIcon
 } from '@heroicons/react/24/outline';
 
 const Sidebar = () => {
@@ -26,6 +27,7 @@ const Sidebar = () => {
     { name: 'Devices', icon: ComputerDesktopIcon, path: '/devices' },
     { name: 'Content', icon: DocumentTextIcon, path: '/content' },
     { name: 'Services', icon: WrenchScrewdriverIcon, path: '/services' },
+    { name: 'Video Analysis', icon: VideoCameraIcon, path: '/video-analysis' },
     { name: 'Reports', icon: ChartBarIcon, path: '/reports' },
     { name: 'Settings', icon: Cog6ToothIcon, path: '/settings' }
   ];

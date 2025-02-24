@@ -9,6 +9,7 @@ import ServicesPage from '../admin_panel/pages/ServicesPage';
 import ReportsPage from '../admin_panel/pages/ReportsPage';
 import SettingsPage from '../admin_panel/pages/SettingsPage';
 import ConsultationBooking from '../admin_panel/pages/ConsultationBooking';
+import VideoAnalysisPage from '../admin_panel/pages/VideoAnalysisPage';
 
 const AdminRoutes = [
   <Route
@@ -45,6 +46,11 @@ const AdminRoutes = [
     key="consultation-booking"
     path="/services/consultation-booking"
     element={<ConsultationBooking />}
+  />,
+  <Route
+    key="video-analysis"
+    path="/video-analysis"
+    element={<VideoAnalysisPage />}
   />,
   <Route
     key="reports"
