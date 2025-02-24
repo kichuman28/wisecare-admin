@@ -10,7 +10,7 @@ import {
 import { collection, query, where, orderBy, addDoc, onSnapshot, serverTimestamp, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { useAuth } from '../../../context/AuthContext';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday, isSameDay } from 'date-fns';
 
 const DoctorMessages = () => {
   const location = useLocation();
@@ -229,6 +229,31 @@ const DoctorMessages = () => {
     patient.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Add this helper function before the return statement
+  const groupMessagesByDate = (messages) => {
+    const groups = [];
+    let currentDate = null;
+    
+    messages.forEach((message) => {
+      if (!message.timestamp) return;
+      
+      const messageDate = message.timestamp;
+      if (!currentDate || !isSameDay(currentDate, messageDate)) {
+        currentDate = messageDate;
+        groups.push({
+          type: 'date',
+          date: messageDate,
+        });
+      }
+      groups.push({
+        type: 'message',
+        data: message,
+      });
+    });
+    
+    return groups;
+  };
+
   if (loading) {
     return (
       <DoctorLayout>
@@ -316,38 +341,50 @@ const DoctorMessages = () => {
                   </div>
                 </div>
               ) : (
-                messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.senderId === user.uid ? 'justify-end' : 'justify-start'}`}
-                  >
-                    {message.senderId !== user.uid && (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-2">
-                        <span className="text-primary text-sm font-semibold">
-                          {selectedPatient.displayName?.split(' ').map(n => n[0]).join('')}
+                groupMessagesByDate(messages).map((item, index) => (
+                  item.type === 'date' ? (
+                    <div key={`date-${index}`} className="flex justify-center my-4">
+                      <div className="bg-gray-200 rounded-full px-4 py-1">
+                        <span className="text-xs text-gray-600">
+                          {isToday(item.date) ? 'Today' :
+                           isYesterday(item.date) ? 'Yesterday' :
+                           format(item.date, 'MMMM d, yyyy')}
                         </span>
                       </div>
-                    )}
-                    <div className={`max-w-[70%] ${
-                      message.senderId === user.uid
-                        ? 'bg-primary text-white'
-                        : 'bg-white text-deep-blue'
-                    } rounded-2xl px-4 py-2 shadow-sm`}>
-                      <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.senderId === user.uid ? 'text-white/70' : 'text-primary-hover'
-                      }`}>
-                        {message.timestamp ? format(message.timestamp, 'h:mm a') : 'Sending...'}
-                      </p>
                     </div>
-                    {message.senderId === user.uid && (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center ml-2">
-                        <span className="text-primary text-sm font-semibold">
-                          {user.displayName?.split(' ').map(n => n[0]).join('') || 'D'}
-                        </span>
+                  ) : (
+                    <div
+                      key={item.data.id}
+                      className={`flex ${item.data.senderId === user.uid ? 'justify-end' : 'justify-start'}`}
+                    >
+                      {item.data.senderId !== user.uid && (
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-2">
+                          <span className="text-primary text-sm font-semibold">
+                            {selectedPatient.displayName?.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                      )}
+                      <div className={`max-w-[70%] ${
+                        item.data.senderId === user.uid
+                          ? 'bg-primary text-white'
+                          : 'bg-white text-deep-blue'
+                      } rounded-2xl px-4 py-2 shadow-sm`}>
+                        <p className="text-sm whitespace-pre-wrap break-words">{item.data.text}</p>
+                        <p className={`text-xs mt-1 ${
+                          item.data.senderId === user.uid ? 'text-white/70' : 'text-primary-hover'
+                        }`}>
+                          {item.data.timestamp ? format(item.data.timestamp, 'h:mm a') : 'Sending...'}
+                        </p>
                       </div>
-                    )}
-                  </div>
+                      {item.data.senderId === user.uid && (
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center ml-2">
+                          <span className="text-primary text-sm font-semibold">
+                            {user.displayName?.split(' ').map(n => n[0]).join('') || 'D'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
                 ))
               )}
               <div ref={messagesEndRef} />
