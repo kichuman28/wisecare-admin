@@ -9,6 +9,70 @@
 
 WiseCare Admin is a powerful, modern administrative dashboard built with React and Vite. It provides a comprehensive solution for managing healthcare-related data, analytics, and administrative tasks with an intuitive and responsive interface.
 
+## 📸 Screenshots
+
+### Admin Interface
+
+<details>
+<summary>Click to expand Admin screenshots</summary>
+
+#### Dashboard
+![Admin Dashboard](screenshots/admin/dashboard.png)
+
+#### Login Screen
+![Admin Login](screenshots/admin/admin%20login%20screen.png)
+
+#### User Management
+![Users](screenshots/admin/Users.png)
+
+#### Services Management
+![Services](screenshots/admin/services.png)
+
+#### Consultation Booking
+![Consultation Booking](screenshots/admin/consulation%20booking.png)
+
+#### Reports
+![Reports](screenshots/admin/Reports.png)
+
+#### SOS Screen
+![SOS Screen](screenshots/admin/sos%20screen.png)
+
+#### Settings
+![Settings](screenshots/admin/settings.png)
+
+</details>
+
+### Doctor Interface
+
+<details>
+<summary>Click to expand Doctor screenshots</summary>
+
+#### Dashboard
+![Doctor Dashboard](screenshots/doctor/dashboard.png)
+
+#### Login Screen
+![Doctor Login](screenshots/doctor/doctor%20login%20screen.png)
+
+#### Appointments
+![Appointments](screenshots/doctor/appointment.png)
+
+#### Patients
+![Patients](screenshots/doctor/patients.png)
+
+#### Consultations
+![Consultations](screenshots/doctor/consunlations%20.png)
+
+#### Medical Records
+![Medical Records](screenshots/doctor/medical%20records.png)
+
+#### Messages
+![Messages](screenshots/doctor/messages.png)
+
+#### Settings
+![Settings](screenshots/doctor/settings.png)
+
+</details>
+
 ## ✨ Key Features
 
 - 📊 **Advanced Analytics Dashboard**
