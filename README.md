@@ -13,9 +13,6 @@ WiseCare Admin is a powerful, modern administrative dashboard built with React a
 
 ### Admin Interface
 
-<details>
-<summary>Click to expand Admin screenshots</summary>
-
 #### Dashboard
 ![Admin Dashboard](screenshots/admin/dashboard.png)
 
@@ -40,12 +37,7 @@ WiseCare Admin is a powerful, modern administrative dashboard built with React a
 #### Settings
 ![Settings](screenshots/admin/settings.png)
 
-</details>
-
 ### Doctor Interface
-
-<details>
-<summary>Click to expand Doctor screenshots</summary>
 
 #### Dashboard
 ![Doctor Dashboard](screenshots/doctor/dashboard.png)
@@ -70,8 +62,6 @@ WiseCare Admin is a powerful, modern administrative dashboard built with React a
 
 #### Settings
 ![Settings](screenshots/doctor/settings.png)
-
-</details>
 
 ## ✨ Key Features
 
