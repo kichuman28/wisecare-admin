@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CloudArrowUpIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const Detection = {
   frame_number: Number,
@@ -26,15 +27,10 @@ const VideoUpload = () => {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      console.log('File selected:', {
-        name: selectedFile.name,
-        size: `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`,
-        type: selectedFile.type
-      });
-
       // Validate file type
       if (!['video/mp4', 'video/avi', 'video/quicktime'].includes(selectedFile.type)) {
         setError('Please select a valid video file (MP4, AVI, or MOV)');
+        setFile(null);
         return;
       }
 
@@ -42,12 +38,14 @@ const VideoUpload = () => {
       const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
       if (selectedFile.size > MAX_FILE_SIZE) {
         setError(`File size too large. Please select a video under ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+        setFile(null);
         return;
       }
 
       setFile(selectedFile);
       setError(null);
       setUploadProgress(0);
+      setResult(null);
     }
   };
 
@@ -60,36 +58,25 @@ const VideoUpload = () => {
     setLoading(true);
     setError(null);
     setUploadProgress(0);
+    setResult(null);
 
     const formData = new FormData();
     formData.append('video', file);
 
-    console.log('Starting video upload...', {
-      fileName: file.name,
-      fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
-      fileType: file.type
-    });
-
     try {
-      // Use relative URL when in development, full URL in production
       const apiUrl = import.meta.env.DEV 
         ? '/api/detect_fall'
         : `${import.meta.env.VITE_API_URL}/detect_fall`;
-      
-      console.log('Sending request to:', apiUrl);
 
       const xhr = new XMLHttpRequest();
       
-      // Setup upload progress handling
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const progress = (event.loaded / event.total) * 100;
           setUploadProgress(Math.round(progress));
-          console.log(`Upload progress: ${Math.round(progress)}%`);
         }
       };
 
-      // Create a promise to handle the XHR request
       const response = await new Promise((resolve, reject) => {
         xhr.open('POST', apiUrl);
         xhr.setRequestHeader('Accept', 'application/json');
@@ -107,45 +94,26 @@ const VideoUpload = () => {
           }
         };
 
-        xhr.onerror = () => {
-          reject(new Error('Network error occurred'));
-        };
-
-        xhr.onabort = () => {
-          reject(new Error('Upload aborted'));
-        };
-
+        xhr.onerror = () => reject(new Error('Network error occurred'));
+        xhr.onabort = () => reject(new Error('Upload aborted'));
         xhr.send(formData);
       });
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      console.log('Received data:', response.data);
-      
+      if (!response.ok) throw new Error('Upload failed');
       if (!response.data || typeof response.data !== 'object') {
         throw new Error('Invalid response format from server');
       }
 
       setResult(response.data);
-      console.log('Video analysis completed successfully');
     } catch (err) {
-      console.error('Upload/Processing error:', {
-        message: err.message,
-        stack: err.stack,
-        type: err.name
-      });
+      let errorMessage = 'An error occurred while processing the video';
       
-      let errorMessage;
       if (err.message.includes('Network error')) {
-        errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+        errorMessage = 'Unable to connect to the server. Please check your internet connection.';
       } else if (err.message.includes('timeout')) {
         errorMessage = 'The request timed out. The video might be too large or the server is busy.';
       } else if (err.message.includes('Invalid JSON')) {
         errorMessage = 'Received invalid response from server. Please try again.';
-      } else {
-        errorMessage = err.message || 'An error occurred while processing the video';
       }
       
       setError(errorMessage);
@@ -155,36 +123,59 @@ const VideoUpload = () => {
     }
   };
 
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-6">Fall Detection Video Analysis</h2>
-      
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Upload Video
-        </label>
+    <div className="space-y-6">
+      {/* File Upload Section */}
+      <div className="relative">
         <input
           type="file"
           accept=".mp4,.avi,.mov"
           onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100
-            border border-gray-300 rounded-md"
+          className="hidden"
+          id="video-upload"
         />
+        <label
+          htmlFor="video-upload"
+          className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer
+            ${file ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary/50'}
+            transition-colors duration-200`}
+        >
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <CloudArrowUpIcon className={`w-12 h-12 mb-3 ${file ? 'text-primary' : 'text-gray-400'}`} />
+            {file ? (
+              <div className="text-center">
+                <p className="text-sm text-primary font-medium">{file.name}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {(file.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="mb-2 text-sm text-gray-500">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">MP4, AVI, or MOV (max 50MB)</p>
+              </div>
+            )}
+          </div>
+        </label>
       </div>
 
+      {/* Upload Button and Progress */}
       <button
         onClick={handleUpload}
         disabled={!file || loading}
-        className={`w-full py-2 px-4 rounded-md ${
-          loading
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700'
-        } text-white font-semibold transition duration-150`}
+        className={`w-full py-3 px-4 rounded-lg font-medium transition duration-200
+          ${loading
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : 'bg-primary text-white hover:bg-primary-hover'
+          }`}
       >
         {loading ? (
           <div className="flex items-center justify-center">
@@ -192,81 +183,102 @@ const VideoUpload = () => {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            {uploadProgress > 0 ? `Uploading ${uploadProgress}%` : 'Processing...'}
+            {uploadProgress > 0 ? `Uploading ${uploadProgress}%` : 'Processing video...'}
           </div>
         ) : (
           'Upload and Process Video'
         )}
       </button>
 
-      {/* Upload Progress Bar */}
-      {loading && uploadProgress > 0 && uploadProgress < 100 && (
-        <div className="mt-4">
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
-              style={{ width: `${uploadProgress}%` }}
-            />
-          </div>
-          <p className="text-sm text-gray-600 mt-1 text-center">
-            Uploading: {uploadProgress}%
-          </p>
-        </div>
-      )}
-
+      {/* Error Message */}
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
-          {error}
+        <div className="flex items-center p-4 text-red-800 bg-red-50 rounded-lg">
+          <ExclamationCircleIcon className="h-5 w-5 mr-2 flex-shrink-0" />
+          <p className="text-sm">{error}</p>
         </div>
       )}
 
+      {/* Results Section */}
       {result && (
-        <div className="mt-6">
-          <h3 className="text-xl font-bold mb-4">Analysis Results</h3>
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="p-3 bg-white rounded-md shadow-sm">
-                <p className="text-sm text-gray-500">Total Frames</p>
-                <p className="text-lg font-semibold">{result.total_frames}</p>
-              </div>
-              <div className="p-3 bg-white rounded-md shadow-sm">
-                <p className="text-sm text-gray-500">FPS</p>
-                <p className="text-lg font-semibold">{result.fps}</p>
-              </div>
+        <div className="space-y-6">
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-primary/5 p-4 rounded-lg">
+              <p className="text-sm text-gray-500">Total Frames</p>
+              <p className="text-2xl font-semibold text-primary">{result.total_frames}</p>
+            </div>
+            <div className="bg-primary/5 p-4 rounded-lg">
+              <p className="text-sm text-gray-500">FPS</p>
+              <p className="text-2xl font-semibold text-primary">{result.fps}</p>
+            </div>
+          </div>
+
+          {/* Detections List */}
+          <div className="bg-white rounded-lg border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">
+                Fall Detections
+                <span className="ml-2 text-sm text-gray-500">
+                  ({result.detections.length} events)
+                </span>
+              </h3>
             </div>
             
-            <h4 className="font-semibold mb-3">Fall Detections:</h4>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
               {result.detections.map((detection, index) => (
-                <div key={index} className="bg-white p-3 rounded-md shadow-sm mb-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    <p className="text-sm">
-                      <span className="text-gray-500">Frame:</span> {detection.frame_number}
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-gray-500">Time:</span> {detection.time.toFixed(2)}s
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-gray-500">Status:</span>{' '}
-                      <span className={`font-semibold ${
+                <div key={index} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <CheckCircleIcon className={`h-5 w-5 mr-2 ${
+                        detection.confidence > 0.7 ? 'text-green-500' : 'text-yellow-500'
+                      }`} />
+                      <span className="font-medium text-gray-900">
+                        Detection #{index + 1}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      Frame {detection.frame_number}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500">Time: </span>
+                      <span className="font-medium">{formatTime(detection.time)}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Track ID: </span>
+                      <span className="font-medium">{detection.track_id}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Status: </span>
+                      <span className={`font-medium ${
                         detection.status === 'fall' ? 'text-red-600' : 'text-green-600'
                       }`}>
                         {detection.status.toUpperCase()}
                       </span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-gray-500">Confidence:</span>{' '}
-                      {(detection.confidence * 100).toFixed(1)}%
-                    </p>
-                    <p className="text-sm col-span-2">
-                      <span className="text-gray-500">Fall Score:</span>{' '}
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                        <div 
-                          className="bg-blue-600 h-2.5 rounded-full" 
-                          style={{ width: `${detection.fall_score * 100}%` }}
-                        ></div>
-                      </div>
-                    </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Confidence: </span>
+                      <span className="font-medium">
+                        {(detection.confidence * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-500">Fall Probability</span>
+                      <span className="font-medium">
+                        {(detection.fall_score * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${detection.fall_score * 100}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
