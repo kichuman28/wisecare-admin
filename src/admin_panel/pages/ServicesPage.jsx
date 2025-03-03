@@ -99,6 +99,9 @@ const ServicesPage = () => {
       case 'consultation booking':
         navigate('/services/consultation-booking');
         break;
+      case 'medication & grocery delivery':
+        navigate('/services/medication-delivery');
+        break;
       // Add other service routes as they become available
       default:
         break;
