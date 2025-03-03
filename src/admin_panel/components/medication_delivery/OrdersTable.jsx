@@ -6,7 +6,8 @@ import {
   MapPinIcon,
   CurrencyRupeeIcon,
   UserCircleIcon,
-  ClockIcon
+  ClockIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import StatusBadge from './StatusBadge';
 
@@ -51,7 +52,7 @@ const OrdersTable = ({
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
@@ -59,7 +60,6 @@ const OrdersTable = ({
                 <React.Fragment key={order.id}>
                   <tr 
                     className={`hover:bg-primary/5 cursor-pointer transition-colors ${selectedOrderId === order.id ? 'bg-primary/10' : ''}`}
-                    onClick={() => handleOrderSelect(order)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm font-semibold text-primary">{order.id.substring(0, 8)}</span>
@@ -99,28 +99,37 @@ const OrdersTable = ({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge status={order.status} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <button
-                        className="text-gray-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-gray-100"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleOrderExpanded(order.id);
-                        }}
-                      >
-                        {orderExpanded[order.id] ? 
-                          <ChevronUpIcon className="h-5 w-5" /> : 
-                          <ChevronDownIcon className="h-5 w-5" />
-                        }
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                          onClick={() => handleOrderSelect(order)}
+                        >
+                          <EyeIcon className="h-3.5 w-3.5 mr-1" />
+                          Details
+                        </button>
+                        <button
+                          className="text-gray-400 hover:text-primary transition-colors p-1.5 rounded-full hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleOrderExpanded(order.id);
+                          }}
+                        >
+                          {orderExpanded[order.id] ? 
+                            <ChevronUpIcon className="h-5 w-5" /> : 
+                            <ChevronDownIcon className="h-5 w-5" />
+                          }
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {orderExpanded[order.id] && (
                     <tr className="bg-gray-50/70">
                       <td colSpan="6" className="px-6 py-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-3">
                             <h3 className="text-sm font-semibold text-primary">Medicines</h3>
-                            <ul className="space-y-2">
+                            <ul className="space-y-2 max-h-48 overflow-y-auto pr-2">
                               {order.medicines.map((medicine, idx) => (
                                 <li key={idx} className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
                                   <div className="flex justify-between">
@@ -171,21 +180,21 @@ const OrdersTable = ({
                                   <p className="text-sm text-amber-600">No address provided</p>
                                 </div>
                               )}
-                              
-                              <div className="mt-3 pt-2 border-t border-gray-100">
-                                <button
-                                  className="text-primary hover:text-primary-hover text-sm font-medium flex items-center"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleOrderSelect(order);
-                                  }}
-                                >
-                                  View full details
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                </button>
-                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            <h3 className="text-sm font-semibold text-primary">Actions</h3>
+                            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                              <button
+                                className="w-full flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOrderSelect(order);
+                                }}
+                              >
+                                <EyeIcon className="h-4 w-4 mr-2" />
+                                View Full Details
+                              </button>
                             </div>
                           </div>
                         </div>

@@ -38,6 +38,7 @@ const MedicationDeliveryPage = () => {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [orderExpanded, setOrderExpanded] = useState({});
+  const [orderDetailsOpen, setOrderDetailsOpen] = useState(false);
 
   // Fetch initial data
   useEffect(() => {
@@ -85,7 +86,10 @@ const MedicationDeliveryPage = () => {
         if (selectedOrder) {
           const updatedSelectedOrder = ordersData.find(order => order.id === selectedOrder.id);
           if (updatedSelectedOrder) {
-            setSelectedOrder(updatedSelectedOrder);
+            setSelectedOrder(prev => ({
+              ...prev,
+              ...updatedSelectedOrder
+            }));
           }
         }
         
@@ -249,6 +253,7 @@ const MedicationDeliveryPage = () => {
   // Handle order selection
   const handleOrderSelect = async (order) => {
     setSelectedOrder(order);
+    setOrderDetailsOpen(true);
     
     // Fetch address details if needed
     if (order.addressId && !addressDetails[order.addressId]) {
@@ -329,23 +334,38 @@ const MedicationDeliveryPage = () => {
     try {
       setAssignLoading(true);
       
-      // Update order in Firestore
-      await updateDoc(doc(db, 'orders', selectedOrder.id), {
+      // Create updated order data
+      const updatedOrderData = {
         deliveryStaffId: selectedStaff.id,
         deliveryStaffName: selectedStaff.name,
         status: 'processing',
         updatedAt: Timestamp.now()
-      });
+      };
       
-      // We don't need to update local state manually anymore
-      // as the onSnapshot listener will handle this
+      // Update order in Firestore
+      await updateDoc(doc(db, 'orders', selectedOrder.id), updatedOrderData);
       
+      // Immediately update the selected order in the local state
+      setSelectedOrder(prevOrder => ({
+        ...prevOrder,
+        ...updatedOrderData
+      }));
+      
+      // Close the assignment modal
       setAssignModalOpen(false);
+      
+      // Reset selected staff
+      setSelectedStaff(null);
     } catch (error) {
       console.error('Error assigning delivery staff:', error);
     } finally {
       setAssignLoading(false);
     }
+  };
+
+  // Close order details modal
+  const closeOrderDetails = () => {
+    setOrderDetailsOpen(false);
   };
 
   // Loading state
@@ -392,44 +412,39 @@ const MedicationDeliveryPage = () => {
         
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Orders Table */}
-            <div className="lg:col-span-2">
-              {filteredOrders.length > 0 ? (
-                <OrdersTable
-                  orders={filteredOrders}
-                  selectedOrderId={selectedOrder?.id}
-                  patientDetails={patientDetails}
-                  addressDetails={addressDetails}
-                  orderExpanded={orderExpanded}
-                  formatDate={formatDate}
-                  handleOrderSelect={handleOrderSelect}
-                  toggleOrderExpanded={toggleOrderExpanded}
-                />
-              ) : (
-                <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
-                  <div className="bg-primary/5 rounded-full p-4 w-20 h-20 mx-auto flex items-center justify-center">
-                    <DocumentTextIcon className="h-10 w-10 text-primary" />
-                  </div>
-                  <h3 className="mt-4 text-xl font-semibold text-gray-800">No Orders Found</h3>
-                  <p className="mt-2 text-gray-500">Try adjusting your filters to find what you're looking for.</p>
-                </div>
-              )}
+          {filteredOrders.length > 0 ? (
+            <OrdersTable
+              orders={filteredOrders}
+              selectedOrderId={selectedOrder?.id}
+              patientDetails={patientDetails}
+              addressDetails={addressDetails}
+              orderExpanded={orderExpanded}
+              formatDate={formatDate}
+              handleOrderSelect={handleOrderSelect}
+              toggleOrderExpanded={toggleOrderExpanded}
+            />
+          ) : (
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
+              <div className="bg-primary/5 rounded-full p-4 w-20 h-20 mx-auto flex items-center justify-center">
+                <DocumentTextIcon className="h-10 w-10 text-primary" />
+              </div>
+              <h3 className="mt-4 text-xl font-semibold text-gray-800">No Orders Found</h3>
+              <p className="mt-2 text-gray-500">Try adjusting your filters to find what you're looking for.</p>
             </div>
-
-            {/* Order Details Panel */}
-            <div className="lg:col-span-1">
-              <OrderDetails
-                order={selectedOrder}
-                patientDetails={patientDetails}
-                addressDetails={addressDetails}
-                formatDate={formatDate}
-                assignLoading={assignLoading}
-                setAssignModalOpen={setAssignModalOpen}
-              />
-            </div>
-          </div>
+          )}
         </div>
+        
+        {/* Order Details Modal */}
+        <OrderDetails
+          order={selectedOrder}
+          patientDetails={patientDetails}
+          addressDetails={addressDetails}
+          formatDate={formatDate}
+          assignLoading={assignLoading}
+          setAssignModalOpen={setAssignModalOpen}
+          isOpen={orderDetailsOpen}
+          onClose={closeOrderDetails}
+        />
         
         {/* Assign Delivery Staff Modal */}
         <AssignStaffModal
