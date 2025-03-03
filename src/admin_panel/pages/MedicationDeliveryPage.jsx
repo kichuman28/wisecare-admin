@@ -8,7 +8,8 @@ import {
   updateDoc, 
   where, 
   orderBy, 
-  Timestamp 
+  Timestamp,
+  onSnapshot 
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Layout from '../components/layout/Layout';
@@ -41,33 +42,9 @@ const MedicationDeliveryPage = () => {
 
   // Fetch initial data
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Apply filters when search term or status filter changes
-  useEffect(() => {
-    const filtered = filterOrders(orders, searchTerm, statusFilter, patientDetails, addressDetails);
-    setFilteredOrders(filtered);
-  }, [searchTerm, statusFilter, orders, patientDetails, addressDetails]);
-
-  // Fetch all required data
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch orders
-        const ordersQuery = query(
-          collection(db, 'orders'), 
-          orderBy('orderDate', 'desc')
-        );
-        const ordersSnapshot = await getDocs(ordersQuery);
-        const ordersData = ordersSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          orderDate: doc.data().orderDate?.toDate() || new Date()
-        }));
-        setOrders(ordersData);
-        setFilteredOrders(ordersData);
         
         // Fetch delivery staff
         const staffQuery = query(
@@ -80,21 +57,63 @@ const MedicationDeliveryPage = () => {
           ...doc.data()
         }));
         setDeliveryStaff(staffData);
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchInitialData();
+    
+    // Set up the real-time listener for orders
+    const ordersQuery = query(
+      collection(db, 'orders'), 
+      orderBy('orderDate', 'desc')
+    );
+    
+    const unsubscribe = onSnapshot(ordersQuery, async (snapshot) => {
+      try {
+        const ordersData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          orderDate: doc.data().orderDate?.toDate() || new Date()
+        }));
+        
+        setOrders(ordersData);
+        
+        // Update selected order if it's in the updated data
+        if (selectedOrder) {
+          const updatedSelectedOrder = ordersData.find(order => order.id === selectedOrder.id);
+          if (updatedSelectedOrder) {
+            setSelectedOrder(updatedSelectedOrder);
+          }
+        }
         
         // Fetch user details for all orders
-      await fetchPatientDetails(ordersData);
-      
-      // Fetch addresses for all orders
-      await fetchAddressDetails(ordersData);
-      
-      // Fetch prescription details
-      await fetchPrescriptionDetails(ordersData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        await fetchPatientDetails(ordersData);
+        
+        // Fetch addresses for all orders
+        await fetchAddressDetails(ordersData);
+        
+        // Fetch prescription details
+        await fetchPrescriptionDetails(ordersData);
+      } catch (error) {
+        console.error('Error processing order updates:', error);
+      }
+    }, (error) => {
+      console.error('Error in order listener:', error);
+    });
+    
+    // Clean up the listener when component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  // Apply filters when search term or status filter changes
+  useEffect(() => {
+    const filtered = filterOrders(orders, searchTerm, statusFilter, patientDetails, addressDetails);
+    setFilteredOrders(filtered);
+  }, [searchTerm, statusFilter, orders, patientDetails, addressDetails]);
 
   // Fetch patient details
   const fetchPatientDetails = async (ordersData) => {
@@ -335,26 +354,8 @@ const MedicationDeliveryPage = () => {
         updatedAt: Timestamp.now()
       });
       
-      // Update local state
-      const updatedOrders = orders.map(order => {
-        if (order.id === selectedOrder.id) {
-          return {
-            ...order,
-            deliveryStaffId: selectedStaff.id,
-            deliveryStaffName: selectedStaff.name,
-            status: 'processing'
-          };
-        }
-        return order;
-      });
-      
-      setOrders(updatedOrders);
-      setSelectedOrder({
-        ...selectedOrder,
-        deliveryStaffId: selectedStaff.id,
-        deliveryStaffName: selectedStaff.name,
-        status: 'processing'
-      });
+      // We don't need to update local state manually anymore
+      // as the onSnapshot listener will handle this
       
       setAssignModalOpen(false);
     } catch (error) {
@@ -377,22 +378,8 @@ const MedicationDeliveryPage = () => {
         updatedAt: Timestamp.now()
       });
       
-      // Update local state
-      const updatedOrders = orders.map(order => {
-        if (order.id === selectedOrder.id) {
-          return {
-            ...order,
-            status: deliveryStatus
-          };
-        }
-        return order;
-      });
-      
-      setOrders(updatedOrders);
-      setSelectedOrder({
-        ...selectedOrder,
-        status: deliveryStatus
-      });
+      // We don't need to update local state manually anymore
+      // as the onSnapshot listener will handle this
       
       setDeliveryStatus('');
     } catch (error) {
