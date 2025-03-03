@@ -3,7 +3,6 @@ import {
   UserIcon, 
   ClipboardDocumentListIcon, 
   TruckIcon,
-  UserCircleIcon,
   PhoneIcon,
   EnvelopeIcon,
   MapPinIcon,
@@ -12,7 +11,9 @@ import {
   ClockIcon,
   HomeIcon,
   InformationCircleIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  CurrencyRupeeIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import StatusBadge from './StatusBadge';
 
@@ -21,17 +22,16 @@ const OrderDetails = ({
   patientDetails, 
   addressDetails,
   formatDate, 
-  deliveryStatus, 
-  setDeliveryStatus, 
-  updateOrderStatus, 
   assignLoading, 
   setAssignModalOpen 
 }) => {
   if (!order) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-        <TruckIcon className="h-12 w-12 text-gray-300 mx-auto" />
-        <p className="mt-4 text-gray-500">Select an order to view details</p>
+      <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
+        <div className="bg-primary/5 rounded-full p-4 w-20 h-20 mx-auto flex items-center justify-center">
+          <TruckIcon className="h-10 w-10 text-primary" />
+        </div>
+        <p className="mt-4 text-gray-500 font-medium">Select an order to view details</p>
       </div>
     );
   }
@@ -43,62 +43,58 @@ const OrderDetails = ({
   const addressDataExists = hasAddressId && addressDetails[order.addressId];
   const address = addressDataExists ? addressDetails[order.addressId] : null;
   
-  console.log('OrderDetails - address data:', { 
-    hasAddressId, 
-    addressId: order.addressId, 
-    addressDataExists, 
-    address 
-  });
-  
   return (
-    <div className="bg-white rounded-xl shadow-sm">
-      <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-800">Order Details</h2>
-        <StatusBadge status={order.status} />
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+      <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h2 className="text-lg font-semibold text-primary">Order Details</h2>
+        <StatusBadge status={order.status} size="lg" />
       </div>
-      <div className="p-6 space-y-6">
+      
+      <div className="divide-y divide-gray-100">
         {/* Order ID & Date */}
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-sm text-gray-500">Order ID</p>
-            <p className="text-sm font-medium text-gray-800">{order.id}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Order Date</p>
-            <p className="text-sm text-gray-800">{formatDate(order.orderDate)}</p>
+        <div className="p-6 bg-gradient-to-r from-primary/5 to-transparent">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-gray-500 font-medium">Order ID</p>
+              <p className="text-sm font-semibold text-gray-800 mt-1">{order.id}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs uppercase tracking-wider text-gray-500 font-medium">Order Date</p>
+              <p className="text-sm font-semibold text-gray-800 mt-1">{formatDate(order.orderDate)}</p>
+            </div>
           </div>
         </div>
         
         {/* Patient Information */}
-        <div className="border-t border-gray-100 pt-4">
-          <h3 className="text-sm font-medium text-gray-800 mb-3 flex items-center">
-            <UserIcon className="h-4 w-4 mr-1.5 text-primary" />
+        <div className="p-6">
+          <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
+            <UserIcon className="h-4 w-4 mr-2" />
             Patient Information
           </h3>
           
-          <div className="bg-gray-50 rounded-xl p-4 shadow-sm">
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm">
             <div className="flex items-start space-x-3">
               {patient.photoURL ? (
                 <img 
                   src={patient.photoURL} 
                   alt={patient.name} 
-                  className="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm"
+                  className="h-14 w-14 rounded-xl object-cover shadow-sm border-2 border-white"
                 />
               ) : (
-                <div className="h-12 w-12 rounded-full bg-primary-light/30 flex items-center justify-center text-primary font-medium">
-                  {patient.name?.charAt(0) || '?'}
+                <div className="h-14 w-14 rounded-xl bg-primary-light flex items-center justify-center text-white font-medium text-lg shadow-sm">
+                  {patient.name?.charAt(0).toUpperCase() || '?'}
                 </div>
               )}
               
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-gray-800">{patient.name}</h4>
-                <div className="mt-3 space-y-2 text-sm">
-                  <p className="flex items-center text-gray-700">
-                    <PhoneIcon className="h-4 w-4 mr-2 text-gray-400" />
+                <h4 className="text-base font-semibold text-gray-900">{patient.name}</h4>
+                <div className="mt-3 space-y-2">
+                  <p className="flex items-center text-gray-700 text-sm">
+                    <PhoneIcon className="h-4 w-4 mr-2 text-primary" />
                     {patient.phone || 'No phone number'}
                   </p>
-                  <p className="flex items-center text-gray-700">
-                    <EnvelopeIcon className="h-4 w-4 mr-2 text-gray-400" />
+                  <p className="flex items-center text-gray-700 text-sm">
+                    <EnvelopeIcon className="h-4 w-4 mr-2 text-primary" />
                     {patient.email || 'No email'}
                   </p>
                 </div>
@@ -106,16 +102,16 @@ const OrderDetails = ({
             </div>
             
             {(patient.createdAt || patient.lastLoginAt) && (
-              <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-2 gap-2 text-xs text-gray-500">
+              <div className="mt-4 pt-3 border-t border-gray-200 grid grid-cols-2 gap-3 text-xs">
                 {patient.createdAt && (
-                  <div className="flex items-center">
-                    <CalendarIcon className="h-3.5 w-3.5 mr-1 text-gray-400" />
+                  <div className="flex items-center text-gray-600">
+                    <CalendarIcon className="h-3.5 w-3.5 mr-1.5 text-primary" />
                     <span>Joined: {formatDate(patient.createdAt)}</span>
                   </div>
                 )}
                 {patient.lastLoginAt && (
-                  <div className="flex items-center">
-                    <ClockIcon className="h-3.5 w-3.5 mr-1 text-gray-400" />
+                  <div className="flex items-center text-gray-600">
+                    <ClockIcon className="h-3.5 w-3.5 mr-1.5 text-primary" />
                     <span>Last active: {formatDate(patient.lastLoginAt)}</span>
                   </div>
                 )}
@@ -124,7 +120,7 @@ const OrderDetails = ({
             
             {patient.provider && (
               <div className="mt-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
                   {patient.provider}
                 </span>
               </div>
@@ -133,29 +129,29 @@ const OrderDetails = ({
         </div>
 
         {/* Delivery Address */}
-        <div className="border-t border-gray-100 pt-4">
-          <h3 className="text-sm font-medium text-gray-800 mb-3 flex items-center">
-            <MapPinIcon className="h-4 w-4 mr-1.5 text-primary" />
+        <div className="p-6">
+          <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
+            <MapPinIcon className="h-4 w-4 mr-2" />
             Delivery Address
           </h3>
           
-          <div className="bg-gray-50 rounded-xl p-4 shadow-sm">
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm">
             {!hasAddressId ? (
               <div className="flex items-center text-amber-600">
                 <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
-                <p>No address ID provided for this order</p>
+                <p className="font-medium">No address ID provided for this order</p>
               </div>
             ) : !addressDataExists ? (
               <div className="flex items-center text-amber-600">
                 <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
-                <p>Address data not loaded yet</p>
+                <p className="font-medium">Address data not loaded yet</p>
               </div>
             ) : address && address.address ? (
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <HomeIcon className="h-5 w-5 mr-2 text-gray-400 mt-0.5" />
+                  <HomeIcon className="h-5 w-5 mr-2 text-primary mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-gray-800">
+                    <p className="text-sm font-semibold text-gray-800">
                       {address.address}
                     </p>
                   </div>
@@ -163,7 +159,7 @@ const OrderDetails = ({
                 
                 {address.additionalInfo && (
                   <div className="flex items-start">
-                    <InformationCircleIcon className="h-5 w-5 mr-2 text-gray-400 mt-0.5" />
+                    <InformationCircleIcon className="h-5 w-5 mr-2 text-primary mt-0.5" />
                     <p className="text-sm text-gray-600">{address.additionalInfo}</p>
                   </div>
                 )}
@@ -177,7 +173,7 @@ const OrderDetails = ({
                       href={`https://www.google.com/maps?q=${address.latitude},${address.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-primary hover:text-primary-hover mt-1 inline-block"
+                      className="text-xs text-primary hover:text-primary-hover mt-1 inline-block font-medium"
                     >
                       View on Google Maps
                     </a>
@@ -186,7 +182,8 @@ const OrderDetails = ({
                 
                 {address.isDefault && (
                   <div className="pt-1">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                      <ShieldCheckIcon className="h-3.5 w-3.5 mr-1" />
                       Default Address
                     </span>
                   </div>
@@ -195,101 +192,98 @@ const OrderDetails = ({
             ) : (
               <div className="flex items-center text-amber-600">
                 <MapPinIcon className="h-5 w-5 mr-2" />
-                <p>Address data is empty or invalid</p>
+                <p className="font-medium">Address data is empty or invalid</p>
               </div>
             )}
           </div>
         </div>
         
-        {/* Prescription & Medicine Details */}
-        <div className="border-t border-gray-100 pt-4">
-          <h3 className="text-sm font-medium text-gray-800 mb-3 flex items-center">
-            <ClipboardDocumentListIcon className="h-4 w-4 mr-1.5 text-primary" />
+        {/* Medicine Details */}
+        <div className="p-6">
+          <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
+            <ClipboardDocumentListIcon className="h-4 w-4 mr-2" />
             Medicine Details
           </h3>
           <ul className="space-y-3">
             {order.medicines.map((medicine, index) => (
-              <li key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex justify-between">
-                  <p className="text-sm font-medium text-gray-800">{medicine.medicineName}</p>
-                  <p className="text-sm font-semibold text-primary">₹{medicine.totalPrice}</p>
+              <li key={index} className="bg-gradient-to-r from-gray-50 to-white rounded-xl p-4 border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-semibold text-gray-900">{medicine.medicineName}</p>
+                  <p className="flex items-center text-sm font-bold text-primary">
+                    <CurrencyRupeeIcon className="h-3.5 w-3.5 mr-0.5" />
+                    {medicine.totalPrice}
+                  </p>
                 </div>
-                <div className="mt-2 text-xs text-gray-500 grid grid-cols-2 gap-2">
-                  <p className="flex items-center">
-                    <span className="w-20 text-gray-600">Quantity:</span> 
-                    <span className="font-medium">{medicine.quantity} units</span>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                  <p className="flex items-center text-gray-700">
+                    <span className="text-gray-500 mr-2">Quantity:</span> 
+                    <span className="font-semibold">{medicine.quantity} units</span>
                   </p>
-                  <p className="flex items-center">
-                    <span className="w-20 text-gray-600">Price/Unit:</span> 
-                    <span className="font-medium">₹{medicine.pricePerUnit}</span>
+                  <p className="flex items-center text-gray-700">
+                    <span className="text-gray-500 mr-2">Price/Unit:</span> 
+                    <span className="font-semibold">₹{medicine.pricePerUnit}</span>
                   </p>
-                  <p className="flex items-center">
-                    <span className="w-20 text-gray-600">Dosage:</span> 
-                    <span className="font-medium">{medicine.dosage}</span>
+                  <p className="flex items-center text-gray-700">
+                    <span className="text-gray-500 mr-2">Dosage:</span> 
+                    <span className="font-semibold">{medicine.dosage}</span>
                   </p>
-                  <p className="flex items-center">
-                    <span className="w-20 text-gray-600">Frequency:</span> 
-                    <span className="font-medium">{medicine.frequency}</span>
+                  <p className="flex items-center text-gray-700">
+                    <span className="text-gray-500 mr-2">Frequency:</span> 
+                    <span className="font-semibold">{medicine.frequency}</span>
                   </p>
-                  <p className="col-span-2 flex items-center">
-                    <span className="w-20 text-gray-600">Days Supply:</span> 
-                    <span className="font-medium">{medicine.daysSupply} days</span>
+                  <p className="col-span-2 flex items-center text-gray-700">
+                    <span className="text-gray-500 mr-2">Days Supply:</span> 
+                    <span className="font-semibold">{medicine.daysSupply} days</span>
                   </p>
                 </div>
               </li>
             ))}
           </ul>
-          <div className="mt-4 flex justify-between items-center border-t border-gray-100 pt-3 px-2">
-            <p className="text-sm font-medium text-gray-700">Total Amount</p>
-            <p className="text-base font-bold text-primary">₹{order.totalAmount}</p>
+          <div className="mt-4 flex justify-between items-center border-t border-gray-100 pt-4">
+            <p className="text-sm font-semibold text-gray-700">Total Amount</p>
+            <p className="text-base font-bold text-primary flex items-center">
+              <CurrencyRupeeIcon className="h-4 w-4 mr-0.5" />
+              {order.totalAmount}
+            </p>
           </div>
         </div>
         
-        {/* Assignment & Actions */}
-        <div className="border-t border-gray-100 pt-4 space-y-4">
-          <h3 className="text-sm font-medium text-gray-800 mb-3 flex items-center">
-            <TruckIcon className="h-4 w-4 mr-1.5 text-primary" />
-            Delivery Status
+        {/* Assignment Actions */}
+        <div className="p-6">
+          <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
+            <TruckIcon className="h-4 w-4 mr-2" />
+            Delivery Information
           </h3>
           
           {order.deliveryStaffId ? (
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 shadow-sm">
-              <p className="text-sm font-medium text-gray-800">Assigned To</p>
-              <p className="text-sm text-gray-700 mb-3">{order.deliveryStaffName}</p>
-              
-              {/* Status update for assigned orders */}
-              <div className="mt-3 grid grid-cols-1 gap-2">
-                <p className="text-sm font-medium text-gray-800">Update Status</p>
-                <select 
-                  className="w-full p-2.5 bg-white border border-gray-200 rounded-md text-sm"
-                  value={deliveryStatus}
-                  onChange={(e) => setDeliveryStatus(e.target.value)}
-                >
-                  <option value="">Select status...</option>
-                  <option value="processing">Processing</option>
-                  <option value="dispatched">Dispatched</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <button
-                  className="w-full py-2 px-4 bg-primary text-white rounded-lg text-sm hover:bg-primary-hover transition-colors"
-                  onClick={updateOrderStatus}
-                  disabled={!deliveryStatus || assignLoading}
-                >
-                  {assignLoading ? 'Updating...' : 'Update Status'}
-                </button>
+            <div className="bg-gradient-to-r from-primary/5 to-gray-50 rounded-xl p-5 border border-primary/20 shadow-sm">
+              <div className="flex items-center space-x-3">
+                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white">
+                  <TruckIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Assigned To</p>
+                  <p className="text-base font-semibold text-gray-900">{order.deliveryStaffName}</p>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="bg-gradient-to-tr from-amber-50 to-amber-100 rounded-lg p-4 shadow-sm text-center border border-amber-200">
-              <p className="text-sm text-amber-800 mb-3">This order needs to be assigned to a delivery staff member</p>
-              <button
-                className="flex items-center justify-center mx-auto py-2.5 px-6 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-colors shadow-sm"
-                onClick={() => setAssignModalOpen(true)}
-              >
-                <PlusIcon className="h-4 w-4 mr-1.5" />
-                Assign Delivery Staff
-              </button>
+            <div className="bg-gradient-to-r from-primary/5 to-white rounded-xl p-5 border border-primary/20 shadow-sm">
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-700 mb-4">This order needs to be assigned to a delivery staff member</p>
+                <button
+                  className="flex items-center justify-center mx-auto py-2.5 px-8 bg-primary text-white rounded-lg text-sm hover:bg-primary-hover transition-all shadow-sm font-medium"
+                  onClick={() => setAssignModalOpen(true)}
+                  disabled={assignLoading}
+                >
+                  {assignLoading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                  ) : (
+                    <PlusIcon className="h-4 w-4 mr-2" />
+                  )}
+                  Assign Delivery Staff
+                </button>
+              </div>
             </div>
           )}
         </div>

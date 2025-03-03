@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Layout from '../components/layout/Layout';
-import { TruckIcon } from '@heroicons/react/24/outline';
+import { TruckIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 // Import our components
 import OrdersTable from '../components/medication_delivery/OrdersTable';
@@ -38,7 +38,6 @@ const MedicationDeliveryPage = () => {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [orderExpanded, setOrderExpanded] = useState({});
-  const [deliveryStatus, setDeliveryStatus] = useState('');
 
   // Fetch initial data
   useEffect(() => {
@@ -157,21 +156,15 @@ const MedicationDeliveryPage = () => {
   // Fetch address details
   const fetchAddressDetails = async (ordersData) => {
     try {
-      console.log('Starting address fetch for orders:', ordersData.length);
       const addressIds = [...new Set(ordersData.map(order => order.addressId).filter(Boolean))];
-      console.log('Address IDs to fetch:', addressIds);
       const addressData = {};
       
       for (const addressId of addressIds) {
         try {
-          console.log('Fetching address for ID:', addressId);
-          
           // The collection path should be users/{userId}/addresses/{addressId}
-          // From the screenshot, we can see the correct path structure
           // Get the order with this addressId to find the userId
           const orderWithAddress = ordersData.find(order => order.addressId === addressId);
           if (!orderWithAddress || !orderWithAddress.userId) {
-            console.log('Could not find order with userId for addressId:', addressId);
             addressData[addressId] = {
               id: addressId,
               address: 'Address not found - no user ID',
@@ -184,22 +177,18 @@ const MedicationDeliveryPage = () => {
           }
           
           const userId = orderWithAddress.userId;
-          console.log('Found userId for address:', userId);
           
           // Correct path: users/{userId}/addresses/{addressId}
           const addressDoc = await getDoc(doc(db, 'users', userId, 'addresses', addressId));
-          console.log('Address doc exists:', addressDoc.exists());
           
           if (addressDoc.exists()) {
             const addressDataFromDoc = addressDoc.data();
-            console.log('Address data retrieved:', addressDataFromDoc);
             
             addressData[addressId] = {
               id: addressId,
               ...addressDataFromDoc
             };
           } else {
-            console.log('Address doc not found for path:', `users/${userId}/addresses/${addressId}`);
             // If not found, set default values matching actual structure
             addressData[addressId] = {
               id: addressId,
@@ -223,7 +212,6 @@ const MedicationDeliveryPage = () => {
         }
       }
       
-      console.log('Final address data:', addressData);
       setAddressDetails(addressData);
     } catch (error) {
       console.error('Error in address fetching process:', error);
@@ -233,27 +221,27 @@ const MedicationDeliveryPage = () => {
   // Fetch prescription and doctor details
   const fetchPrescriptionDetails = async (ordersData) => {
     try {
-        const prescriptionIds = [...new Set(ordersData.map(order => order.prescriptionId).filter(Boolean))];
-        const doctorIds = new Set();
-        
-        for (const prescriptionId of prescriptionIds) {
-          const prescriptionDoc = await getDoc(doc(db, 'prescriptions', prescriptionId));
-          if (prescriptionDoc.exists() && prescriptionDoc.data().doctorId) {
-            doctorIds.add(prescriptionDoc.data().doctorId);
-          }
+      const prescriptionIds = [...new Set(ordersData.map(order => order.prescriptionId).filter(Boolean))];
+      const doctorIds = new Set();
+      
+      for (const prescriptionId of prescriptionIds) {
+        const prescriptionDoc = await getDoc(doc(db, 'prescriptions', prescriptionId));
+        if (prescriptionDoc.exists() && prescriptionDoc.data().doctorId) {
+          doctorIds.add(prescriptionDoc.data().doctorId);
         }
-        
-        // Fetch doctor details
-        const doctorData = {};
-        for (const doctorId of doctorIds) {
-          const doctorDoc = await getDoc(doc(db, 'users', doctorId));
-          if (doctorDoc.exists()) {
-            doctorData[doctorId] = doctorDoc.data();
-          }
+      }
+      
+      // Fetch doctor details
+      const doctorData = {};
+      for (const doctorId of doctorIds) {
+        const doctorDoc = await getDoc(doc(db, 'users', doctorId));
+        if (doctorDoc.exists()) {
+          doctorData[doctorId] = doctorDoc.data();
         }
-        
-        setDoctorDetails(doctorData);
-      } catch (error) {
+      }
+      
+      setDoctorDetails(doctorData);
+    } catch (error) {
       console.error('Error fetching prescription details:', error);
     }
   };
@@ -265,15 +253,11 @@ const MedicationDeliveryPage = () => {
     // Fetch address details if needed
     if (order.addressId && !addressDetails[order.addressId]) {
       try {
-        console.log('Fetching address in handleOrderSelect for:', order.addressId);
-        
         // Use the correct path: users/{userId}/addresses/{addressId}
         const addressDoc = await getDoc(doc(db, 'users', order.userId, 'addresses', order.addressId));
-        console.log('Address exists in handleOrderSelect:', addressDoc.exists());
         
         if (addressDoc.exists()) {
           const addressData = addressDoc.data();
-          console.log('Address data in handleOrderSelect:', addressData);
           
           setAddressDetails(prev => ({
             ...prev,
@@ -283,7 +267,6 @@ const MedicationDeliveryPage = () => {
             }
           }));
         } else {
-          console.log('Address not found in handleOrderSelect:', order.addressId);
           setAddressDetails(prev => ({
             ...prev,
             [order.addressId]: {
@@ -365,36 +348,15 @@ const MedicationDeliveryPage = () => {
     }
   };
 
-  // Update order status
-  const updateOrderStatus = async () => {
-    if (!selectedOrder || !deliveryStatus) return;
-    
-    try {
-      setAssignLoading(true);
-      
-      // Update order in Firestore
-      await updateDoc(doc(db, 'orders', selectedOrder.id), {
-        status: deliveryStatus,
-        updatedAt: Timestamp.now()
-      });
-      
-      // We don't need to update local state manually anymore
-      // as the onSnapshot listener will handle this
-      
-      setDeliveryStatus('');
-    } catch (error) {
-      console.error('Error updating order status:', error);
-    } finally {
-      setAssignLoading(false);
-    }
-  };
-
   // Loading state
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="flex items-center justify-center min-h-screen bg-background-secondary">
+          <div className="flex flex-col items-center p-8 bg-white rounded-xl shadow-lg">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-gray-600 font-medium">Loading medication orders...</p>
+          </div>
         </div>
       </Layout>
     );
@@ -402,56 +364,70 @@ const MedicationDeliveryPage = () => {
 
   return (
     <Layout>
-      <div className="p-4 sm:p-6 bg-gray-50/50 min-h-screen">
+      <div className="min-h-screen bg-gray-50/70">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex items-center">
-            <div className="p-2.5 bg-emerald-100 rounded-lg mr-4">
-              <TruckIcon className="h-8 w-8 text-emerald-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Medication Delivery</h1>
-              <p className="text-sm text-gray-600 mt-1">Manage medication orders and deliveries</p>
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center">
+                <div className="p-3 bg-primary/10 rounded-lg mr-4">
+                  <TruckIcon className="h-7 w-7 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Medication Delivery</h1>
+                  <p className="text-sm text-gray-600 mt-1">Track and manage medication deliveries</p>
+                </div>
+              </div>
+              
+              {/* Filters */}
+              <OrderFilters 
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+              />
             </div>
           </div>
-          
-          {/* Filters */}
-          <OrderFilters 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-          />
         </div>
+        
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Orders Table */}
+            <div className="lg:col-span-2">
+              {filteredOrders.length > 0 ? (
+                <OrdersTable
+                  orders={filteredOrders}
+                  selectedOrderId={selectedOrder?.id}
+                  patientDetails={patientDetails}
+                  addressDetails={addressDetails}
+                  orderExpanded={orderExpanded}
+                  formatDate={formatDate}
+                  handleOrderSelect={handleOrderSelect}
+                  toggleOrderExpanded={toggleOrderExpanded}
+                />
+              ) : (
+                <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
+                  <div className="bg-primary/5 rounded-full p-4 w-20 h-20 mx-auto flex items-center justify-center">
+                    <DocumentTextIcon className="h-10 w-10 text-primary" />
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold text-gray-800">No Orders Found</h3>
+                  <p className="mt-2 text-gray-500">Try adjusting your filters to find what you're looking for.</p>
+                </div>
+              )}
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Orders Table */}
-          <div className="lg:col-span-2">
-            <OrdersTable
-              orders={filteredOrders}
-              selectedOrderId={selectedOrder?.id}
-              patientDetails={patientDetails}
-              addressDetails={addressDetails}
-              orderExpanded={orderExpanded}
-              formatDate={formatDate}
-              handleOrderSelect={handleOrderSelect}
-              toggleOrderExpanded={toggleOrderExpanded}
-            />
-          </div>
-
-          {/* Order Details Panel */}
-          <div className="lg:col-span-1">
-            <OrderDetails
-              order={selectedOrder}
-              patientDetails={patientDetails}
-              addressDetails={addressDetails}
-              formatDate={formatDate}
-              deliveryStatus={deliveryStatus}
-              setDeliveryStatus={setDeliveryStatus}
-              updateOrderStatus={updateOrderStatus}
-              assignLoading={assignLoading}
-              setAssignModalOpen={setAssignModalOpen}
-            />
+            {/* Order Details Panel */}
+            <div className="lg:col-span-1">
+              <OrderDetails
+                order={selectedOrder}
+                patientDetails={patientDetails}
+                addressDetails={addressDetails}
+                formatDate={formatDate}
+                assignLoading={assignLoading}
+                setAssignModalOpen={setAssignModalOpen}
+              />
+            </div>
           </div>
         </div>
         
