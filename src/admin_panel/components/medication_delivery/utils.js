@@ -19,9 +19,10 @@ export const formatDate = (date) => {
  * @param {string} searchTerm - Search term
  * @param {string} statusFilter - Status filter
  * @param {Object} patientDetails - Patient details
+ * @param {Object} addressDetails - Address details
  * @returns {Array} Filtered orders
  */
-export const filterOrders = (orders, searchTerm, statusFilter, patientDetails) => {
+export const filterOrders = (orders, searchTerm, statusFilter, patientDetails, addressDetails = {}) => {
   let results = [...orders];
   
   if (statusFilter !== 'all') {
@@ -34,10 +35,24 @@ export const filterOrders = (orders, searchTerm, statusFilter, patientDetails) =
       const medicineNames = order.medicines.map(med => med.medicineName.toLowerCase()).join(' ');
       const searchLower = searchTerm.toLowerCase();
       
+      // Include address fields in search
+      let addressMatch = false;
+      if (order.addressId && addressDetails[order.addressId]) {
+        const address = addressDetails[order.addressId];
+        // Use actual address structure
+        const addressString = [
+          address.address,
+          address.additionalInfo
+        ].filter(Boolean).join(' ').toLowerCase();
+        
+        addressMatch = addressString.includes(searchLower);
+      }
+      
       return (
         patientName.toLowerCase().includes(searchLower) ||
         medicineNames.includes(searchLower) ||
-        order.id.toLowerCase().includes(searchLower)
+        order.id.toLowerCase().includes(searchLower) ||
+        addressMatch
       );
     });
   }

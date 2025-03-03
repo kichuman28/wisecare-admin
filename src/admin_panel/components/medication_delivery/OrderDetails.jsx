@@ -9,13 +9,17 @@ import {
   MapPinIcon,
   PlusIcon,
   CalendarIcon,
-  ClockIcon
+  ClockIcon,
+  HomeIcon,
+  InformationCircleIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import StatusBadge from './StatusBadge';
 
 const OrderDetails = ({ 
   order, 
   patientDetails, 
+  addressDetails,
   formatDate, 
   deliveryStatus, 
   setDeliveryStatus, 
@@ -33,6 +37,18 @@ const OrderDetails = ({
   }
   
   const patient = patientDetails[order.userId] || {};
+  
+  // More careful address handling
+  const hasAddressId = Boolean(order.addressId);
+  const addressDataExists = hasAddressId && addressDetails[order.addressId];
+  const address = addressDataExists ? addressDetails[order.addressId] : null;
+  
+  console.log('OrderDetails - address data:', { 
+    hasAddressId, 
+    addressId: order.addressId, 
+    addressDataExists, 
+    address 
+  });
   
   return (
     <div className="bg-white rounded-xl shadow-sm">
@@ -85,12 +101,6 @@ const OrderDetails = ({
                     <EnvelopeIcon className="h-4 w-4 mr-2 text-gray-400" />
                     {patient.email || 'No email'}
                   </p>
-                  {order.deliveryAddress && (
-                    <p className="flex items-start text-gray-700">
-                      <MapPinIcon className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
-                      <span>{order.deliveryAddress}</span>
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
@@ -117,6 +127,75 @@ const OrderDetails = ({
                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
                   {patient.provider}
                 </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Delivery Address */}
+        <div className="border-t border-gray-100 pt-4">
+          <h3 className="text-sm font-medium text-gray-800 mb-3 flex items-center">
+            <MapPinIcon className="h-4 w-4 mr-1.5 text-primary" />
+            Delivery Address
+          </h3>
+          
+          <div className="bg-gray-50 rounded-xl p-4 shadow-sm">
+            {!hasAddressId ? (
+              <div className="flex items-center text-amber-600">
+                <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
+                <p>No address ID provided for this order</p>
+              </div>
+            ) : !addressDataExists ? (
+              <div className="flex items-center text-amber-600">
+                <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
+                <p>Address data not loaded yet</p>
+              </div>
+            ) : address && address.address ? (
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <HomeIcon className="h-5 w-5 mr-2 text-gray-400 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {address.address}
+                    </p>
+                  </div>
+                </div>
+                
+                {address.additionalInfo && (
+                  <div className="flex items-start">
+                    <InformationCircleIcon className="h-5 w-5 mr-2 text-gray-400 mt-0.5" />
+                    <p className="text-sm text-gray-600">{address.additionalInfo}</p>
+                  </div>
+                )}
+                
+                {(address.latitude && address.longitude) && (
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <p className="text-xs text-gray-500">
+                      Location: {address.latitude.toFixed(6)}, {address.longitude.toFixed(6)}
+                    </p>
+                    <a 
+                      href={`https://www.google.com/maps?q=${address.latitude},${address.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:text-primary-hover mt-1 inline-block"
+                    >
+                      View on Google Maps
+                    </a>
+                  </div>
+                )}
+                
+                {address.isDefault && (
+                  <div className="pt-1">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700">
+                      Default Address
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center text-amber-600">
+                <MapPinIcon className="h-5 w-5 mr-2" />
+                <p>Address data is empty or invalid</p>
               </div>
             )}
           </div>

@@ -32,6 +32,7 @@ const MedicationDeliveryPage = () => {
   const [loading, setLoading] = useState(true);
   const [patientDetails, setPatientDetails] = useState({});
   const [doctorDetails, setDoctorDetails] = useState({});
+  const [addressDetails, setAddressDetails] = useState({});
   const [assignLoading, setAssignLoading] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -45,9 +46,9 @@ const MedicationDeliveryPage = () => {
 
   // Apply filters when search term or status filter changes
   useEffect(() => {
-    const filtered = filterOrders(orders, searchTerm, statusFilter, patientDetails);
+    const filtered = filterOrders(orders, searchTerm, statusFilter, patientDetails, addressDetails);
     setFilteredOrders(filtered);
-  }, [searchTerm, statusFilter, orders, patientDetails]);
+  }, [searchTerm, statusFilter, orders, patientDetails, addressDetails]);
 
   // Fetch all required data
     const fetchData = async () => {
@@ -82,6 +83,9 @@ const MedicationDeliveryPage = () => {
         
         // Fetch user details for all orders
       await fetchPatientDetails(ordersData);
+      
+      // Fetch addresses for all orders
+      await fetchAddressDetails(ordersData);
       
       // Fetch prescription details
       await fetchPrescriptionDetails(ordersData);
@@ -130,6 +134,82 @@ const MedicationDeliveryPage = () => {
       console.error('Error fetching patient details:', error);
     }
   };
+
+  // Fetch address details
+  const fetchAddressDetails = async (ordersData) => {
+    try {
+      console.log('Starting address fetch for orders:', ordersData.length);
+      const addressIds = [...new Set(ordersData.map(order => order.addressId).filter(Boolean))];
+      console.log('Address IDs to fetch:', addressIds);
+      const addressData = {};
+      
+      for (const addressId of addressIds) {
+        try {
+          console.log('Fetching address for ID:', addressId);
+          
+          // The collection path should be users/{userId}/addresses/{addressId}
+          // From the screenshot, we can see the correct path structure
+          // Get the order with this addressId to find the userId
+          const orderWithAddress = ordersData.find(order => order.addressId === addressId);
+          if (!orderWithAddress || !orderWithAddress.userId) {
+            console.log('Could not find order with userId for addressId:', addressId);
+            addressData[addressId] = {
+              id: addressId,
+              address: 'Address not found - no user ID',
+              additionalInfo: '',
+              latitude: null,
+              longitude: null,
+              isDefault: false
+            };
+            continue;
+          }
+          
+          const userId = orderWithAddress.userId;
+          console.log('Found userId for address:', userId);
+          
+          // Correct path: users/{userId}/addresses/{addressId}
+          const addressDoc = await getDoc(doc(db, 'users', userId, 'addresses', addressId));
+          console.log('Address doc exists:', addressDoc.exists());
+          
+          if (addressDoc.exists()) {
+            const addressDataFromDoc = addressDoc.data();
+            console.log('Address data retrieved:', addressDataFromDoc);
+            
+            addressData[addressId] = {
+              id: addressId,
+              ...addressDataFromDoc
+            };
+          } else {
+            console.log('Address doc not found for path:', `users/${userId}/addresses/${addressId}`);
+            // If not found, set default values matching actual structure
+            addressData[addressId] = {
+              id: addressId,
+              address: 'Address not found',
+              additionalInfo: '',
+              latitude: null,
+              longitude: null,
+              isDefault: false
+            };
+          }
+        } catch (addressError) {
+          console.error('Error fetching specific address:', addressId, addressError);
+          addressData[addressId] = {
+            id: addressId,
+            address: 'Error fetching address',
+            additionalInfo: '',
+            latitude: null,
+            longitude: null,
+            isDefault: false
+          };
+        }
+      }
+      
+      console.log('Final address data:', addressData);
+      setAddressDetails(addressData);
+    } catch (error) {
+      console.error('Error in address fetching process:', error);
+    }
+  };
         
   // Fetch prescription and doctor details
   const fetchPrescriptionDetails = async (ordersData) => {
@@ -162,6 +242,45 @@ const MedicationDeliveryPage = () => {
   // Handle order selection
   const handleOrderSelect = async (order) => {
     setSelectedOrder(order);
+    
+    // Fetch address details if needed
+    if (order.addressId && !addressDetails[order.addressId]) {
+      try {
+        console.log('Fetching address in handleOrderSelect for:', order.addressId);
+        
+        // Use the correct path: users/{userId}/addresses/{addressId}
+        const addressDoc = await getDoc(doc(db, 'users', order.userId, 'addresses', order.addressId));
+        console.log('Address exists in handleOrderSelect:', addressDoc.exists());
+        
+        if (addressDoc.exists()) {
+          const addressData = addressDoc.data();
+          console.log('Address data in handleOrderSelect:', addressData);
+          
+          setAddressDetails(prev => ({
+            ...prev,
+            [order.addressId]: {
+              id: order.addressId,
+              ...addressData
+            }
+          }));
+        } else {
+          console.log('Address not found in handleOrderSelect:', order.addressId);
+          setAddressDetails(prev => ({
+            ...prev,
+            [order.addressId]: {
+              id: order.addressId,
+              address: 'Address not found',
+              additionalInfo: '',
+              latitude: null,
+              longitude: null,
+              isDefault: false
+            }
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching address in handleOrderSelect:', error);
+      }
+    }
     
     // Fetch prescription details if needed
     if (order.prescriptionId) {
@@ -325,6 +444,7 @@ const MedicationDeliveryPage = () => {
               orders={filteredOrders}
               selectedOrderId={selectedOrder?.id}
               patientDetails={patientDetails}
+              addressDetails={addressDetails}
               orderExpanded={orderExpanded}
               formatDate={formatDate}
               handleOrderSelect={handleOrderSelect}
@@ -337,6 +457,7 @@ const MedicationDeliveryPage = () => {
             <OrderDetails
               order={selectedOrder}
               patientDetails={patientDetails}
+              addressDetails={addressDetails}
               formatDate={formatDate}
               deliveryStatus={deliveryStatus}
               setDeliveryStatus={setDeliveryStatus}

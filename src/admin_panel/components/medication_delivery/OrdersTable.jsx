@@ -2,7 +2,8 @@ import React from 'react';
 import { 
   ChevronUpIcon, 
   ChevronDownIcon,
-  ExclamationTriangleIcon 
+  ExclamationTriangleIcon,
+  MapPinIcon 
 } from '@heroicons/react/24/outline';
 import StatusBadge from './StatusBadge';
 
@@ -10,15 +11,32 @@ const OrdersTable = ({
   orders, 
   selectedOrderId, 
   patientDetails, 
+  addressDetails,
   orderExpanded, 
   formatDate, 
   handleOrderSelect, 
   toggleOrderExpanded 
 }) => {
+  // Helper function to format address for display
+  const formatAddressPreview = (addressId) => {
+    if (!addressId) return 'No address ID';
+    if (!addressDetails || !addressDetails[addressId]) return 'Address data not loaded';
+    
+    const address = addressDetails[addressId];
+    
+    // Check if address has the address field
+    if (!address.address) return 'Address details missing';
+    
+    // Truncate if too long
+    const fullAddress = address.address;
+    return fullAddress.length > 40 ? `${fullAddress.substring(0, 37)}...` : fullAddress;
+  };
+  
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100">
         <h2 className="text-lg font-semibold text-gray-800">Medication Orders</h2>
+        <p className="text-xs text-gray-500 mt-1">Showing {orders.length} orders</p>
       </div>
       <div className="overflow-x-auto">
         {orders.length > 0 ? (
@@ -93,6 +111,19 @@ const OrdersTable = ({
                               ) : (
                                 <p className="text-amber-600">Not assigned yet</p>
                               )}
+                              
+                              {order.addressId ? (
+                                <div className="mt-2 flex items-start">
+                                  <MapPinIcon className="h-4 w-4 mt-0.5 mr-1.5 text-gray-500" />
+                                  <p className="text-gray-600 break-words">{formatAddressPreview(order.addressId)}</p>
+                                </div>
+                              ) : (
+                                <div className="mt-2 flex items-start">
+                                  <ExclamationTriangleIcon className="h-4 w-4 mt-0.5 mr-1.5 text-amber-500" />
+                                  <p className="text-amber-600">No address provided</p>
+                                </div>
+                              )}
+                              
                               <p className="mt-2">
                                 <button
                                   className="text-primary hover:text-primary-hover text-sm font-medium"
