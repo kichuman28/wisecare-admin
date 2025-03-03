@@ -14,7 +14,11 @@ import {
   ExclamationTriangleIcon,
   CurrencyRupeeIcon,
   ShieldCheckIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon,
+  PencilSquareIcon,
+  ChatBubbleLeftIcon,
+  MapIcon
 } from '@heroicons/react/24/outline';
 import StatusBadge from './StatusBadge';
 
@@ -40,6 +44,26 @@ const OrderDetails = ({
   const hasAddressId = Boolean(order.addressId);
   const addressDataExists = hasAddressId && addressDetails[order.addressId];
   const address = addressDataExists ? addressDetails[order.addressId] : null;
+  
+  // Check if proof of delivery exists
+  const hasDeliveryProof = Boolean(order.proofImageUrl || order.signatureUrl);
+  
+  // Format coordinates for display if they exist
+  const formatCoordinates = (geopoint) => {
+    if (!geopoint) return null;
+    const latitude = geopoint._lat || geopoint.latitude;
+    const longitude = geopoint._long || geopoint.longitude;
+    
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') return null;
+    
+    return {
+      lat: latitude.toFixed(6),
+      lng: longitude.toFixed(6),
+      url: `https://www.google.com/maps?q=${latitude},${longitude}`
+    };
+  };
+  
+  const coordinates = order.statusUpdateLocation ? formatCoordinates(order.statusUpdateLocation) : null;
   
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
@@ -206,6 +230,118 @@ const OrderDetails = ({
               )}
             </div>
           </div>
+
+          {/* Proof of Delivery (only shown for delivered orders) */}
+          {(order.status === "delivered" || hasDeliveryProof) && (
+            <div className="p-6">
+              <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
+                <PhotoIcon className="h-4 w-4 mr-2" />
+                Proof of Delivery
+              </h3>
+
+              <div className="bg-gradient-to-r from-emerald-50 to-white rounded-xl p-4 border border-emerald-100 shadow-sm">
+                {!hasDeliveryProof ? (
+                  <div className="flex items-center justify-center py-6">
+                    <p className="text-gray-500">No delivery proof available</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Delivery Images */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {order.proofImageUrl && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-gray-700 flex items-center">
+                            <PhotoIcon className="h-4 w-4 mr-1.5 text-primary" />
+                            Delivery Photo
+                          </p>
+                          <div className="relative rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-white">
+                            <img 
+                              src={order.proofImageUrl} 
+                              alt="Proof of Delivery" 
+                              className="w-full object-cover h-48"
+                            />
+                            <a 
+                              href={order.proofImageUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="absolute bottom-2 right-2 bg-white text-primary text-xs font-medium px-2 py-1 rounded-md shadow hover:bg-primary hover:text-white transition-colors"
+                            >
+                              View Full Image
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {order.signatureUrl && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-gray-700 flex items-center">
+                            <PencilSquareIcon className="h-4 w-4 mr-1.5 text-primary" />
+                            Customer Signature
+                          </p>
+                          <div className="relative rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-white">
+                            <img 
+                              src={order.signatureUrl} 
+                              alt="Customer Signature" 
+                              className="w-full object-contain h-48 bg-white"
+                            />
+                            <a 
+                              href={order.signatureUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="absolute bottom-2 right-2 bg-white text-primary text-xs font-medium px-2 py-1 rounded-md shadow hover:bg-primary hover:text-white transition-colors"
+                            >
+                              View Full Image
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Delivery Notes */}
+                    {order.deliveryNotes && (
+                      <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
+                        <p className="text-sm font-medium text-gray-700 flex items-center mb-2">
+                          <ChatBubbleLeftIcon className="h-4 w-4 mr-1.5 text-primary" />
+                          Delivery Notes
+                        </p>
+                        <p className="text-sm text-gray-600 italic">"{order.deliveryNotes}"</p>
+                      </div>
+                    )}
+
+                    {/* Delivery Location */}
+                    {coordinates && (
+                      <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
+                        <p className="text-sm font-medium text-gray-700 flex items-center mb-2">
+                          <MapIcon className="h-4 w-4 mr-1.5 text-primary" />
+                          Delivery Location
+                        </p>
+                        <p className="text-sm text-gray-600 mb-1">
+                          Coordinates: {coordinates.lat}, {coordinates.lng}
+                        </p>
+                        <a 
+                          href={coordinates.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:text-primary-hover font-medium inline-flex items-center"
+                        >
+                          <MapPinIcon className="h-3.5 w-3.5 mr-1" />
+                          View on Google Maps
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Delivery Timestamp */}
+                    {order.updatedAt && order.status === "delivered" && (
+                      <div className="text-xs text-gray-500 flex items-center mt-2">
+                        <ClockIcon className="h-3.5 w-3.5 mr-1.5" />
+                        <span>Delivered on: {formatDate(order.updatedAt.toDate ? order.updatedAt.toDate() : order.updatedAt)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         
           {/* Medicine Details */}
           <div className="p-6">
