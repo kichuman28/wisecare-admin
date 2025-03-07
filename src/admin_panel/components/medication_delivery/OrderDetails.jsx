@@ -81,156 +81,156 @@ const OrderDetails = ({
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
-        </div>
+      </div>
       
         <div className="divide-y divide-gray-100">
-          {/* Order ID & Date */}
+        {/* Order ID & Date */}
           <div className="p-6 bg-gradient-to-r from-primary/5 to-transparent">
-            <div className="flex justify-between items-start">
-              <div>
+        <div className="flex justify-between items-start">
+          <div>
                 <p className="text-xs uppercase tracking-wider text-gray-500 font-medium">Order ID</p>
                 <p className="text-sm font-semibold text-gray-800 mt-1">{order.id}</p>
-              </div>
-              <div className="text-right">
+          </div>
+          <div className="text-right">
                 <p className="text-xs uppercase tracking-wider text-gray-500 font-medium">Order Date</p>
                 <p className="text-sm font-semibold text-gray-800 mt-1">{formatDate(order.orderDate)}</p>
               </div>
             </div>
-          </div>
+        </div>
         
-          {/* Patient Information */}
+        {/* Patient Information */}
           <div className="p-6">
             <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
               <UserIcon className="h-4 w-4 mr-2" />
-              Patient Information
-            </h3>
+            Patient Information
+          </h3>
           
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-start space-x-3">
-                {patient.photoURL ? (
-                  <img 
-                    src={patient.photoURL} 
-                    alt={patient.name} 
+            <div className="flex items-start space-x-3">
+              {patient.photoURL ? (
+                <img 
+                  src={patient.photoURL} 
+                  alt={patient.name} 
                     className="h-14 w-14 rounded-xl object-cover shadow-sm border-2 border-white"
-                  />
-                ) : (
+                />
+              ) : (
                   <div className="h-14 w-14 rounded-xl bg-primary-light flex items-center justify-center text-white font-medium text-lg shadow-sm">
                     {patient.name?.charAt(0).toUpperCase() || '?'}
-                  </div>
-                )}
+                </div>
+              )}
               
-                <div className="flex-1">
+              <div className="flex-1">
                   <h4 className="text-base font-semibold text-gray-900">{patient.name}</h4>
                   <div className="mt-3 space-y-2">
                     <p className="flex items-center text-gray-700 text-sm">
                       <PhoneIcon className="h-4 w-4 mr-2 text-primary" />
-                      {patient.phone || 'No phone number'}
-                    </p>
+                    {patient.phone || 'No phone number'}
+                  </p>
                     <p className="flex items-center text-gray-700 text-sm">
                       <EnvelopeIcon className="h-4 w-4 mr-2 text-primary" />
-                      {patient.email || 'No email'}
-                    </p>
-                  </div>
+                    {patient.email || 'No email'}
+                  </p>
                 </div>
               </div>
+            </div>
             
-              {(patient.createdAt || patient.lastLoginAt) && (
+            {(patient.createdAt || patient.lastLoginAt) && (
                 <div className="mt-4 pt-3 border-t border-gray-200 grid grid-cols-2 gap-3 text-xs">
-                  {patient.createdAt && (
+                {patient.createdAt && (
                     <div className="flex items-center text-gray-600">
                       <CalendarIcon className="h-3.5 w-3.5 mr-1.5 text-primary" />
-                      <span>Joined: {formatDate(patient.createdAt)}</span>
-                    </div>
-                  )}
-                  {patient.lastLoginAt && (
+                    <span>Joined: {formatDate(patient.createdAt)}</span>
+                  </div>
+                )}
+                {patient.lastLoginAt && (
                     <div className="flex items-center text-gray-600">
                       <ClockIcon className="h-3.5 w-3.5 mr-1.5 text-primary" />
-                      <span>Last active: {formatDate(patient.lastLoginAt)}</span>
-                    </div>
-                  )}
-                </div>
-              )}
+                    <span>Last active: {formatDate(patient.lastLoginAt)}</span>
+                  </div>
+                )}
+              </div>
+            )}
             
-              {patient.provider && (
-                <div className="mt-2">
+            {patient.provider && (
+              <div className="mt-2">
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
-                    {patient.provider}
-                  </span>
-                </div>
-              )}
-            </div>
+                  {patient.provider}
+                </span>
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Delivery Address */}
+        {/* Delivery Address */}
           <div className="p-6">
             <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
               <MapPinIcon className="h-4 w-4 mr-2" />
-              Delivery Address
-            </h3>
+            Delivery Address
+          </h3>
           
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm">
-              {!hasAddressId ? (
-                <div className="flex items-center text-amber-600">
-                  <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
+            {!hasAddressId ? (
+              <div className="flex items-center text-amber-600">
+                <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
                   <p className="font-medium">No address ID provided for this order</p>
-                </div>
-              ) : !addressDataExists ? (
-                <div className="flex items-center text-amber-600">
-                  <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
+              </div>
+            ) : !addressDataExists ? (
+              <div className="flex items-center text-amber-600">
+                <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
                   <p className="font-medium">Address data not loaded yet</p>
-                </div>
-              ) : address && address.address ? (
-                <div className="space-y-3">
-                  <div className="flex items-start">
+              </div>
+            ) : address && address.address ? (
+              <div className="space-y-3">
+                <div className="flex items-start">
                     <HomeIcon className="h-5 w-5 mr-2 text-primary mt-0.5" />
-                    <div>
+                  <div>
                       <p className="text-sm font-semibold text-gray-800">
-                        {address.address}
-                      </p>
-                    </div>
+                      {address.address}
+                    </p>
                   </div>
+                </div>
                 
-                  {address.additionalInfo && (
-                    <div className="flex items-start">
+                {address.additionalInfo && (
+                  <div className="flex items-start">
                       <InformationCircleIcon className="h-5 w-5 mr-2 text-primary mt-0.5" />
-                      <p className="text-sm text-gray-600">{address.additionalInfo}</p>
-                    </div>
-                  )}
+                    <p className="text-sm text-gray-600">{address.additionalInfo}</p>
+                  </div>
+                )}
                 
-                  {(address.latitude && address.longitude) && (
-                    <div className="mt-2 pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-500">
-                        Location: {address.latitude.toFixed(6)}, {address.longitude.toFixed(6)}
-                      </p>
-                      <a 
-                        href={`https://www.google.com/maps?q=${address.latitude},${address.longitude}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                {(address.latitude && address.longitude) && (
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <p className="text-xs text-gray-500">
+                      Location: {address.latitude.toFixed(6)}, {address.longitude.toFixed(6)}
+                    </p>
+                    <a 
+                      href={`https://www.google.com/maps?q=${address.latitude},${address.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                         className="text-xs text-primary hover:text-primary-hover mt-1 inline-block font-medium"
-                      >
-                        View on Google Maps
-                      </a>
-                    </div>
-                  )}
+                    >
+                      View on Google Maps
+                    </a>
+                  </div>
+                )}
                 
-                  {address.isDefault && (
-                    <div className="pt-1">
+                {address.isDefault && (
+                  <div className="pt-1">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
                         <ShieldCheckIcon className="h-3.5 w-3.5 mr-1" />
-                        Default Address
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center text-amber-600">
-                  <MapPinIcon className="h-5 w-5 mr-2" />
+                      Default Address
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center text-amber-600">
+                <MapPinIcon className="h-5 w-5 mr-2" />
                   <p className="font-medium">Address data is empty or invalid</p>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-
+        </div>
+        
           {/* Proof of Delivery (only shown for delivered orders) */}
           {(order.status === "delivered" || hasDeliveryProof) && (
             <div className="p-6">
@@ -347,10 +347,10 @@ const OrderDetails = ({
           <div className="p-6">
             <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
               <ClipboardDocumentListIcon className="h-4 w-4 mr-2" />
-              Medicine Details
-            </h3>
-            <ul className="space-y-3">
-              {order.medicines.map((medicine, index) => (
+            Medicine Details
+          </h3>
+          <ul className="space-y-3">
+            {order.medicines.map((medicine, index) => (
                 <li key={index} className="bg-gradient-to-r from-gray-50 to-white rounded-xl p-4 border border-gray-100 shadow-sm transition-all hover:shadow-md">
                   <div className="flex justify-between items-center">
                     <p className="text-sm font-semibold text-gray-900">{medicine.medicineName}</p>
@@ -358,7 +358,7 @@ const OrderDetails = ({
                       <CurrencyRupeeIcon className="h-3.5 w-3.5 mr-0.5" />
                       {medicine.totalPrice}
                     </p>
-                  </div>
+                </div>
                   <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
                     <p className="flex items-center text-gray-700">
                       <span className="text-gray-500 mr-2">Quantity:</span> 
@@ -379,11 +379,11 @@ const OrderDetails = ({
                     <p className="col-span-2 flex items-center text-gray-700">
                       <span className="text-gray-500 mr-2">Days Supply:</span> 
                       <span className="font-semibold">{medicine.daysSupply} days</span>
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
             <div className="mt-4 flex justify-between items-center border-t border-gray-100 pt-4">
               <p className="text-sm font-semibold text-gray-700">Total Amount</p>
               <p className="text-base font-bold text-primary flex items-center">
@@ -391,16 +391,16 @@ const OrderDetails = ({
                 {order.totalAmount}
               </p>
             </div>
-          </div>
+        </div>
         
           {/* Assignment Actions */}
           <div className="p-6">
             <h3 className="text-sm font-semibold text-primary flex items-center mb-4">
               <TruckIcon className="h-4 w-4 mr-2" />
               Delivery Information
-            </h3>
+          </h3>
           
-            {order.deliveryStaffId ? (
+          {order.deliveryStaffId ? (
               <div 
                 key={`staff-${order.deliveryStaffId}`} 
                 className="bg-gradient-to-r from-primary/5 to-gray-50 rounded-xl p-5 border border-primary/20 shadow-sm"
@@ -414,8 +414,8 @@ const OrderDetails = ({
                     <p className="text-base font-semibold text-gray-900">{order.deliveryStaffName}</p>
                   </div>
                 </div>
-              </div>
-            ) : (
+            </div>
+          ) : (
               <div 
                 key="staff-unassigned" 
                 className="bg-gradient-to-r from-primary/5 to-white rounded-xl p-5 border border-primary/20 shadow-sm"
@@ -432,11 +432,11 @@ const OrderDetails = ({
                     ) : (
                       <PlusIcon className="h-4 w-4 mr-2" />
                     )}
-                    Assign Delivery Staff
-                  </button>
+                Assign Delivery Staff
+              </button>
                 </div>
-              </div>
-            )}
+            </div>
+          )}
           </div>
         </div>
       </div>
