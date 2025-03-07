@@ -2,15 +2,15 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-// Replace this with your Firebase configuration
+// Firebase configuration from environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyBC1VhE9RoSzn89dYtqFn0U3ABUHTMO3dg",
-    authDomain: "wise-care-app.firebaseapp.com",
-    projectId: "wise-care-app",
-    storageBucket: "wise-care-app.firebasestorage.app",
-    messagingSenderId: "623753415843",
-    appId: "1:623753415843:web:bb6f22b30f3edcd46e4316",
-    measurementId: "G-7T5CVBZVV3"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
