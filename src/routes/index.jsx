@@ -4,6 +4,7 @@ import Login from '../Login';
 import AdminRoutes from './admin.routes';
 import DoctorRoutes from './doctor.routes';
 import { useAuth } from '../context/AuthContext';
+import LandingPage from '../pages/LandingPage';
 
 // Root redirect component
 const RootRedirect = () => {
@@ -53,6 +54,9 @@ const BaseProtectedRoute = ({ children, allowedRole = null }) => {
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Landing Page - Public */}
+      <Route path="/" element={<LandingPage />} />
+      
       {/* Public route */}
       <Route path="/login" element={<Login />} />
       
@@ -68,9 +72,9 @@ const AppRoutes = () => {
         element: <BaseProtectedRoute allowedRole="admin">{route.props.element}</BaseProtectedRoute>
       }))}
 
-      {/* Root redirect */}
+      {/* Dashboard redirect */}
       <Route
-        path="/"
+        path="/dashboard-redirect"
         element={
           <BaseProtectedRoute>
             <RootRedirect />
