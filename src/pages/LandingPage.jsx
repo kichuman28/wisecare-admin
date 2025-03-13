@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Import images for feature cards
+import sosScreenImg from '../../screenshots/admin/sos screen.png';
+import consultationsImg from '../../screenshots/doctor/consultations.png';
+import deliveryImg from '../../screenshots/admin/delivery.png';
+
 const LandingPage = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -68,6 +73,7 @@ const LandingPage = () => {
       title: "Smart SOS Alerts",
       description: "Real-time emergency notifications with instant response system",
       icon: "🚨",
+      image: sosScreenImg,
       color: "from-red-500/20 to-orange-500/20",
       bgColor: "bg-beige/20"
     },
@@ -75,6 +81,7 @@ const LandingPage = () => {
       title: "Video Consultations",
       description: "Seamless virtual healthcare consultations with advanced video analysis",
       icon: "🎥",
+      image: consultationsImg,
       color: "from-blue-500/20 to-purple-500/20",
       bgColor: "bg-primary-light/20"
     },
@@ -82,6 +89,7 @@ const LandingPage = () => {
       title: "Medication Delivery",
       description: "Efficient medication management and delivery tracking system",
       icon: "💊",
+      image: deliveryImg,
       color: "from-green-500/20 to-teal-500/20",
       bgColor: "bg-pastel-green/20"
     }
@@ -306,7 +314,7 @@ const LandingPage = () => {
                 <div className="relative grid md:grid-cols-2 gap-8 items-center p-8">
                   <div className={`text-center md:text-left ${index % 2 ? "md:order-2" : ""}`}>
                     <motion.div 
-                      className="text-6xl mb-6"
+                      className="text-6xl mb-6 hidden"
                       whileInView={{ 
                         scale: [0.8, 1.2, 1],
                         rotate: [0, -10, 0],
@@ -334,9 +342,11 @@ const LandingPage = () => {
                       transition={{ duration: 0.8, delay: 0.2 }}
                       viewport={{ once: true }}
                     >
-                      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-teal-600/10 flex items-center justify-center">
-                        <span className="text-8xl transform transition-transform hover:scale-110 duration-500">{feature.icon}</span>
-                      </div>
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title}
+                        className="w-full h-full object-cover object-center transition-all duration-500 hover:scale-105"
+                      />
                     </motion.div>
                   </div>
                 </div>
