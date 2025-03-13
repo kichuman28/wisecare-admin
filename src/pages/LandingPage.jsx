@@ -34,6 +34,21 @@ const LandingPage = () => {
         background: transparent;
         display: none;
       }
+      
+      /* Add premium decoration */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+          radial-gradient(circle at 15% 85%, rgba(42, 51, 107, 0.03) 0%, transparent 25%),
+          radial-gradient(circle at 85% 15%, rgba(0, 128, 128, 0.03) 0%, transparent 25%);
+        pointer-events: none;
+        z-index: -1;
+      }
     `;
     document.head.appendChild(style);
     
@@ -53,34 +68,61 @@ const LandingPage = () => {
       title: "Smart SOS Alerts",
       description: "Real-time emergency notifications with instant response system",
       icon: "🚨",
-      color: "from-red-500/20 to-orange-500/20"
+      color: "from-red-500/20 to-orange-500/20",
+      bgColor: "bg-beige/20"
     },
     {
       title: "Video Consultations",
       description: "Seamless virtual healthcare consultations with advanced video analysis",
       icon: "🎥",
-      color: "from-blue-500/20 to-purple-500/20"
+      color: "from-blue-500/20 to-purple-500/20",
+      bgColor: "bg-primary-light/20"
     },
     {
       title: "Medication Delivery",
       description: "Efficient medication management and delivery tracking system",
       icon: "💊",
-      color: "from-green-500/20 to-teal-500/20"
+      color: "from-green-500/20 to-teal-500/20",
+      bgColor: "bg-pastel-green/20"
     }
   ];
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-      {/* Fixed Floating Navbar */}
+      {/* Subtle background pattern */}
+      <div className="fixed inset-0 z-0 opacity-20 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-pastel-green/5"></div>
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-beige/10 mix-blend-multiply filter blur-xl"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-80 h-80 rounded-full bg-primary-light/10 mix-blend-multiply filter blur-xl"></div>
+      </div>
+
+      {/* Fixed Floating Navbar with Glassmorphism */}
       <div className="fixed top-6 left-0 right-0 z-50 px-4">
         <motion.nav 
-          className={`mx-auto py-3 px-8 rounded-full ${scrolled ? 'bg-white shadow-xl' : 'bg-white shadow-lg'} transition-all duration-300 max-w-6xl`}
+          className={`mx-auto py-3 px-8 rounded-full backdrop-blur-xl border border-white/20 ${scrolled ? 'bg-white/70 shadow-xl' : 'bg-white/40'} transition-all duration-300 max-w-6xl`}
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
           <div className="flex items-center justify-between h-14">
-            <Link to="/" className="text-2xl font-bold text-primary">WiseCare</Link>
+            <Link to="/" className="text-2xl font-bold text-primary">
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="inline-block"
+              >
+                Wise
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="inline-block text-teal-600"
+              >
+                Care
+              </motion.span>
+            </Link>
             
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
@@ -89,7 +131,7 @@ const LandingPage = () => {
               <a href="#contact" className="text-deep-blue hover:text-primary transition-colors">Contact</a>
               <Link
                 to="/login"
-                className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-md"
+                className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-md hover:scale-105"
               >
                 Access Dashboard
               </Link>
@@ -113,7 +155,7 @@ const LandingPage = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="md:hidden mt-4 rounded-2xl bg-white shadow-lg"
+                className="md:hidden mt-4 rounded-2xl bg-white/80 backdrop-blur-md shadow-lg border border-white/20"
               >
                 <div className="py-4 px-4 space-y-4">
                   <a href="#features" className="block text-deep-blue hover:text-primary transition-colors">Features</a>
@@ -132,18 +174,22 @@ const LandingPage = () => {
         </motion.nav>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-teal-600/5" />
+      {/* Hero Section with Enhanced Background */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-beige/5 to-background">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMTI1MjkiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2djZoLTZ2LTZoNnptLTYtNnYtNmg2djZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
         
         {/* Animated Background Shapes */}
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute rounded-full mix-blend-multiply opacity-70"
+              className="absolute rounded-full mix-blend-multiply opacity-60"
               style={{
-                background: `radial-gradient(circle, ${i % 2 ? '#2D336B' : '#008080'}15, transparent 60%)`,
+                background: `radial-gradient(circle, ${
+                  i % 3 === 0 ? '#2D336B' : 
+                  i % 3 === 1 ? '#008080' : 
+                  '#A7D7C5'
+                }15, transparent 60%)`,
                 width: `${Math.random() * 400 + 200}px`,
                 height: `${Math.random() * 400 + 200}px`,
                 left: `${Math.random() * 100}%`,
@@ -170,10 +216,16 @@ const LandingPage = () => {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-primary mb-6 leading-tight">
-              Healthcare Reimagined <br />
-              <span className="text-teal-600">for the Digital Age</span>
-            </h1>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <h1 className="text-5xl md:text-7xl font-bold text-primary mb-6 leading-tight">
+                Healthcare Reimagined <br />
+                <span className="text-teal-600">for the Digital Age</span>
+              </h1>
+            </motion.div>
             <motion.p 
               className="text-xl md:text-2xl text-deep-blue mb-12 max-w-2xl mx-auto"
               initial={{ opacity: 0 }}
@@ -187,20 +239,42 @@ const LandingPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
             >
               <Link
                 to="/login"
-                className="inline-block bg-gradient-to-r from-primary to-teal-600 hover:from-primary-hover hover:to-teal-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:shadow-xl transform hover:scale-105"
+                className="inline-block bg-gradient-to-r from-primary to-teal-600 hover:from-primary-hover hover:to-teal-600/90 text-white px-10 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
               >
                 Explore Features
               </Link>
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Scrolling indicator */}
+        <motion.div 
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          animate={{ 
+            y: [0, 12, 0],
+            opacity: [0.6, 1, 0.6]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <svg className="w-6 h-10 text-primary/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </motion.div>
       </section>
 
-      {/* Features Section - Interactive Showcase */}
-      <section id="features" className="py-20 relative overflow-hidden">
+      {/* Features Section - Enhanced Interactive Showcase */}
+      <section id="features" className="py-20 relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-background">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyRDMzNkIiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2djZoLTZ2LTZoNnptLTYtNnYtNmg2djZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
+        
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -228,20 +302,42 @@ const LandingPage = () => {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl transform -skew-y-3`} />
+                <div className={`absolute inset-0 ${feature.bgColor} backdrop-blur-sm rounded-3xl transform -skew-y-3 shadow-xl`} />
                 <div className="relative grid md:grid-cols-2 gap-8 items-center p-8">
                   <div className={`text-center md:text-left ${index % 2 ? "md:order-2" : ""}`}>
-                    <div className="text-6xl mb-6">{feature.icon}</div>
+                    <motion.div 
+                      className="text-6xl mb-6"
+                      whileInView={{ 
+                        scale: [0.8, 1.2, 1],
+                        rotate: [0, -10, 0],
+                        opacity: [0, 1]
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        ease: "easeInOut",
+                        times: [0, 0.5, 1]
+                      }}
+                      viewport={{ once: true }}
+                    >
+                      {feature.icon}
+                    </motion.div>
                     <h3 className="text-2xl font-bold text-primary mb-4">{feature.title}</h3>
                     <p className="text-deep-blue text-lg">{feature.description}</p>
                   </div>
                   <div className={`${index % 2 ? "md:order-1" : ""}`}>
-                    {/* Replace with actual feature image/illustration */}
-                    <div className="aspect-video bg-white rounded-xl shadow-xl overflow-hidden">
+                    <motion.div 
+                      className="aspect-video bg-white/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border border-white/60"
+                      whileInView={{ 
+                        opacity: [0, 1],
+                        y: [50, 0]
+                      }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                      viewport={{ once: true }}
+                    >
                       <div className="w-full h-full bg-gradient-to-br from-primary/10 to-teal-600/10 flex items-center justify-center">
-                        <span className="text-8xl">{feature.icon}</span>
+                        <span className="text-8xl transform transition-transform hover:scale-110 duration-500">{feature.icon}</span>
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>
@@ -250,10 +346,97 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Redesigned CTA Section - Clean Design */}
-      <section id="contact" className="py-20 relative overflow-hidden bg-primary-light/10">
+      {/* About Section */}
+      <section id="about" className="py-20 relative overflow-hidden bg-gradient-to-br from-background via-pastel-green/10 to-background">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDgwODAiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2djZoLTZ2LTZoNnptLTYtNnYtNmg2djZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
+        
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/60">
+                  <h2 className="text-3xl font-bold text-primary mb-6">Our Mission</h2>
+                  <p className="text-deep-blue mb-6">
+                    WiseCare is dedicated to transforming healthcare delivery through innovative technology 
+                    solutions that put patients first and empower healthcare providers with the tools they 
+                    need to deliver exceptional care.
+                  </p>
+                  <p className="text-deep-blue">
+                    Our platform seamlessly connects patients with healthcare services, emergency 
+                    response systems, and medical professionals through an intuitive, secure interface
+                    designed for the modern digital age.
+                  </p>
+                </div>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-teal-600/20 rounded-3xl transform rotate-3 opacity-70 blur-lg"></div>
+                <div className="relative bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/60">
+                  <h2 className="text-3xl font-bold text-teal-600 mb-6">Why Choose WiseCare?</h2>
+                  <ul className="space-y-4">
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
+                        <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                        </svg>
+                      </div>
+                      <p className="text-deep-blue">Real-time emergency response system with SOS alerts</p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
+                        <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                        </svg>
+                      </div>
+                      <p className="text-deep-blue">Advanced video consultation with AI analysis</p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
+                        <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                        </svg>
+                      </div>
+                      <p className="text-deep-blue">Efficient medication management and delivery tracking</p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
+                        <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                        </svg>
+                      </div>
+                      <p className="text-deep-blue">Intuitive interface designed for healthcare professionals</p>
+                    </li>
+                  </ul>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Premium CTA Section */}
+      <section id="contact" className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-deep-blue/90 z-0"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2djZoLTZ2LTZoNnptLTYtNnYtNmg2djZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 z-0"></div>
+        
+        <div className="absolute inset-0 z-0 opacity-20">
+          <div className="absolute h-56 w-56 rounded-full bg-white/10 blur-3xl top-1/4 left-1/4 mix-blend-overlay"></div>
+          <div className="absolute h-64 w-64 rounded-full bg-white/10 blur-3xl bottom-1/3 right-1/3 mix-blend-overlay"></div>
+        </div>
+        
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto bg-white rounded-3xl p-10 shadow-xl">
+          <div className="max-w-4xl mx-auto backdrop-blur-lg bg-white/10 rounded-3xl p-10 shadow-2xl border border-white/20">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -261,25 +444,35 @@ const LandingPage = () => {
               viewport={{ once: true }}
               className="text-center"
             >
-              <h2 className="text-4xl font-bold mb-6 text-primary">
+              <h2 className="text-4xl font-bold mb-6 text-white">
                 Ready to Transform Healthcare?
               </h2>
-              <p className="text-xl mb-8 text-deep-blue max-w-2xl mx-auto">
+              <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
                 Join WiseCare today and experience the future of healthcare management
               </p>
               <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-                <Link
-                  to="/login"
-                  className="inline-block bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Get Started
-                </Link>
-                <a
-                  href="#features"
-                  className="inline-block bg-transparent border-2 border-primary text-primary px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:bg-primary/5"
+                  <Link
+                    to="/login"
+                    className="inline-block bg-white text-primary px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-white/20"
+                  >
+                    Get Started
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Learn More
-                </a>
+                  <a
+                    href="#features"
+                    className="inline-block bg-transparent border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:bg-white/10 hover:shadow-lg hover:shadow-white/10"
+                  >
+                    Learn More
+                  </a>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -287,11 +480,19 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-deep-blue text-white py-12">
-        <div className="container mx-auto px-4">
+      <footer className="bg-deep-blue text-white py-12 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary-light/20 filter blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-teal-600/20 filter blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4">WiseCare</h3>
+              <h3 className="text-2xl font-bold mb-4">
+                <span className="text-white">Wise</span>
+                <span className="text-teal-600">Care</span>
+              </h3>
               <p className="text-primary-light">Transforming healthcare through innovation</p>
             </div>
             <div>
