@@ -1,9 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LandingPage = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Detect scroll for navbar shadow
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Apply CSS to hide scrollbars
+  useEffect(() => {
+    // Store original overflow style
+    const originalStyle = document.body.style.overflow;
+    
+    // Add custom style to hide scrollbar but keep functionality
+    document.body.style.overflow = 'auto';
+    document.body.style.scrollbarWidth = 'none'; // Firefox
+    document.documentElement.style.scrollbarWidth = 'none'; // Firefox
+    
+    // For WebKit browsers (Chrome, Safari)
+    const style = document.createElement('style');
+    style.textContent = `
+      ::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+        display: none;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      // Restore original style
+      document.body.style.overflow = originalStyle;
+      document.body.style.scrollbarWidth = '';
+      document.documentElement.style.scrollbarWidth = '';
+      if (style.parentNode) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
 
   const features = [
     {
@@ -26,18 +69,17 @@ const LandingPage = () => {
     }
   ];
 
-  const stats = [
-    { number: "98%", label: "Patient Satisfaction" },
-    { number: "24/7", label: "Emergency Support" },
-    { number: "50k+", label: "Active Users" }
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+    <div className="min-h-screen bg-background overflow-hidden">
+      {/* Fixed Floating Navbar */}
+      <div className="fixed top-6 left-0 right-0 z-50 px-4">
+        <motion.nav 
+          className={`mx-auto py-3 px-8 rounded-full ${scrolled ? 'bg-white shadow-xl' : 'bg-white shadow-lg'} transition-all duration-300 max-w-6xl`}
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center justify-between h-14">
             <Link to="/" className="text-2xl font-bold text-primary">WiseCare</Link>
             
             {/* Desktop Menu */}
@@ -47,7 +89,7 @@ const LandingPage = () => {
               <a href="#contact" className="text-deep-blue hover:text-primary transition-colors">Contact</a>
               <Link
                 to="/login"
-                className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300"
+                className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-md"
               >
                 Access Dashboard
               </Link>
@@ -63,35 +105,35 @@ const LandingPage = () => {
               </svg>
             </button>
           </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isNavOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-white border-t"
-            >
-              <div className="container mx-auto px-4 py-4 space-y-4">
-                <a href="#features" className="block text-deep-blue hover:text-primary transition-colors">Features</a>
-                <a href="#about" className="block text-deep-blue hover:text-primary transition-colors">About</a>
-                <a href="#contact" className="block text-deep-blue hover:text-primary transition-colors">Contact</a>
-                <Link
-                  to="/login"
-                  className="block bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full text-center text-sm font-semibold transition-all duration-300"
-                >
-                  Access Dashboard
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+          
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {isNavOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="md:hidden mt-4 rounded-2xl bg-white shadow-lg"
+              >
+                <div className="py-4 px-4 space-y-4">
+                  <a href="#features" className="block text-deep-blue hover:text-primary transition-colors">Features</a>
+                  <a href="#about" className="block text-deep-blue hover:text-primary transition-colors">About</a>
+                  <a href="#contact" className="block text-deep-blue hover:text-primary transition-colors">Contact</a>
+                  <Link
+                    to="/login"
+                    className="block bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full text-center text-sm font-semibold transition-all duration-300"
+                  >
+                    Access Dashboard
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.nav>
+      </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-teal-600/5" />
         
         {/* Animated Background Shapes */}
@@ -121,7 +163,7 @@ const LandingPage = () => {
           ))}
         </div>
 
-        <div className="container mx-auto px-4 z-10">
+        <div className="container mx-auto px-4 z-10 mt-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -132,25 +174,27 @@ const LandingPage = () => {
               Healthcare Reimagined <br />
               <span className="text-teal-600">for the Digital Age</span>
             </h1>
-            <p className="text-xl md:text-2xl text-deep-blue mb-12 max-w-2xl mx-auto">
+            <motion.p 
+              className="text-xl md:text-2xl text-deep-blue mb-12 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+            >
               Revolutionizing healthcare delivery with smart technology and compassionate care
-            </p>
+            </motion.p>
             
-            {/* Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-16">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 }}
-                  className="text-center"
-                >
-                  <h3 className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.number}</h3>
-                  <p className="text-deep-blue">{stat.label}</p>
-                </motion.div>
-              ))}
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <Link
+                to="/login"
+                className="inline-block bg-gradient-to-r from-primary to-teal-600 hover:from-primary-hover hover:to-teal-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:shadow-xl transform hover:scale-105"
+              >
+                Explore Features
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -206,32 +250,39 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-primary text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#ffffff_0%,_transparent_100%)]" />
-        </div>
-        <div className="container mx-auto px-4 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <h2 className="text-4xl font-bold mb-6">
-              Ready to Transform Healthcare?
-            </h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Join WiseCare today and experience the future of healthcare management
-            </p>
-            <Link
-              to="/login"
-              className="inline-block bg-white text-primary px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+      {/* Redesigned CTA Section - Clean Design */}
+      <section id="contact" className="py-20 relative overflow-hidden bg-primary-light/10">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto bg-white rounded-3xl p-10 shadow-xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center"
             >
-              Get Started
-            </Link>
-          </motion.div>
+              <h2 className="text-4xl font-bold mb-6 text-primary">
+                Ready to Transform Healthcare?
+              </h2>
+              <p className="text-xl mb-8 text-deep-blue max-w-2xl mx-auto">
+                Join WiseCare today and experience the future of healthcare management
+              </p>
+              <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+                <Link
+                  to="/login"
+                  className="inline-block bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                >
+                  Get Started
+                </Link>
+                <a
+                  href="#features"
+                  className="inline-block bg-transparent border-2 border-primary text-primary px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:bg-primary/5"
+                >
+                  Learn More
+                </a>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
