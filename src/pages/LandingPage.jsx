@@ -71,7 +71,7 @@ const LandingPage = () => {
   const features = [
     {
       title: "Smart SOS Alerts",
-      description: "Real-time emergency notifications with instant response system",
+      description: "Real-time emergency response system for seniors living independently, with instant notifications to caregivers and family",
       icon: "🚨",
       image: sosScreenImg,
       color: "from-red-500/20 to-orange-500/20",
@@ -79,7 +79,7 @@ const LandingPage = () => {
     },
     {
       title: "Video Consultations",
-      description: "Seamless virtual healthcare consultations with advanced video analysis",
+      description: "User-friendly virtual healthcare meetings for elderly patients who struggle with mobility or transportation",
       icon: "🎥",
       image: consultationsImg,
       color: "from-blue-500/20 to-purple-500/20",
@@ -87,7 +87,7 @@ const LandingPage = () => {
     },
     {
       title: "Medication Delivery",
-      description: "Efficient medication management and delivery tracking system",
+      description: "Simplified medication management with scheduled deliveries to ensure seniors never miss important prescriptions",
       icon: "💊",
       image: deliveryImg,
       color: "from-green-500/20 to-teal-500/20",
@@ -230,7 +230,7 @@ const LandingPage = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <h1 className="text-5xl md:text-7xl font-bold text-primary mb-6 leading-tight">
-                Healthcare Reimagined <br />
+                Eldercare Reimagined <br />
                 <span className="text-teal-600">for the Digital Age</span>
               </h1>
             </motion.div>
@@ -240,7 +240,7 @@ const LandingPage = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
             >
-              Revolutionizing healthcare delivery with smart technology and compassionate care
+              Empowering senior citizens with smart technology and compassionate care for a safer, more connected life
             </motion.p>
             
             <motion.div
@@ -292,10 +292,10 @@ const LandingPage = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-primary mb-4">
-              Comprehensive Healthcare Solutions
+              Comprehensive Eldercare Solutions
             </h2>
             <p className="text-xl text-deep-blue max-w-3xl mx-auto">
-              Empowering healthcare providers with cutting-edge tools and seamless patient care
+              Bridging the gap between seniors and modern healthcare with intuitive technology designed for older adults
             </p>
           </motion.div>
 
@@ -372,14 +372,13 @@ const LandingPage = () => {
                 <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/60">
                   <h2 className="text-3xl font-bold text-primary mb-6">Our Mission</h2>
                   <p className="text-deep-blue mb-6">
-                    WiseCare is dedicated to transforming healthcare delivery through innovative technology 
-                    solutions that put patients first and empower healthcare providers with the tools they 
-                    need to deliver exceptional care.
+                    WiseCare is dedicated to addressing the unique challenges faced by elderly individuals and 
+                    their families through innovative technology solutions that combat social isolation, improve 
+                    healthcare access, and enhance safety.
                   </p>
                   <p className="text-deep-blue">
-                    Our platform seamlessly connects patients with healthcare services, emergency 
-                    response systems, and medical professionals through an intuitive, secure interface
-                    designed for the modern digital age.
+                    Our platform bridges the distance between seniors and their families, providing peace of mind 
+                    to loved ones while ensuring the elderly maintain their independence, dignity, and quality of life.
                   </p>
                 </div>
               </motion.div>
@@ -401,7 +400,7 @@ const LandingPage = () => {
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                         </svg>
                       </div>
-                      <p className="text-deep-blue">Real-time emergency response system with SOS alerts</p>
+                      <p className="text-deep-blue">Emergency SOS system with instant family notification</p>
                     </li>
                     <li className="flex items-start">
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
@@ -409,7 +408,7 @@ const LandingPage = () => {
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                         </svg>
                       </div>
-                      <p className="text-deep-blue">Advanced video consultation with AI analysis</p>
+                      <p className="text-deep-blue">Simple, age-friendly interface designed for seniors</p>
                     </li>
                     <li className="flex items-start">
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
@@ -417,7 +416,7 @@ const LandingPage = () => {
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                         </svg>
                       </div>
-                      <p className="text-deep-blue">Efficient medication management and delivery tracking</p>
+                      <p className="text-deep-blue">Medication delivery and management for those with limited mobility</p>
                     </li>
                     <li className="flex items-start">
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-1 mr-3">
@@ -425,7 +424,7 @@ const LandingPage = () => {
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                         </svg>
                       </div>
-                      <p className="text-deep-blue">Intuitive interface designed for healthcare professionals</p>
+                      <p className="text-deep-blue">Family monitoring dashboard to stay connected with elderly loved ones</p>
                     </li>
                   </ul>
                 </div>
@@ -455,10 +454,10 @@ const LandingPage = () => {
               className="text-center"
             >
               <h2 className="text-4xl font-bold mb-6 text-white">
-                Ready to Transform Healthcare?
+                Ready to Support Your Elderly Loved Ones?
               </h2>
               <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Join WiseCare today and experience the future of healthcare management
+                Join WiseCare today and provide the caring connection that helps seniors live independently with dignity
               </p>
               <div className="flex flex-col md:flex-row justify-center items-center gap-4">
                 <motion.div
@@ -503,7 +502,7 @@ const LandingPage = () => {
                 <span className="text-white">Wise</span>
                 <span className="text-teal-600">Care</span>
               </h3>
-              <p className="text-primary-light">Transforming healthcare through innovation</p>
+              <p className="text-primary-light">Improving elderly lives through technology</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
