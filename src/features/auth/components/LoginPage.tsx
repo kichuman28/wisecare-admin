@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuth } from '../use-auth';
 import { authApi } from '../auth.api';
-import { ROUTES } from '@/shared/constants';
+import { getDashboardRoute } from '@/shared/constants';
 import type { AuthResponse } from '../auth.types';
 import type { ApiError } from '@/shared/types';
 
@@ -22,7 +22,7 @@ export function LoginPage() {
         mutationFn: (credentials) => authApi.signIn(credentials),
         onSuccess: ({ data }) => {
             login(data);
-            navigate(ROUTES.DASHBOARD, { replace: true });
+            navigate(getDashboardRoute(data.role), { replace: true });
         },
     });
 

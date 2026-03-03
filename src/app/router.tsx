@@ -1,50 +1,20 @@
 import { Routes, Route } from 'react-router-dom';
 import { ROUTES } from '@/shared/constants';
-import { LoginPage, AuthGuard } from '@/features/auth';
+import { LoginPage, AuthGuard, RoleGuard } from '@/features/auth';
+import { AdminLayout } from '@/app/layouts/AdminLayout';
+import { AgentLayout } from '@/app/layouts/AgentLayout';
+import { RoleRedirect } from '@/app/routes/RoleRedirect';
+import {
+    AdminDashboardPage,
+    AdminServiceRequestsPage,
+    AdminUsersPage,
+    AdminAlertsPage,
+} from '@/app/routes/admin.pages';
+import { AgentDashboardPage } from '@/app/routes/agent.pages';
 
 // ---------------------------------------------------------------------------
-// Placeholder pages — replace with feature modules as they are built
+// Not Found
 // ---------------------------------------------------------------------------
-
-function DashboardPage() {
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <h1 className="text-2xl font-semibold text-gray-800">
-                WiseCare Admin — Dashboard
-            </h1>
-        </div>
-    );
-}
-
-function ServiceRequestsPage() {
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <h1 className="text-2xl font-semibold text-gray-800">
-                WiseCare Admin — Service Requests
-            </h1>
-        </div>
-    );
-}
-
-function UsersPage() {
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <h1 className="text-2xl font-semibold text-gray-800">
-                WiseCare Admin — Users
-            </h1>
-        </div>
-    );
-}
-
-function AlertsPage() {
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <h1 className="text-2xl font-semibold text-gray-800">
-                WiseCare Admin — Alerts
-            </h1>
-        </div>
-    );
-}
 
 function NotFoundPage() {
     return (
@@ -65,12 +35,30 @@ export function AppRoutes() {
             {/* Public routes */}
             <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
-            {/* Protected routes — requires authentication */}
+            {/* Root redirect — sends to role-specific dashboard */}
+            <Route path="/" element={<RoleRedirect />} />
+
+            {/* Protected: Auth required */}
             <Route element={<AuthGuard />}>
-                <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-                <Route path={ROUTES.SERVICE_REQUESTS} element={<ServiceRequestsPage />} />
-                <Route path={ROUTES.USERS} element={<UsersPage />} />
-                <Route path={ROUTES.ALERTS} element={<AlertsPage />} />
+
+                {/* Admin routes — ADMIN role only */}
+                <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
+                    <Route element={<AdminLayout />}>
+                        <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboardPage />} />
+                        <Route path={ROUTES.ADMIN_SERVICE_REQUESTS} element={<AdminServiceRequestsPage />} />
+                        <Route path={ROUTES.ADMIN_USERS} element={<AdminUsersPage />} />
+                        <Route path={ROUTES.ADMIN_ALERTS} element={<AdminAlertsPage />} />
+                    </Route>
+                </Route>
+
+                {/* Agent routes — AGENT role only */}
+                <Route element={<RoleGuard allowedRoles={['AGENT']} />}>
+                    <Route element={<AgentLayout />}>
+                        <Route path={ROUTES.AGENT_DASHBOARD} element={<AgentDashboardPage />} />
+                        <Route path={ROUTES.AGENT_REQUESTS} element={<AgentDashboardPage />} />
+                    </Route>
+                </Route>
+
             </Route>
 
             {/* Catch-all */}
