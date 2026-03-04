@@ -9,6 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { tokenStorage } from '@/lib/auth/token-storage';
+import { api } from '@/lib/api/axios-instance';
 import { ROUTES } from '@/shared/constants';
 import type { TokenPayload } from '@/shared/types';
 import type { AuthUser, AuthResponse } from './auth.types';
@@ -24,6 +25,8 @@ export interface AuthContextValue {
     isLoading: boolean;
     login: (data: AuthResponse) => void;
     logout: () => Promise<void>;
+    /** Update user fields in-place (e.g. after an onboarding step) */
+    updateUser: (patch: Partial<AuthUser>) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(
@@ -87,6 +90,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Token still valid — decode and restore user
             if (!tokenStorage.isTokenExpired(accessToken)) {
                 const restored = buildUserFromToken(accessToken);
+
+                // For FAMILY role, fetch full profile to get real onboardingStep
+                if (restored?.role === 'FAMILY') {
+                    try {
+                        const { data } = await api.get<{ onboardingStep: AuthUser['onboardingStep']; profileComplete: boolean }>('/users/me');
+                        restored.onboardingStep = data.onboardingStep;
+                        restored.profileComplete = data.profileComplete;
+                    } catch {
+                        // If profile fetch fails, proceed with defaults
+                    }
+                }
+
                 setUser(restored);
                 setIsLoading(false);
                 return;
@@ -104,6 +119,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 const { data } = await authApi.refresh({ refreshToken });
                 tokenStorage.setTokens(data.accessToken, data.refreshToken);
                 const restored = buildUserFromToken(data.accessToken);
+
+                // For FAMILY role, fetch full profile after refresh
+                if (restored?.role === 'FAMILY') {
+                    try {
+                        const { data: profile } = await api.get<{ onboardingStep: AuthUser['onboardingStep']; profileComplete: boolean }>('/users/me');
+                        restored.onboardingStep = profile.onboardingStep;
+                        restored.profileComplete = profile.profileComplete;
+                    } catch {
+                        // If profile fetch fails, proceed with defaults
+                    }
+                }
+
                 setUser(restored);
             } catch {
                 // Refresh failed — force re-login
@@ -122,6 +149,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = useCallback((data: AuthResponse) => {
         tokenStorage.setTokens(data.accessToken, data.refreshToken);
         setUser(buildUserFromResponse(data));
+    }, []);
+
+    // -----------------------------------------------------------------------
+    // Update user — allows onboarding steps to patch user state
+    // -----------------------------------------------------------------------
+    const updateUser = useCallback((patch: Partial<AuthUser>) => {
+        setUser((prev) => (prev ? { ...prev, ...patch } : null));
     }, []);
 
     // -----------------------------------------------------------------------
@@ -153,6 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isLoading,
                 login,
                 logout,
+                updateUser,
             }}
         >
             {children}

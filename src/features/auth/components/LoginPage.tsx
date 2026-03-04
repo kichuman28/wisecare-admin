@@ -4,9 +4,20 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuth } from '../use-auth';
 import { authApi } from '../auth.api';
-import { getDashboardRoute } from '@/shared/constants';
+import { getDashboardRoute, getOnboardingRoute, ROUTES } from '@/shared/constants';
 import type { AuthResponse } from '../auth.types';
 import type { ApiError } from '@/shared/types';
+
+/**
+ * Determines where to navigate after a successful login.
+ * FAMILY users mid-onboarding are sent to their current step.
+ */
+function getPostLoginRoute(data: AuthResponse): string {
+    if (data.role === 'FAMILY' && data.onboardingStep !== 'COMPLETE') {
+        return getOnboardingRoute(data.onboardingStep);
+    }
+    return getDashboardRoute(data.role);
+}
 
 export function LoginPage() {
     const [email, setEmail] = useState('');
@@ -22,7 +33,7 @@ export function LoginPage() {
         mutationFn: (credentials) => authApi.signIn(credentials),
         onSuccess: ({ data }) => {
             login(data);
-            navigate(getDashboardRoute(data.role), { replace: true });
+            navigate(getPostLoginRoute(data), { replace: true });
         },
     });
 
@@ -41,7 +52,7 @@ export function LoginPage() {
             <div className="w-full max-w-sm space-y-6">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900">
-                        WiseCare Admin
+                        WiseCare
                     </h1>
                     <p className="mt-1 text-sm text-gray-500">
                         Sign in to your account
@@ -70,7 +81,7 @@ export function LoginPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            placeholder="admin@wisecare.com"
+                            placeholder="you@example.com"
                         />
                     </div>
 
@@ -100,8 +111,16 @@ export function LoginPage() {
                     >
                         {signinMutation.isPending ? 'Signing in…' : 'Sign in'}
                     </button>
+
+                    <p className="text-center text-sm text-gray-500">
+                        Family member?{' '}
+                        <a href={ROUTES.FAMILY_SIGNUP} className="font-medium text-blue-600 hover:text-blue-500">
+                            Create an account
+                        </a>
+                    </p>
                 </form>
             </div>
         </div>
     );
 }
+

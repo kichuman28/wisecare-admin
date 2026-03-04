@@ -1,8 +1,16 @@
 import { Routes, Route } from 'react-router-dom';
 import { ROUTES } from '@/shared/constants';
 import { LoginPage, AuthGuard, RoleGuard } from '@/features/auth';
+import {
+    FamilySignupPage,
+    FamilyBasicOnboardingPage,
+    FamilyLinkPage,
+    FamilyOnboardingGuard,
+    FamilyDashboardGuard,
+} from '@/features/family';
 import { AdminLayout } from '@/app/layouts/AdminLayout';
 import { AgentLayout } from '@/app/layouts/AgentLayout';
+import { FamilyLayout } from '@/app/layouts/FamilyLayout';
 import { RoleRedirect } from '@/app/routes/RoleRedirect';
 import {
     AdminDashboardPage,
@@ -11,6 +19,7 @@ import {
     AdminAlertsPage,
 } from '@/app/routes/admin.pages';
 import { AgentDashboardPage } from '@/app/routes/agent.pages';
+import { FamilyDashboardPage } from '@/app/routes/family.pages';
 
 // ---------------------------------------------------------------------------
 // Not Found
@@ -34,6 +43,7 @@ export function AppRoutes() {
         <Routes>
             {/* Public routes */}
             <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.FAMILY_SIGNUP} element={<FamilySignupPage />} />
 
             {/* Root redirect — sends to role-specific dashboard */}
             <Route path="/" element={<RoleRedirect />} />
@@ -56,6 +66,21 @@ export function AppRoutes() {
                     <Route element={<AgentLayout />}>
                         <Route path={ROUTES.AGENT_DASHBOARD} element={<AgentDashboardPage />} />
                         <Route path={ROUTES.AGENT_REQUESTS} element={<AgentDashboardPage />} />
+                    </Route>
+                </Route>
+
+                {/* Family onboarding — FAMILY role, onboarding NOT complete */}
+                <Route element={<RoleGuard allowedRoles={['FAMILY']} />}>
+                    <Route element={<FamilyOnboardingGuard />}>
+                        <Route path={ROUTES.FAMILY_ONBOARDING_BASIC} element={<FamilyBasicOnboardingPage />} />
+                        <Route path={ROUTES.FAMILY_ONBOARDING_LINK} element={<FamilyLinkPage />} />
+                    </Route>
+
+                    {/* Family dashboard — FAMILY role, onboarding COMPLETE */}
+                    <Route element={<FamilyDashboardGuard />}>
+                        <Route element={<FamilyLayout />}>
+                            <Route path={ROUTES.FAMILY_DASHBOARD} element={<FamilyDashboardPage />} />
+                        </Route>
                     </Route>
                 </Route>
 

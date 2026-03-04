@@ -1,8 +1,9 @@
-import type { UserRole } from '@/shared/types';
+import type { OnboardingStep, UserRole } from '@/shared/types';
 
 /** Route paths — single source of truth for navigation */
 export const ROUTES = {
     LOGIN: '/login',
+    FAMILY_SIGNUP: '/signup/family',
 
     // Admin routes
     ADMIN_DASHBOARD: '/admin',
@@ -13,6 +14,11 @@ export const ROUTES = {
     // Agent routes
     AGENT_DASHBOARD: '/agent',
     AGENT_REQUESTS: '/agent/requests',
+
+    // Family routes
+    FAMILY_ONBOARDING_BASIC: '/family/onboarding/basic',
+    FAMILY_ONBOARDING_LINK: '/family/onboarding/link',
+    FAMILY_DASHBOARD: '/family',
 } as const;
 
 /** Maps a role to its default landing route after login */
@@ -22,8 +28,28 @@ export function getDashboardRoute(role: UserRole): string {
             return ROUTES.ADMIN_DASHBOARD;
         case 'AGENT':
             return ROUTES.AGENT_DASHBOARD;
+        case 'FAMILY':
+            return ROUTES.FAMILY_DASHBOARD;
         default:
-            // ELDERLY and FAMILY use the mobile app — shouldn't reach here
+            // ELDERLY uses the mobile app — shouldn't reach here
             return ROUTES.LOGIN;
+    }
+}
+
+/**
+ * Maps an onboarding step to the correct onboarding route.
+ * Used after signup/signin to resume onboarding at the right point.
+ */
+export function getOnboardingRoute(step: OnboardingStep): string {
+    switch (step) {
+        case 'BASIC_INFO':
+            return ROUTES.FAMILY_ONBOARDING_BASIC;
+        case 'LINK':
+            return ROUTES.FAMILY_ONBOARDING_LINK;
+        case 'COMPLETE':
+            return ROUTES.FAMILY_DASHBOARD;
+        default:
+            // MEDICATIONS, INVITE are elderly-only steps
+            return ROUTES.FAMILY_ONBOARDING_BASIC;
     }
 }
