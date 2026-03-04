@@ -1,47 +1,28 @@
 // ---------------------------------------------------------------------------
-// Placeholder pages — replace with feature modules as they are built
+// Admin pages — wired to the admin feature module
 // ---------------------------------------------------------------------------
 
-export function AdminDashboardPage() {
-    return (
-        <div>
-            <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
-            <p className="mt-2 text-sm text-gray-500">
-                Platform overview — stats, pending requests, and recent alerts will go here.
-            </p>
-        </div>
-    );
-}
+export { AdminDashboard as AdminDashboardPage } from '@/features/admin';
+export { RequestsPage as AdminServiceRequestsPage } from '@/features/admin';
+export { AlertsPage as AdminAlertsPage } from '@/features/admin';
 
-export function AdminServiceRequestsPage() {
-    return (
-        <div>
-            <h2 className="text-xl font-semibold text-gray-800">Service Requests</h2>
-            <p className="mt-2 text-sm text-gray-500">
-                All service requests across all elderly users.
-            </p>
-        </div>
-    );
-}
-
+// Users page — placeholder until backend API is available
 export function AdminUsersPage() {
     return (
-        <div>
-            <h2 className="text-xl font-semibold text-gray-800">Users</h2>
-            <p className="mt-2 text-sm text-gray-500">
-                User management — list, create agents, activate/deactivate.
-            </p>
-        </div>
-    );
-}
-
-export function AdminAlertsPage() {
-    return (
-        <div>
-            <h2 className="text-xl font-semibold text-gray-800">Alerts</h2>
-            <p className="mt-2 text-sm text-gray-500">
-                All health alerts across all elderly users.
-            </p>
+        <div className="space-y-4">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+                <p className="mt-1 text-sm text-gray-500">
+                    User management — list, create agents, activate/deactivate.
+                </p>
+            </div>
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+                <strong>Coming soon:</strong> User management requires a{' '}
+                <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">
+                    GET /admin/users
+                </code>{' '}
+                backend endpoint that is not yet available.
+            </div>
         </div>
     );
 }
