@@ -12,6 +12,8 @@ export const ROUTES = {
     ADMIN_ALERTS: '/admin/alerts',
     ADMIN_ESCALATIONS: '/admin/escalations',
     ADMIN_AI_OPS: '/admin/ai-operations',
+    ADMIN_RULES: '/admin/rules',
+    ADMIN_AI_CONFIG: '/admin/ai-config',
 
     // Family routes
     FAMILY_ONBOARDING_BASIC: '/family/onboarding/basic',

@@ -9,6 +9,14 @@ import type {
     CreateAgentRequest,
     ToggleUserStatusRequest,
     ResolveEscalationRequest,
+    RulesFilters,
+    RuleCreateRequest,
+    RuleUpdateRequest,
+    RuleToggleRequest,
+    RuleTestRequest,
+    AIAgentConfigUpdateRequest,
+    CategoryToggleRequest,
+    CategoryLimitsUpdateRequest,
 } from './admin.types';
 
 // ---------------------------------------------------------------------------
@@ -29,6 +37,9 @@ export const adminKeys = {
     weeklySummary: ['admin-weekly-summary'] as const,
     recommendations: ['admin-recommendations'] as const,
     anomalies: (hours?: number) => ['admin-anomalies', hours] as const,
+    rules: (filters?: RulesFilters) => ['admin-rules', filters] as const,
+    rule: (ruleId: string) => ['admin-rule', ruleId] as const,
+    aiAgentConfig: ['admin-ai-agent-config'] as const,
 };
 
 // ---------------------------------------------------------------------------
@@ -271,5 +282,115 @@ export function useResolveEscalation() {
             queryClient.invalidateQueries({ queryKey: ['admin-escalations'] });
             queryClient.invalidateQueries({ queryKey: ['admin-escalation-stats'] });
         },
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Queries — Rules Engine
+// ---------------------------------------------------------------------------
+
+/** Fetch rules with optional filters */
+export function useRules(filters?: RulesFilters) {
+    return useQuery({
+        queryKey: adminKeys.rules(filters),
+        queryFn: () => adminApi.getRules(filters).then((r) => r.data),
+    });
+}
+
+/** Fetch a single rule */
+export function useRule(ruleId: string) {
+    return useQuery({
+        queryKey: adminKeys.rule(ruleId),
+        queryFn: () => adminApi.getRule(ruleId).then((r) => r.data),
+        enabled: !!ruleId,
+    });
+}
+
+/** Fetch AI Agent Configuration */
+export function useAIAgentConfig() {
+    return useQuery({
+        queryKey: adminKeys.aiAgentConfig,
+        queryFn: () => adminApi.getAIAgentConfig().then((r) => r.data),
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Mutations — Rules Engine
+// ---------------------------------------------------------------------------
+
+export function useCreateRule() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: RuleCreateRequest) => adminApi.createRule(data).then((r) => r.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-rules'] }),
+    });
+}
+
+export function useUpdateRule() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ ruleId, data }: { ruleId: string; data: RuleUpdateRequest }) =>
+            adminApi.updateRule(ruleId, data).then((r) => r.data),
+        onSuccess: (_, { ruleId }) => {
+            queryClient.invalidateQueries({ queryKey: ['admin-rules'] });
+            queryClient.invalidateQueries({ queryKey: adminKeys.rule(ruleId) });
+        },
+    });
+}
+
+export function useDeleteRule() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (ruleId: string) => adminApi.deleteRule(ruleId).then((r) => r.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-rules'] }),
+    });
+}
+
+export function useToggleRule() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ ruleId, data }: { ruleId: string; data: RuleToggleRequest }) =>
+            adminApi.toggleRule(ruleId, data).then((r) => r.data),
+        onSuccess: (_, { ruleId }) => {
+            queryClient.invalidateQueries({ queryKey: ['admin-rules'] });
+            queryClient.invalidateQueries({ queryKey: adminKeys.rule(ruleId) });
+        },
+    });
+}
+
+export function useTestRule() {
+    return useMutation({
+        mutationFn: (data: RuleTestRequest) => adminApi.testRule(data).then((r) => r.data),
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Mutations — AI Agent Config
+// ---------------------------------------------------------------------------
+
+export function useUpdateAIAgentConfig() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: AIAgentConfigUpdateRequest) =>
+            adminApi.updateAIAgentConfig(data).then((r) => r.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig }),
+    });
+}
+
+export function useToggleCategory() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ category, data }: { category: string; data: CategoryToggleRequest }) =>
+            adminApi.toggleCategory(category, data).then((r) => r.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig }),
+    });
+}
+
+export function useUpdateCategoryLimits() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ category, data }: { category: string; data: CategoryLimitsUpdateRequest }) =>
+            adminApi.updateCategoryLimits(category, data).then((r) => r.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig }),
     });
 }

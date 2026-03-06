@@ -424,3 +424,208 @@ export const SEVERITY_COLORS: Record<string, string> = {
     WARNING: 'amber',
     INFO: 'blue',
 };
+
+// ---------------------------------------------------------------------------
+// Rules Engine types (GET/POST/PATCH/DELETE /admin/rules)
+// ---------------------------------------------------------------------------
+
+export type RuleCategory = 'GROCERY' | 'MEDICINE' | 'FOOD' | 'DOCTOR' | 'ALL';
+
+export type RuleType = 'APPROVAL' | 'BUDGET' | 'ESCALATION';
+
+export type RuleOperator =
+    | 'EQUALS'
+    | 'NOT_EQUALS'
+    | 'LESS_THAN'
+    | 'GREATER_THAN'
+    | 'LESS_THAN_OR_EQUAL'
+    | 'GREATER_THAN_OR_EQUAL'
+    | 'CONTAINS'
+    | 'NOT_CONTAINS'
+    | 'BETWEEN'
+    | 'IN'
+    | 'NOT_IN';
+
+export type RuleActionType =
+    | 'AUTO_APPROVE'
+    | 'REQUIRE_APPROVAL'
+    | 'ESCALATE'
+    | 'REJECT';
+
+export type RuleField =
+    | 'orderTotal'
+    | 'category'
+    | 'prescriptionRequired'
+    | 'userTier'
+    | 'currentTime'
+    | 'userDailySpent'
+    | 'city';
+
+export interface RuleCondition {
+    field: RuleField | string;
+    operator: RuleOperator;
+    value: number | string | boolean | number[] | string[];
+}
+
+export interface RuleMetadata {
+    createdBy: string;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface Rule {
+    ruleId: string;
+    name: string;
+    description: string;
+    category: RuleCategory;
+    ruleType: RuleType;
+    priority: number;
+    enabled: string | boolean;
+    conditions: RuleCondition;
+    action: RuleActionType;
+    metadata: RuleMetadata;
+}
+
+export interface RulesResponse {
+    rules: Rule[];
+    count: number;
+}
+
+export interface RulesFilters {
+    category?: RuleCategory;
+    enabled?: boolean;
+    ruleType?: RuleType;
+}
+
+export interface RuleCreateRequest {
+    name: string;
+    description: string;
+    category: RuleCategory;
+    ruleType: RuleType;
+    priority: number;
+    conditions: RuleCondition;
+    action: RuleActionType;
+}
+
+export interface RuleUpdateRequest {
+    name?: string;
+    description?: string;
+    priority?: number;
+    conditions?: RuleCondition;
+    action?: RuleActionType;
+}
+
+export interface RuleCreateResponse {
+    ruleId: string;
+    message: string;
+    rule: Pick<Rule, 'ruleId' | 'name' | 'category' | 'enabled'>;
+}
+
+export interface RuleUpdateResponse {
+    ruleId: string;
+    message: string;
+    rule: Partial<Rule>;
+}
+
+export interface RuleDeleteResponse {
+    ruleId: string;
+    message: string;
+}
+
+export interface RuleToggleRequest {
+    enabled: boolean;
+}
+
+export interface RuleToggleResponse {
+    ruleId: string;
+    enabled: boolean;
+    message: string;
+}
+
+export interface RuleTestRequest {
+    ruleId: string;
+    testData: Record<string, unknown>;
+}
+
+export interface RuleTestResponse {
+    matched: boolean;
+    action: RuleActionType;
+    conditions: RuleCondition;
+    testData: Record<string, unknown>;
+}
+
+// ---------------------------------------------------------------------------
+// AI Agent Configuration types (GET/PATCH /admin/ai-agent/config)
+// ---------------------------------------------------------------------------
+
+export interface CategoryConfig {
+    enabled: boolean;
+    autoApprovalLimit: number;
+    requireApprovalAbove: number;
+    escalationTriggers: string[];
+}
+
+export interface WorkingHoursConfig {
+    aiAgent: string;
+    humanAgents: {
+        start: string;
+        end: string;
+    };
+    afterHoursPolicy: string;
+}
+
+export interface BudgetLimitsConfig {
+    perUser: {
+        daily: number;
+        monthly: number;
+    };
+    perCategory: Record<string, number>;
+}
+
+export interface AIAgentConfig {
+    configId: string;
+    categories: Record<string, CategoryConfig>;
+    workingHours: WorkingHoursConfig;
+    budgetLimits: BudgetLimitsConfig;
+    version: string;
+}
+
+export interface AIAgentConfigResponse {
+    config: AIAgentConfig;
+    summary: {
+        totalCategories: number;
+        enabledCategories: number;
+        disabledCategories: number;
+        lastUpdated: string;
+    };
+}
+
+export interface AIAgentConfigUpdateRequest {
+    categories?: Record<string, Partial<CategoryConfig>>;
+    budgetLimits?: {
+        perUser?: Partial<BudgetLimitsConfig['perUser']>;
+        perCategory?: Record<string, number>;
+    };
+}
+
+export interface CategoryToggleRequest {
+    enabled: boolean;
+}
+
+export interface CategoryToggleResponse {
+    category: string;
+    enabled: boolean;
+    message: string;
+}
+
+export interface CategoryLimitsUpdateRequest {
+    autoApprovalLimit?: number;
+    requireApprovalAbove?: number;
+    escalationTriggers?: string[];
+}
+
+export interface CategoryLimitsUpdateResponse {
+    category: string;
+    message: string;
+    categoryConfig: CategoryConfig;
+}

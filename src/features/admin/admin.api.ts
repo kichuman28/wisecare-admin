@@ -23,6 +23,24 @@ import type {
     RecommendationsResponse,
     AnomaliesResponse,
     UserRole,
+    RulesResponse,
+    RulesFilters,
+    Rule,
+    RuleCreateRequest,
+    RuleCreateResponse,
+    RuleUpdateRequest,
+    RuleUpdateResponse,
+    RuleDeleteResponse,
+    RuleToggleRequest,
+    RuleToggleResponse,
+    RuleTestRequest,
+    RuleTestResponse,
+    AIAgentConfigResponse,
+    AIAgentConfigUpdateRequest,
+    CategoryToggleRequest,
+    CategoryToggleResponse,
+    CategoryLimitsUpdateRequest,
+    CategoryLimitsUpdateResponse,
 } from './admin.types';
 
 // ---------------------------------------------------------------------------
@@ -153,4 +171,74 @@ export const adminApi = {
         const params = hours ? { hours } : undefined;
         return api.get<AnomaliesResponse>('/admin/anomalies', { params });
     },
+
+    // ── Rules Engine ───────────────────────────────────────────────────────
+
+    /** List all rules with optional filtering */
+    getRules(filters?: RulesFilters) {
+        return api.get<RulesResponse>('/admin/rules', { params: filters });
+    },
+
+    /** Get a specific rule by ID */
+    getRule(ruleId: string) {
+        return api.get<Rule>(`/admin/rules/${ruleId}`);
+    },
+
+    /** Create a new rule */
+    createRule(data: RuleCreateRequest) {
+        return api.post<RuleCreateResponse>('/admin/rules', data);
+    },
+
+    /** Update an existing rule */
+    updateRule(ruleId: string, data: RuleUpdateRequest) {
+        return api.patch<RuleUpdateResponse>(`/admin/rules/${ruleId}`, data);
+    },
+
+    /** Delete a rule */
+    deleteRule(ruleId: string) {
+        return api.delete<RuleDeleteResponse>(`/admin/rules/${ruleId}`);
+    },
+
+    /** Toggle a rule enabled/disabled */
+    toggleRule(ruleId: string, data: RuleToggleRequest) {
+        return api.post<RuleToggleResponse>(`/admin/rules/${ruleId}/toggle`, data);
+    },
+
+    /** Test a rule against sample data */
+    testRule(data: RuleTestRequest) {
+        return api.post<RuleTestResponse>('/admin/rules/test', data);
+    },
+
+    // ── AI Agent Configuration ─────────────────────────────────────────────
+
+    /** Get current AI agent configuration */
+    getAIAgentConfig() {
+        return api.get<AIAgentConfigResponse>('/admin/ai-agent/config');
+    },
+
+    /** Update AI agent configuration */
+    updateAIAgentConfig(data: AIAgentConfigUpdateRequest) {
+        return api.patch<{ message: string; config: Partial<AIAgentConfigResponse['config']>; version: string }>(
+            '/admin/ai-agent/config',
+            data,
+        );
+    },
+
+    /** Enable or disable a category */
+    toggleCategory(category: string, data: CategoryToggleRequest) {
+        return api.post<CategoryToggleResponse>(
+            `/admin/ai-agent/categories/${category}/toggle`,
+            data,
+        );
+    },
+
+    /** Update limits for a specific category */
+    updateCategoryLimits(category: string, data: CategoryLimitsUpdateRequest) {
+        return api.patch<CategoryLimitsUpdateResponse>(
+            `/admin/ai-agent/categories/${category}/limits`,
+            data,
+        );
+    },
 } as const;
+
+

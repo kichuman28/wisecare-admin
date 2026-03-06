@@ -18,6 +18,8 @@ import {
     AdminAlertsPage,
     AdminEscalationsPage,
     AdminAIOperationsPage,
+    AdminRulesPage,
+    AdminAIAgentConfigPage,
 } from '@/app/routes/admin.pages';
 import { FamilyDashboardPage } from '@/app/routes/family.pages';
 
@@ -60,6 +62,8 @@ export function AppRoutes() {
                         <Route path={ROUTES.ADMIN_ALERTS} element={<AdminAlertsPage />} />
                         <Route path={ROUTES.ADMIN_ESCALATIONS} element={<AdminEscalationsPage />} />
                         <Route path={ROUTES.ADMIN_AI_OPS} element={<AdminAIOperationsPage />} />
+                        <Route path={ROUTES.ADMIN_RULES} element={<AdminRulesPage />} />
+                        <Route path={ROUTES.ADMIN_AI_CONFIG} element={<AdminAIAgentConfigPage />} />
                     </Route>
                 </Route>
 

@@ -7,6 +7,8 @@ export { AlertsPage } from './pages/AlertsPage';
 export { UsersPage } from './pages/UsersPage';
 export { EscalationsPage } from './pages/EscalationsPage';
 export { AIOperationsPage } from './pages/AIOperationsPage';
+export { RulesPage } from './pages/RulesPage';
+export { AIAgentConfigPage } from './pages/AIAgentConfigPage';
 
 // Components
 export { AdminStats } from './components/AdminStats';
@@ -37,6 +39,17 @@ export {
     useCreateAgent,
     useToggleUserStatus,
     useResolveEscalation,
+    useRules,
+    useRule,
+    useCreateRule,
+    useUpdateRule,
+    useDeleteRule,
+    useToggleRule,
+    useTestRule,
+    useAIAgentConfig,
+    useUpdateAIAgentConfig,
+    useToggleCategory,
+    useUpdateCategoryLimits,
     adminKeys,
 } from './admin.hooks';
 
@@ -64,4 +77,15 @@ export type {
     Recommendation,
     Anomaly,
     UserRole,
+    Rule,
+    RuleCondition,
+    RuleActionType,
+    RuleOperator,
+    RuleField,
+    RuleMetadata,
+    RulesFilters,
+    AIAgentConfig,
+    CategoryConfig,
+    WorkingHoursConfig,
+    BudgetLimitsConfig,
 } from './admin.types';

@@ -1,4 +1,4 @@
-import type { Alert, AlertSeverity } from '../admin.types';
+import type { Alert } from '../admin.types';
 import { useResolveAlert } from '../admin.hooks';
 import { useAuth } from '@/features/auth';
 import { AlertCriticalIcon, AlertTriangleIcon, InfoIcon, CheckCircleIcon } from '@/shared/components';

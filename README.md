@@ -80,7 +80,9 @@ src/
 │   │       ├── AlertsPage.tsx         # Alert monitoring with filters
 │   │       ├── UsersPage.tsx          # User CRUD with role tabs
 │   │       ├── EscalationsPage.tsx    # AI escalations with resolve
-│   │       └── AIOperationsPage.tsx   # Daily/weekly summary, recs, anomalies
+│   │       ├── AIOperationsPage.tsx   # Daily/weekly summary, recs, anomalies
+│   │       ├── RulesPage.tsx          # Rules Engine management
+│   │       └── AIAgentConfigPage.tsx  # Global AI Agent configuration
 │   │
 │   └── family/                   # Family member module
 │       ├── family.types.ts       # FamilyProfile, ElderlyLink types
@@ -141,6 +143,8 @@ src/
 | `/admin/alerts` | Alert monitoring with severity/type filters and resolve |
 | `/admin/escalations` | AI escalation queue with priority tabs and resolve |
 | `/admin/ai-operations` | Daily/weekly summary, recommendations, anomalies |
+| `/admin/rules` | Rules Engine — filter, toggle, and manage business rules |
+| `/admin/ai-config` | AI Agent Config — manage bounds, categories, and hours |
 
 ### Family (`FAMILY` role required)
 | Route | Page |
@@ -179,6 +183,9 @@ All requests go through the Axios instance which attaches `Authorization: Bearer
 | `GET` | `/admin/summary/weekly` | AI Ops — weekly overview |
 | `GET` | `/admin/recommendations` | AI Ops — recommendations |
 | `GET` | `/admin/anomalies` | AI Ops — anomalies |
+| `GET, POST, PATCH, DELETE` | `/admin/rules` | Rules Engine operations |
+| `GET, PATCH` | `/admin/ai-agent/config` | Global AI Agent settings |
+| `POST, PATCH` | `/admin/ai-agent/categories/...` | Category toggles and limits |
 | `POST` | `/family/onboarding/basic-info` | Family onboarding |
 | `POST` | `/family/link-elderly` | Family linking |
 
@@ -235,7 +242,9 @@ Defined as Tailwind CSS v4 `@theme` tokens in `src/index.css`, mapped from the F
 - **Users**: Role filter tabs (All/Elderly/Family/Agent/Admin), data table with activate/deactivate, user detail slide-in drawer (shows medications & memory summary for elderly), Create Agent modal with default password display
 - **Escalations**: Priority filter tabs, stats bar (escalation rate, trend, period selector), escalation cards with inline resolve forms (resolution type + notes)
 - **AI Operations**: Daily summary (status badge, metrics grid, category breakdown table), weekly overview with mini bar chart, AI recommendations cards (priority-coded), system anomalies with threshold/actual metrics
-- **Layout**: Collapsible sidebar (full ↔ icon rail) with 6 nav items and orange active indicators
+- **Rules Engine**: View, filter, test, and toggle dynamic behavior rules that govern AI agent decisions (e.g., auto-approvals, escalations) without code changes.
+- **AI Agent Config**: Visual dashboard to manage global limits (budgeting), configure working hours, and enforce category-specific bounds and manual approval triggers.
+- **Layout**: Collapsible sidebar (full ↔ icon rail) with 8 nav items and orange active indicators
 
 ### ✅ Family Module
 - **Signup**: 60/40 split registration page with feature pills
