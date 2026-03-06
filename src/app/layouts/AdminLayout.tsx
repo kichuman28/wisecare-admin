@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { ROUTES } from '@/shared/constants';
-import { DashboardIcon, RequestsIcon, AlertIcon, UsersIcon, LogOutIcon } from '@/shared/components';
+import { DashboardIcon, RequestsIcon, AlertIcon, UsersIcon, AlertTriangleIcon, ActivityIcon, LogOutIcon } from '@/shared/components';
 
 const NAV_ITEMS = [
     { label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD, icon: DashboardIcon },
     { label: 'Requests', path: ROUTES.ADMIN_SERVICE_REQUESTS, icon: RequestsIcon },
     { label: 'Alerts', path: ROUTES.ADMIN_ALERTS, icon: AlertIcon },
     { label: 'Users', path: ROUTES.ADMIN_USERS, icon: UsersIcon },
+    { label: 'Escalations', path: ROUTES.ADMIN_ESCALATIONS, icon: AlertTriangleIcon },
+    { label: 'AI Ops', path: ROUTES.ADMIN_AI_OPS, icon: ActivityIcon },
 ];
 
 // ---------------------------------------------------------------------------

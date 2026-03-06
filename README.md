@@ -63,19 +63,24 @@ src/
 │   │       └── RoleGuard.tsx     # Requires specific role
 │   │
 │   ├── admin/                    # Admin dashboard module
-│   │   ├── admin.types.ts        # ServiceRequest, Agent, Alert types
-│   │   ├── admin.api.ts          # GET /service-requests, agents, alerts
-│   │   ├── admin.hooks.ts        # React Query hooks (queries + mutations)
+│   │   ├── admin.types.ts        # 30+ types (Stats, Users, Escalations, AI, etc.)
+│   │   ├── admin.api.ts          # 16 API endpoint functions
+│   │   ├── admin.hooks.ts        # 14 queries + 5 mutations
 │   │   ├── index.ts              # Barrel export
 │   │   ├── components/
-│   │   │   ├── AdminStats.tsx    # Dashboard stat cards
-│   │   │   ├── RequestsTable.tsx # Service requests data table
-│   │   │   ├── AssignAgentModal.tsx  # Agent selection + assignment
-│   │   │   └── AlertsPanel.tsx   # Grouped alerts with resolve
+│   │   │   ├── AdminStats.tsx         # Dashboard stat cards (6 cards from /admin/stats)
+│   │   │   ├── RequestsTable.tsx      # Service requests data table
+│   │   │   ├── AssignAgentModal.tsx    # Agent selection + assignment
+│   │   │   ├── AlertsPanel.tsx        # Flat alert list with severity & resolve
+│   │   │   ├── CreateAgentModal.tsx    # Create agent form + default password
+│   │   │   └── UserDetailDrawer.tsx    # Slide-in user profile panel
 │   │   └── pages/
-│   │       ├── AdminDashboard.tsx     # Overview with stats
-│   │       ├── RequestsPage.tsx      # Tabbed request management
-│   │       └── AlertsPage.tsx        # Alert monitoring
+│   │       ├── AdminDashboard.tsx      # Overview with stats + recent items
+│   │       ├── RequestsPage.tsx       # Tabbed request management
+│   │       ├── AlertsPage.tsx         # Alert monitoring with filters
+│   │       ├── UsersPage.tsx          # User CRUD with role tabs
+│   │       ├── EscalationsPage.tsx    # AI escalations with resolve
+│   │       └── AIOperationsPage.tsx   # Daily/weekly summary, recs, anomalies
 │   │
 │   └── family/                   # Family member module
 │       ├── family.types.ts       # FamilyProfile, ElderlyLink types
@@ -130,10 +135,12 @@ src/
 ### Admin (`ADMIN` role required)
 | Route | Page |
 |-------|------|
-| `/admin` | Dashboard — stats, quick actions, recent pending |
+| `/admin` | Dashboard — 6 stat cards, recent requests & alerts |
 | `/admin/service-requests` | Tabbed request management (6 status filters) |
-| `/admin/users` | User management (placeholder — needs backend) |
-| `/admin/alerts` | Alert monitoring with resolve |
+| `/admin/users` | User management — role tabs, create agent, activate/deactivate |
+| `/admin/alerts` | Alert monitoring with severity/type filters and resolve |
+| `/admin/escalations` | AI escalation queue with priority tabs and resolve |
+| `/admin/ai-operations` | Daily/weekly summary, recommendations, anomalies |
 
 ### Family (`FAMILY` role required)
 | Route | Page |
@@ -155,10 +162,23 @@ All requests go through the Axios instance which attaches `Authorization: Bearer
 | `POST` | `/auth/signout` | Auth module |
 | `POST` | `/auth/refresh` | Axios interceptor |
 | `GET` | `/users/me` | Family onboarding |
-| `GET` | `/service-requests?status=X` | Admin dashboard |
+| `GET` | `/admin/stats` | Admin dashboard |
+| `GET` | `/service-requests?status=X` | Requests page |
 | `GET` | `/admin/agents/available` | Admin assign modal |
 | `PATCH` | `/service-requests/{id}/assign` | Admin assign agent |
+| `GET` | `/admin/alerts` | Alerts page (filters: severity, type, resolved) |
 | `PATCH` | `/alerts/{id}/resolve` | Admin alerts |
+| `GET` | `/admin/users` | Users page (filters: role, active) |
+| `GET` | `/admin/users/{userId}` | User detail drawer |
+| `POST` | `/admin/users/agent` | Create agent modal |
+| `PATCH` | `/admin/users/{userId}/status` | Activate/deactivate user |
+| `GET` | `/admin/escalations/pending` | Escalations page |
+| `GET` | `/admin/escalations/stats` | Escalations stats bar |
+| `POST` | `/admin/escalations/{id}/resolve` | Resolve escalation |
+| `GET` | `/admin/summary/daily` | AI Ops — daily summary |
+| `GET` | `/admin/summary/weekly` | AI Ops — weekly overview |
+| `GET` | `/admin/recommendations` | AI Ops — recommendations |
+| `GET` | `/admin/anomalies` | AI Ops — anomalies |
 | `POST` | `/family/onboarding/basic-info` | Family onboarding |
 | `POST` | `/family/link-elderly` | Family linking |
 
@@ -207,11 +227,15 @@ Defined as Tailwind CSS v4 `@theme` tokens in `src/index.css`, mapped from the F
 - Sign-out with token invalidation
 
 ### ✅ Admin Dashboard
-- **Overview**: 3 stat cards with branded gradients (orange, navy, teal) and SVG watermark icons
+- **Overview**: 6 stat cards powered by `/admin/stats` — pending, active, completed today, total users, unresolved alerts, total requests
+- **Recent Items**: Recent requests and alerts cards with status/severity badges
 - **Service Requests**: 6-tab filtered table (Pending → Assigned → Accepted → In Progress → Completed → Rejected)
 - **Assign Agent**: Modal to fetch available agents, filter by city, select and assign
-- **Alerts**: Grouped alerts by elderly user with SVG severity icons and resolve buttons
-- **Layout**: Collapsible sidebar (full ↔ icon rail) with orange active nav indicators
+- **Alerts**: Filterable by severity/type/resolved, summary cards with alert counts, resolve buttons
+- **Users**: Role filter tabs (All/Elderly/Family/Agent/Admin), data table with activate/deactivate, user detail slide-in drawer (shows medications & memory summary for elderly), Create Agent modal with default password display
+- **Escalations**: Priority filter tabs, stats bar (escalation rate, trend, period selector), escalation cards with inline resolve forms (resolution type + notes)
+- **AI Operations**: Daily summary (status badge, metrics grid, category breakdown table), weekly overview with mini bar chart, AI recommendations cards (priority-coded), system anomalies with threshold/actual metrics
+- **Layout**: Collapsible sidebar (full ↔ icon rail) with 6 nav items and orange active indicators
 
 ### ✅ Family Module
 - **Signup**: 60/40 split registration page with feature pills
@@ -220,7 +244,6 @@ Defined as Tailwind CSS v4 `@theme` tokens in `src/index.css`, mapped from the F
 - **Dashboard**: Post-onboarding landing page
 
 ### 🚧 Pending
-- **Admin Users Page**: Placeholder — needs `GET /admin/users` backend endpoint
 - **Family Dashboard**: Placeholder — needs additional family-specific endpoints
 
 ---
