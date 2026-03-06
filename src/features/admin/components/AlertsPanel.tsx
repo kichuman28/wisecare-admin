@@ -1,7 +1,8 @@
 import type { ElderlyAlertGroup, Alert, AlertSeverity } from '../admin.types';
 import { useResolveAlert } from '../admin.hooks';
 import { useAuth } from '@/features/auth';
-import { EmptyState } from '@/shared/components';
+import { EmptyState, AlertCriticalIcon, AlertTriangleIcon, InfoIcon, AlertIcon, CheckCircleIcon } from '@/shared/components';
+import type { ReactNode } from 'react';
 
 // ---------------------------------------------------------------------------
 // Severity styling
@@ -17,15 +18,15 @@ const severityStyles: Record<AlertSeverity, { badge: string; border: string }> =
         border: 'border-l-amber-500',
     },
     INFO: {
-        badge: 'bg-blue-100 text-blue-700 border-blue-200',
-        border: 'border-l-blue-500',
+        badge: 'bg-accent-blue/10 text-icon-shield border-accent-blue/30',
+        border: 'border-l-accent-blue',
     },
 };
 
-const severityIcons: Record<AlertSeverity, string> = {
-    CRITICAL: '🚨',
-    WARNING: '⚠️',
-    INFO: 'ℹ️',
+const severityIcons: Record<AlertSeverity, ReactNode> = {
+    CRITICAL: <AlertCriticalIcon size={18} className="text-red-500" />,
+    WARNING: <AlertTriangleIcon size={18} className="text-amber-500" />,
+    INFO: <InfoIcon size={18} className="text-accent-blue" />,
 };
 
 // ---------------------------------------------------------------------------
@@ -43,9 +44,9 @@ function AlertRow({ alert, onResolve, resolving }: AlertRowProps) {
 
     return (
         <div
-            className={`flex items-start gap-3 rounded-xl border border-l-4 bg-white p-4 shadow-sm transition-all hover:shadow-md ${styles.border}`}
+            className={`flex items-start gap-3 rounded-xl border border-l-4 bg-card-surface p-4 shadow-sm transition-all hover:shadow-md ${styles.border}`}
         >
-            <span className="mt-0.5 text-lg">{severityIcons[alert.severity]}</span>
+            <span className="mt-0.5">{severityIcons[alert.severity]}</span>
 
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -54,15 +55,15 @@ function AlertRow({ alert, onResolve, resolving }: AlertRowProps) {
                     >
                         {alert.severity}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-text-muted">
                         {alert.type.replace(/_/g, ' ')}
                     </span>
-                    <span className="text-xs text-gray-300">•</span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-outline">•</span>
+                    <span className="text-xs text-text-muted">
                         {new Date(alert.timestamp).toLocaleString('en-IN')}
                     </span>
                 </div>
-                <p className="mt-1 text-sm text-gray-700">{alert.message}</p>
+                <p className="mt-1 text-sm text-on-background">{alert.message}</p>
             </div>
 
             {!alert.resolved && (
@@ -70,15 +71,17 @@ function AlertRow({ alert, onResolve, resolving }: AlertRowProps) {
                     type="button"
                     onClick={() => onResolve(alert.alertId)}
                     disabled={resolving}
-                    className="shrink-0 rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 transition-all hover:bg-green-100 disabled:opacity-50"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 transition-all hover:bg-green-100 disabled:opacity-50"
                 >
+                    <CheckCircleIcon size={14} />
                     {resolving ? 'Resolving…' : 'Resolve'}
                 </button>
             )}
 
             {alert.resolved && (
-                <span className="shrink-0 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                    ✓ Resolved
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                    <CheckCircleIcon size={14} />
+                    Resolved
                 </span>
             )}
         </div>
@@ -121,14 +124,14 @@ export function AlertsPanel({ alertGroups }: AlertsPanelProps) {
                 <div key={group.elderlyUserId}>
                     {/* Group header */}
                     <div className="mb-3 flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-xs font-bold text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-navy to-icon-shield text-xs font-bold text-white">
                             {group.elderlyName.charAt(0)}
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-gray-900">
+                            <p className="text-sm font-semibold text-on-background">
                                 {group.elderlyName}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-text-muted">
                                 {group.alerts.filter((a) => !a.resolved).length} unresolved
                             </p>
                         </div>

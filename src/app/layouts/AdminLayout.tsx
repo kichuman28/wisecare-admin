@@ -1,84 +1,148 @@
+import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { ROUTES } from '@/shared/constants';
+import { DashboardIcon, RequestsIcon, AlertIcon, UsersIcon, LogOutIcon } from '@/shared/components';
 
 const NAV_ITEMS = [
-    { label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD, icon: '📊' },
-    { label: 'Requests', path: ROUTES.ADMIN_SERVICE_REQUESTS, icon: '📋' },
-    { label: 'Alerts', path: ROUTES.ADMIN_ALERTS, icon: '🔔' },
-    { label: 'Users', path: ROUTES.ADMIN_USERS, icon: '👥' },
+    { label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD, icon: DashboardIcon },
+    { label: 'Requests', path: ROUTES.ADMIN_SERVICE_REQUESTS, icon: RequestsIcon },
+    { label: 'Alerts', path: ROUTES.ADMIN_ALERTS, icon: AlertIcon },
+    { label: 'Users', path: ROUTES.ADMIN_USERS, icon: UsersIcon },
 ];
+
+// ---------------------------------------------------------------------------
+// Toggle chevron icon
+// ---------------------------------------------------------------------------
+
+function ChevronIcon({ collapsed }: { collapsed: boolean }) {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
+        >
+            <polyline points="15 18 9 12 15 6" />
+        </svg>
+    );
+}
 
 /**
  * Admin layout shell — wraps all /admin/* routes.
- * Includes sidebar navigation and top header.
+ * Collapsible sidebar: icons-only rail when collapsed, full sidebar when expanded.
+ * Main content reflows to fill available space.
  */
 export function AdminLayout() {
     const { user, logout } = useAuth();
+    const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            {/* Sidebar */}
-            <aside className="flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white">
+        <div className="flex min-h-screen bg-surface">
+            {/* ── Sidebar ── */}
+            <aside
+                className={`flex shrink-0 flex-col bg-gradient-to-b from-gradient-top to-gradient-bottom transition-all duration-300 ease-in-out ${collapsed ? 'w-[72px]' : 'w-64'
+                    }`}
+            >
                 {/* Logo */}
-                <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white">
+                <div className={`flex items-center border-b border-white/10 py-4 ${collapsed ? 'justify-center px-2' : 'gap-3 px-5'}`}>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-icon-shield text-sm font-bold text-white shadow-lg">
                         W
                     </div>
-                    <span className="text-lg font-bold text-gray-900">
-                        WiseCare
-                    </span>
-                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
-                        ADMIN
-                    </span>
+                    {!collapsed && (
+                        <>
+                            <span className="text-lg font-bold text-white">
+                                WiseCare
+                            </span>
+                            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                ADMIN
+                            </span>
+                        </>
+                    )}
                 </div>
 
                 {/* Nav links */}
-                <nav className="flex-1 space-y-1 px-3 py-4">
+                <nav className={`flex-1 space-y-1 py-4 ${collapsed ? 'px-2' : 'px-3'}`}>
                     {NAV_ITEMS.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             end={item.path === ROUTES.ADMIN_DASHBOARD}
+                            title={collapsed ? item.label : undefined}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${isActive
-                                    ? 'bg-blue-50 text-blue-700 shadow-sm'
-                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                `flex items-center rounded-xl text-sm font-medium transition-all ${collapsed
+                                    ? 'justify-center px-0 py-2.5'
+                                    : 'gap-3 px-3 py-2.5'
+                                } ${isActive
+                                    ? `bg-white/10 text-white shadow-sm ${collapsed ? '' : 'border-l-[3px] border-primary'}`
+                                    : `text-white/60 hover:bg-white/5 hover:text-white/80 ${collapsed ? '' : 'border-l-[3px] border-transparent'}`
                                 }`
                             }
                         >
-                            <span className="text-lg">{item.icon}</span>
-                            {item.label}
+                            {({ isActive }) => (
+                                <>
+                                    <item.icon
+                                        size={collapsed ? 20 : 18}
+                                        className={isActive ? 'text-primary' : 'text-white/60'}
+                                    />
+                                    {!collapsed && item.label}
+                                </>
+                            )}
                         </NavLink>
                     ))}
                 </nav>
 
+                {/* Collapse toggle */}
+                <div className={`border-t border-white/10 ${collapsed ? 'px-2' : 'px-3'} py-2`}>
+                    <button
+                        onClick={() => setCollapsed((c) => !c)}
+                        className={`flex w-full items-center rounded-lg py-2 text-white/50 transition-colors hover:bg-white/10 hover:text-white ${collapsed ? 'justify-center px-0' : 'gap-3 px-3'
+                            }`}
+                        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    >
+                        <ChevronIcon collapsed={collapsed} />
+                        {!collapsed && (
+                            <span className="text-xs font-medium">Collapse</span>
+                        )}
+                    </button>
+                </div>
+
                 {/* User info & sign out */}
-                <div className="border-t border-gray-100 px-4 py-4">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-xs font-bold text-white">
+                <div className={`border-t border-white/10 py-4 ${collapsed ? 'px-2' : 'px-4'}`}>
+                    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-icon-shield text-xs font-bold text-white">
                             {user?.name?.charAt(0)?.toUpperCase() ?? 'A'}
                         </div>
-                        <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-gray-900">
-                                {user?.name ?? 'Admin'}
-                            </p>
-                            <p className="truncate text-xs text-gray-400">
-                                {user?.email ?? ''}
-                            </p>
-                        </div>
+                        {!collapsed && (
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium text-white">
+                                    {user?.name ?? 'Admin'}
+                                </p>
+                                <p className="truncate text-xs text-white/50">
+                                    {user?.email ?? ''}
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <button
                         onClick={logout}
-                        className="mt-3 w-full rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                        title={collapsed ? 'Sign out' : undefined}
+                        className={`mt-3 flex w-full items-center rounded-lg py-2 text-sm font-medium text-red-400 transition-colors hover:bg-white/10 ${collapsed ? 'justify-center px-0' : 'justify-center gap-2 px-3'
+                            }`}
                     >
-                        Sign out
+                        <LogOutIcon size={16} />
+                        {!collapsed && 'Sign out'}
                     </button>
                 </div>
             </aside>
 
-            {/* Main content */}
-            <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+            {/* ── Main content (reflows with sidebar) ── */}
+            <main className="flex-1 overflow-y-auto p-5 lg:p-8">
                 <Outlet />
             </main>
         </div>

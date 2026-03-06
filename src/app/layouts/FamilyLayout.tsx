@@ -3,25 +3,30 @@ import { useAuth } from '@/features/auth';
 
 /**
  * Family layout shell — wraps all /family/* routes.
- * Placeholder for family-specific nav when built.
+ * Navy header bar with brand styling.
  */
 export function FamilyLayout() {
     const { user, logout } = useAuth();
 
     return (
         <div className="flex min-h-screen flex-col">
-            {/* Top bar — placeholder */}
-            <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
-                <h1 className="text-lg font-semibold text-gray-900">
-                    WiseCare Family
-                </h1>
+            {/* Top bar */}
+            <header className="flex items-center justify-between bg-navy-dark px-6 py-3 shadow-md">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-icon-shield text-xs font-bold text-white">
+                        W
+                    </div>
+                    <h1 className="text-lg font-semibold text-white">
+                        WiseCare <span className="text-header-subtitle">Family</span>
+                    </h1>
+                </div>
                 <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-white/70">
                         {user?.name ?? 'Family'}
                     </span>
                     <button
                         onClick={logout}
-                        className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                        className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-white/10"
                     >
                         Sign out
                     </button>
@@ -29,7 +34,7 @@ export function FamilyLayout() {
             </header>
 
             {/* Page content */}
-            <main className="flex-1 bg-gray-50 p-6">
+            <main className="flex-1 bg-surface p-6">
                 <Outlet />
             </main>
         </div>

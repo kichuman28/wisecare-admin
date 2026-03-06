@@ -5,6 +5,8 @@ const statusStyles: Record<ServiceRequestStatus, string> = {
         'bg-amber-50 text-amber-700 border-amber-200',
     ASSIGNED:
         'bg-blue-50 text-blue-700 border-blue-200',
+    ACCEPTED:
+        'bg-purple-50 text-purple-700 border-purple-200',
     IN_PROGRESS:
         'bg-orange-50 text-orange-700 border-orange-200',
     COMPLETED:
@@ -16,6 +18,7 @@ const statusStyles: Record<ServiceRequestStatus, string> = {
 const statusLabels: Record<ServiceRequestStatus, string> = {
     PENDING: 'Pending',
     ASSIGNED: 'Assigned',
+    ACCEPTED: 'Accepted',
     IN_PROGRESS: 'In Progress',
     COMPLETED: 'Completed',
     REJECTED: 'Rejected',

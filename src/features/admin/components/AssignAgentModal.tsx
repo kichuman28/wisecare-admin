@@ -17,7 +17,6 @@ export function AssignAgentModal({ request, onClose }: AssignAgentModalProps) {
     const assignMutation = useAssignAgent();
     const [selectedAgent, setSelectedAgent] = useState<AvailableAgent | null>(null);
 
-    // Filter agents by elderly user's city
     const filteredAgents = useMemo(() => {
         if (!data?.agents) return [];
         return data.agents.filter(
@@ -36,28 +35,28 @@ export function AssignAgentModal({ request, onClose }: AssignAgentModalProps) {
             });
             onClose();
         } catch {
-            // Error is handled by React Query — could add toast here
+            // Error is handled by React Query
         }
     };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="mx-4 w-full max-w-lg animate-[fadeIn_200ms_ease-out] rounded-2xl bg-white shadow-2xl">
+            <div className="mx-4 w-full max-w-lg animate-[fadeIn_200ms_ease-out] rounded-2xl bg-card-surface shadow-2xl ring-1 ring-outline">
                 {/* Header */}
-                <div className="border-b border-gray-100 px-6 py-4">
+                <div className="border-b border-outline px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-lg font-bold text-gray-900">
+                            <h2 className="text-lg font-bold text-on-background">
                                 Assign Agent
                             </h2>
-                            <p className="mt-0.5 text-sm text-gray-500">
+                            <p className="mt-0.5 text-sm text-text-muted">
                                 {request.title} — {request.elderlyName} ({request.elderlyCity})
                             </p>
                         </div>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                            className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-warm-bg hover:text-on-background"
                         >
                             ✕
                         </button>
@@ -79,7 +78,7 @@ export function AssignAgentModal({ request, onClose }: AssignAgentModalProps) {
                             {/* City-filtered agents */}
                             {filteredAgents.length > 0 && (
                                 <div className="mb-4">
-                                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
                                         Agents in {request.elderlyCity}
                                     </p>
                                     <div className="flex flex-col gap-2">
@@ -98,7 +97,7 @@ export function AssignAgentModal({ request, onClose }: AssignAgentModalProps) {
                             {/* Other agents */}
                             {filteredAgents.length < allAgents.length && (
                                 <div>
-                                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
                                         {filteredAgents.length > 0
                                             ? 'Other agents'
                                             : `No agents in ${request.elderlyCity} — showing all`}
@@ -129,11 +128,11 @@ export function AssignAgentModal({ request, onClose }: AssignAgentModalProps) {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
+                <div className="flex items-center justify-end gap-3 border-t border-outline px-6 py-4">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+                        className="rounded-lg px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-warm-bg"
                     >
                         Cancel
                     </button>
@@ -141,7 +140,7 @@ export function AssignAgentModal({ request, onClose }: AssignAgentModalProps) {
                         type="button"
                         disabled={!selectedAgent || assignMutation.isPending}
                         onClick={handleAssign}
-                        className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {assignMutation.isPending ? 'Assigning…' : 'Confirm Assignment'}
                     </button>

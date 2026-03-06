@@ -6,3 +6,4 @@ export { EmptyState } from './EmptyState';
 export { DataTable } from './DataTable';
 export type { Column } from './DataTable';
 export { AgentCard } from './AgentCard';
+export * from './Icons';

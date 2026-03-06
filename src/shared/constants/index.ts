@@ -11,10 +11,6 @@ export const ROUTES = {
     ADMIN_USERS: '/admin/users',
     ADMIN_ALERTS: '/admin/alerts',
 
-    // Agent routes
-    AGENT_DASHBOARD: '/agent',
-    AGENT_REQUESTS: '/agent/requests',
-
     // Family routes
     FAMILY_ONBOARDING_BASIC: '/family/onboarding/basic',
     FAMILY_ONBOARDING_LINK: '/family/onboarding/link',
@@ -26,8 +22,6 @@ export function getDashboardRoute(role: UserRole): string {
     switch (role) {
         case 'ADMIN':
             return ROUTES.ADMIN_DASHBOARD;
-        case 'AGENT':
-            return ROUTES.AGENT_DASHBOARD;
         case 'FAMILY':
             return ROUTES.FAMILY_DASHBOARD;
         default:

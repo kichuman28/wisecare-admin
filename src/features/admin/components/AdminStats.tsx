@@ -1,4 +1,6 @@
 import { usePendingRequests, useInProgressRequests, useAvailableAgents } from '../admin.hooks';
+import { ClipboardIcon, RefreshIcon, UsersIcon } from '@/shared/components';
+import type { ReactNode } from 'react';
 
 // ---------------------------------------------------------------------------
 // Stat card
@@ -7,7 +9,7 @@ import { usePendingRequests, useInProgressRequests, useAvailableAgents } from '.
 interface StatCardProps {
     label: string;
     value: number | undefined;
-    icon: string;
+    icon: ReactNode;
     gradient: string;
     loading: boolean;
 }
@@ -18,9 +20,9 @@ function StatCard({ label, value, icon, gradient, loading }: StatCardProps) {
             className={`relative overflow-hidden rounded-2xl border border-white/20 p-6 text-white shadow-lg ${gradient}`}
         >
             {/* Background icon */}
-            <span className="absolute -right-2 -top-2 text-6xl opacity-20">
+            <div className="absolute -right-3 -top-3 opacity-10">
                 {icon}
-            </span>
+            </div>
 
             <p className="text-sm font-medium text-white/80">{label}</p>
 
@@ -46,21 +48,21 @@ export function AdminStats() {
         {
             label: 'Pending Requests',
             value: pending.data?.requests.length,
-            icon: '📋',
-            gradient: 'bg-gradient-to-br from-amber-500 to-orange-600',
+            icon: <ClipboardIcon size={64} />,
+            gradient: 'bg-gradient-to-br from-primary to-[#c44d1e]',
             loading: pending.isLoading,
         },
         {
             label: 'Active Requests',
             value: active.data?.requests.length,
-            icon: '🔄',
-            gradient: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+            icon: <RefreshIcon size={64} />,
+            gradient: 'bg-gradient-to-br from-navy to-gradient-bottom',
             loading: active.isLoading,
         },
         {
             label: 'Available Agents',
             value: agents.data?.agents.length,
-            icon: '👥',
+            icon: <UsersIcon size={64} />,
             gradient: 'bg-gradient-to-br from-emerald-500 to-teal-600',
             loading: agents.isLoading,
         },

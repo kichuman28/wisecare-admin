@@ -5,6 +5,7 @@
 export type ServiceRequestStatus =
     | 'PENDING'
     | 'ASSIGNED'
+    | 'ACCEPTED'
     | 'IN_PROGRESS'
     | 'COMPLETED'
     | 'REJECTED';
@@ -114,6 +115,7 @@ export interface ResolveAlertRequest {
 export const STATUS_COLORS: Record<ServiceRequestStatus, string> = {
     PENDING: 'amber',
     ASSIGNED: 'blue',
+    ACCEPTED: 'purple',
     IN_PROGRESS: 'orange',
     COMPLETED: 'green',
     REJECTED: 'red',

@@ -37,7 +37,7 @@ export function RequestsTable({ requests, onAssign }: RequestsTableProps) {
                 key: 'requestId',
                 header: 'ID',
                 render: (r) => (
-                    <span className="font-mono text-xs text-gray-500" title={r.requestId}>
+                    <span className="font-mono text-xs text-text-muted" title={r.requestId}>
                         {truncateId(r.requestId)}
                     </span>
                 ),
@@ -47,8 +47,8 @@ export function RequestsTable({ requests, onAssign }: RequestsTableProps) {
                 header: 'Elderly',
                 render: (r) => (
                     <div>
-                        <p className="font-medium text-gray-900">{r.elderlyName}</p>
-                        <p className="text-xs text-gray-400">{r.elderlyCity}</p>
+                        <p className="font-medium text-on-background">{r.elderlyName}</p>
+                        <p className="text-xs text-text-muted">{r.elderlyCity}</p>
                     </div>
                 ),
             },
@@ -56,7 +56,7 @@ export function RequestsTable({ requests, onAssign }: RequestsTableProps) {
                 key: 'type',
                 header: 'Type',
                 render: (r) => (
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-secondary">
                         {r.requestType} / {r.category}
                     </span>
                 ),
@@ -87,11 +87,11 @@ export function RequestsTable({ requests, onAssign }: RequestsTableProps) {
                 header: 'Assigned To',
                 render: (r) =>
                     r.assignedAgentName ? (
-                        <span className="text-sm font-medium text-gray-800">
+                        <span className="text-sm font-medium text-on-background">
                             {r.assignedAgentName}
                         </span>
                     ) : (
-                        <span className="text-xs italic text-gray-400">
+                        <span className="text-xs italic text-text-muted">
                             Unassigned
                         </span>
                     ),
@@ -100,7 +100,7 @@ export function RequestsTable({ requests, onAssign }: RequestsTableProps) {
                 key: 'createdAt',
                 header: 'Created',
                 render: (r) => (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-text-muted">
                         {formatDate(r.createdAt)}
                     </span>
                 ),
@@ -114,7 +114,7 @@ export function RequestsTable({ requests, onAssign }: RequestsTableProps) {
                         <button
                             type="button"
                             onClick={() => onAssign(r)}
-                            className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md active:scale-95"
+                            className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-primary-hover hover:shadow-md active:scale-95"
                         >
                             Assign
                         </button>

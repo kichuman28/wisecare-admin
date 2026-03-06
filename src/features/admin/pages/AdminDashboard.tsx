@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '@/shared/constants';
 import { AdminStats } from '../components/AdminStats';
 import { usePendingRequests } from '../admin.hooks';
-import { LoadingState, EmptyState } from '@/shared/components';
+import { LoadingState, EmptyState, RequestsIcon, AlertIcon } from '@/shared/components';
 import { RequestsTable } from '../components/RequestsTable';
 
 export function AdminDashboard() {
@@ -12,8 +12,8 @@ export function AdminDashboard() {
         <div className="space-y-8">
             {/* Page header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <h1 className="text-2xl font-bold text-on-background">Dashboard</h1>
+                <p className="mt-1 text-sm text-text-muted">
                     Platform overview — monitor requests, agents, and alerts.
                 </p>
             </div>
@@ -25,27 +25,29 @@ export function AdminDashboard() {
             <div className="flex flex-wrap gap-3">
                 <Link
                     to={ROUTES.ADMIN_SERVICE_REQUESTS}
-                    className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 transition-all hover:shadow-md hover:ring-gray-300"
+                    className="inline-flex items-center gap-2 rounded-xl bg-card-surface px-4 py-2.5 text-sm font-medium text-on-background shadow-sm ring-1 ring-outline transition-all hover:shadow-md hover:ring-primary/30"
                 >
-                    📋 Manage Requests
+                    <RequestsIcon size={16} className="text-primary" />
+                    Manage Requests
                 </Link>
                 <Link
                     to={ROUTES.ADMIN_ALERTS}
-                    className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 transition-all hover:shadow-md hover:ring-gray-300"
+                    className="inline-flex items-center gap-2 rounded-xl bg-card-surface px-4 py-2.5 text-sm font-medium text-on-background shadow-sm ring-1 ring-outline transition-all hover:shadow-md hover:ring-primary/30"
                 >
-                    🔔 View Alerts
+                    <AlertIcon size={16} className="text-primary" />
+                    View Alerts
                 </Link>
             </div>
 
             {/* Recent pending requests preview */}
             <div>
                 <div className="mb-3 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-800">
+                    <h2 className="text-lg font-semibold text-on-background">
                         Recent Pending Requests
                     </h2>
                     <Link
                         to={ROUTES.ADMIN_SERVICE_REQUESTS}
-                        className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                        className="text-sm font-semibold text-primary hover:text-primary-hover"
                     >
                         View all →
                     </Link>
@@ -54,7 +56,7 @@ export function AdminDashboard() {
                 {isLoading && <LoadingState message="Loading pending requests…" />}
 
                 {isError && (
-                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    <div className="rounded-xl border border-red-200 bg-error-light p-4 text-sm text-error">
                         Failed to load pending requests. Please try again later.
                     </div>
                 )}
@@ -71,7 +73,6 @@ export function AdminDashboard() {
                     <RequestsTable
                         requests={data.requests.slice(0, 5)}
                         onAssign={() => {
-                            // Navigate to requests page for assignment
                             window.location.href = ROUTES.ADMIN_SERVICE_REQUESTS;
                         }}
                     />

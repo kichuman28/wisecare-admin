@@ -9,7 +9,6 @@ import {
     FamilyDashboardGuard,
 } from '@/features/family';
 import { AdminLayout } from '@/app/layouts/AdminLayout';
-import { AgentLayout } from '@/app/layouts/AgentLayout';
 import { FamilyLayout } from '@/app/layouts/FamilyLayout';
 import { RoleRedirect } from '@/app/routes/RoleRedirect';
 import {
@@ -18,7 +17,6 @@ import {
     AdminUsersPage,
     AdminAlertsPage,
 } from '@/app/routes/admin.pages';
-import { AgentDashboardPage } from '@/app/routes/agent.pages';
 import { FamilyDashboardPage } from '@/app/routes/family.pages';
 
 // ---------------------------------------------------------------------------
@@ -61,13 +59,6 @@ export function AppRoutes() {
                     </Route>
                 </Route>
 
-                {/* Agent routes — AGENT role only */}
-                <Route element={<RoleGuard allowedRoles={['AGENT']} />}>
-                    <Route element={<AgentLayout />}>
-                        <Route path={ROUTES.AGENT_DASHBOARD} element={<AgentDashboardPage />} />
-                        <Route path={ROUTES.AGENT_REQUESTS} element={<AgentDashboardPage />} />
-                    </Route>
-                </Route>
 
                 {/* Family onboarding — FAMILY role, onboarding NOT complete */}
                 <Route element={<RoleGuard allowedRoles={['FAMILY']} />}>

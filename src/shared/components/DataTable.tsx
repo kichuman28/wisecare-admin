@@ -40,30 +40,30 @@ export function DataTable<T>({
     };
 
     return (
-        <div className={`overflow-x-auto rounded-xl border border-gray-200 bg-white ${className}`}>
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+        <div className={`overflow-x-auto rounded-xl border border-outline bg-card-surface ${className}`}>
+            <table className="min-w-full divide-y divide-outline">
+                <thead className="bg-warm-bg">
                     <tr>
                         {columns.map((col) => (
                             <th
                                 key={col.key}
-                                className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 ${alignClass(col.align)}`}
+                                className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-text-muted ${alignClass(col.align)}`}
                             >
                                 {col.header}
                             </th>
                         ))}
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-outline/50">
                     {data.map((row) => (
                         <tr
                             key={rowKey(row)}
-                            className="transition-colors hover:bg-gray-50"
+                            className="transition-colors hover:bg-warm-bg/50"
                         >
                             {columns.map((col) => (
                                 <td
                                     key={col.key}
-                                    className={`whitespace-nowrap px-4 py-3 text-sm text-gray-700 ${alignClass(col.align)}`}
+                                    className={`whitespace-nowrap px-4 py-3 text-sm text-on-background ${alignClass(col.align)}`}
                                 >
                                     {col.render(row)}
                                 </td>

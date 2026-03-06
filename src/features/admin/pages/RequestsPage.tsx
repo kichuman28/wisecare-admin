@@ -12,6 +12,7 @@ import { LoadingState, EmptyState } from '@/shared/components';
 const TABS: { label: string; value: ServiceRequestStatus }[] = [
     { label: 'Pending', value: 'PENDING' },
     { label: 'Assigned', value: 'ASSIGNED' },
+    { label: 'Accepted', value: 'ACCEPTED' },
     { label: 'In Progress', value: 'IN_PROGRESS' },
     { label: 'Completed', value: 'COMPLETED' },
     { label: 'Rejected', value: 'REJECTED' },
@@ -31,24 +32,24 @@ export function RequestsPage() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-on-background">
                     Service Requests
                 </h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-text-muted">
                     Manage all service requests across elderly users.
                 </p>
             </div>
 
             {/* Filter tabs */}
-            <div className="flex flex-wrap gap-1 rounded-xl bg-gray-100 p-1">
+            <div className="flex flex-wrap gap-1 rounded-xl bg-surface p-1 ring-1 ring-outline">
                 {TABS.map((tab) => (
                     <button
                         key={tab.value}
                         type="button"
                         onClick={() => setActiveTab(tab.value)}
                         className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${activeTab === tab.value
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'text-text-muted hover:text-on-background'
                             }`}
                     >
                         {tab.label}
@@ -60,7 +61,7 @@ export function RequestsPage() {
             {isLoading && <LoadingState message="Loading requests…" />}
 
             {isError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <div className="rounded-xl border border-red-200 bg-error-light p-4 text-sm text-error">
                     Failed to load service requests. Please try again later.
                 </div>
             )}

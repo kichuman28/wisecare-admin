@@ -12,9 +12,9 @@ export function EmptyState({
     return (
         <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <span className="text-4xl">{icon}</span>
-            <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+            <h3 className="text-lg font-semibold text-on-background">{title}</h3>
             {description && (
-                <p className="max-w-sm text-sm text-gray-500">{description}</p>
+                <p className="max-w-sm text-sm text-text-muted">{description}</p>
             )}
         </div>
     );
