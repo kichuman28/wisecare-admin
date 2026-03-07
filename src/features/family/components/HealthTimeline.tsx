@@ -1,9 +1,8 @@
 // The timeline API endpoint is not yet implemented on the backend.
 // We are rendering an empty state for now.
-export function HealthTimeline({ elderlyUserId }: { elderlyUserId: string }) {
+export function HealthTimeline({ elderlyUserId: _elderlyUserId }: { elderlyUserId: string }) {
     // The timeline API endpoint is not yet implemented on the backend.
     // We will render an empty state for now.
-    const events: any[] = [];
 
     return (
         <div className="glass-panel glass-card-hover flex flex-col rounded-2xl p-6 h-full">
