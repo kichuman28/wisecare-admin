@@ -27,7 +27,7 @@ This repo is the **web console** — the central dashboard used by **admins** an
 | HTTP Client | Axios (JWT interceptors) |
 | Charts | Recharts (AreaChart, BarChart, PieChart with custom tooltips) |
 | Styling | Tailwind CSS v4 (custom `@theme` tokens) |
-| Font | Inter (Google Fonts — 400, 500, 600, 700) |
+| Font | Lexend (Google Fonts — 400, 500, 600, 700, 800) |
 | Icons | Custom SVG icon library (`shared/components/Icons.tsx`) |
 | Auth | JWT (access + refresh tokens), `localStorage` |
 
