@@ -161,3 +161,20 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px -15px rgba(31, 35, 77, 0.2);
 }
+
+/* ------------------------------------------------------------------ */
+/* Hide Scrollbars Globally                                           */
+/* ------------------------------------------------------------------ */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}

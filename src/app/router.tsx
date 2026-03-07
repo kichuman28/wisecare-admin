@@ -21,7 +21,13 @@ import {
     AdminRulesPage,
     AdminAIAgentConfigPage,
 } from '@/app/routes/admin.pages';
-import { FamilyDashboardPage } from '@/app/routes/family.pages';
+import {
+    FamilyDashboardPage,
+    FamilyTimelinePage,
+    FamilyMedicationsPage,
+    FamilyWalletPage,
+    FamilyServiceRequestsPage,
+} from '@/app/routes/family.pages';
 
 // ---------------------------------------------------------------------------
 // Not Found
@@ -77,8 +83,12 @@ export function AppRoutes() {
 
                     {/* Family dashboard — FAMILY role, onboarding COMPLETE */}
                     <Route element={<FamilyDashboardGuard />}>
-                        <Route element={<FamilyLayout />}>
-                            <Route path={ROUTES.FAMILY_DASHBOARD} element={<FamilyDashboardPage />} />
+                        <Route path="/family" element={<FamilyLayout />}>
+                            <Route index element={<FamilyDashboardPage />} />
+                            <Route path="timeline" element={<FamilyTimelinePage />} />
+                            <Route path="medications" element={<FamilyMedicationsPage />} />
+                            <Route path="wallet" element={<FamilyWalletPage />} />
+                            <Route path="service-requests" element={<FamilyServiceRequestsPage />} />
                         </Route>
                     </Route>
                 </Route>

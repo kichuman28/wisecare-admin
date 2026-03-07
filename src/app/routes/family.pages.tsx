@@ -1,14 +1,9 @@
 // ---------------------------------------------------------------------------
-// Placeholder pages — replace with feature modules as they are built
+// Family pages — re-exports from feature module
 // ---------------------------------------------------------------------------
 
-export function FamilyDashboardPage() {
-    return (
-        <div>
-            <h2 className="text-xl font-semibold text-gray-800">Family Dashboard</h2>
-            <p className="mt-2 text-sm text-gray-500">
-                Monitor your elderly relative — vitals, alerts, and service requests will go here.
-            </p>
-        </div>
-    );
-}
+export { FamilyDashboard as FamilyDashboardPage } from '@/features/family';
+export { FamilyTimelinePage } from '@/features/family/pages/FamilyTimelinePage';
+export { FamilyMedicationsPage } from '@/features/family/pages/FamilyMedicationsPage';
+export { FamilyWalletPage } from '@/features/family/pages/FamilyWalletPage';
+export { FamilyServiceRequestsPage } from '@/features/family/pages/FamilyServiceRequestsPage';

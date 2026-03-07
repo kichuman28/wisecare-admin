@@ -25,6 +25,7 @@ This repo is the **web console** — the central dashboard used by **admins** an
 | Routing | React Router v7 |
 | State / Server | TanStack React Query v5 |
 | HTTP Client | Axios (JWT interceptors) |
+| Charts | Recharts (AreaChart, BarChart, PieChart with custom tooltips) |
 | Styling | Tailwind CSS v4 (custom `@theme` tokens) |
 | Font | Inter (Google Fonts — 400, 500, 600, 700) |
 | Icons | Custom SVG icon library (`shared/components/Icons.tsx`) |
@@ -68,7 +69,8 @@ src/
 │   │   ├── admin.hooks.ts        # 14 queries + 5 mutations
 │   │   ├── index.ts              # Barrel export
 │   │   ├── components/
-│   │   │   ├── AdminStats.tsx         # Dashboard stat cards (6 cards from /admin/stats)
+│   │   │   ├── AdminStats.tsx         # 6 gradient KPI cards with hover-lift animations
+│   │   │   ├── DashboardCharts.tsx    # Recharts: AreaChart, BarChart, UserDistribution donut
 │   │   │   ├── RequestsTable.tsx      # Service requests data table
 │   │   │   ├── AssignAgentModal.tsx    # Agent selection + assignment
 │   │   │   ├── AlertsPanel.tsx        # Flat alert list with severity & resolve
@@ -151,7 +153,12 @@ src/
 |-------|------|
 | `/family/onboarding/basic` | Onboarding step 1 — basic info |
 | `/family/onboarding/link` | Onboarding step 2 — link elderly |
-| `/family` | Family dashboard |
+| `/family` | Redirects to `/family/overview` |
+| `/family/overview` | Core vitals, risk, alerts, and profile view |
+| `/family/timeline` | SOS history tracking |
+| `/family/medications` | Medication schedule tracking |
+| `/family/wallet` | Care wallet balance & recent transactions |
+| `/family/requests` | Real-time service requests monitoring |
 
 ---
 
@@ -188,6 +195,16 @@ All requests go through the Axios instance which attaches `Authorization: Bearer
 | `POST, PATCH` | `/admin/ai-agent/categories/...` | Category toggles and limits |
 | `POST` | `/family/onboarding/basic-info` | Family onboarding |
 | `POST` | `/family/link-elderly` | Family linking |
+| `GET` | `/users/me` | Fetch User Profile & Linked Elderly Profiles |
+| `GET` | `/vitals/latest/{userId}` | Family Dashboard — vitals charts |
+| `GET` | `/risk/{userId}` | Family Dashboard — risk score card |
+| `GET` | `/alerts/user/{userId}` | Family Dashboard — alerts list |
+| `PATCH` | `/alerts/{alertId}/resolve` | Family Dashboard — resolve alert |
+| `GET` | `/service-requests` | Family Dashboard — recent requests |
+| `GET` | `/meds/schedule?userId={id}` | Family Dashboard — Medications Tracker |
+| `GET` | `/wallet/balance?userId={id}` | Family Dashboard — Wallet Balance |
+| `GET` | `/wallet/transactions?userId={id}` | Family Dashboard — Wallet History |
+| `GET` | `/sos?userId={id}` | Family Dashboard — SOS History |
 
 ---
 
@@ -214,8 +231,15 @@ Defined as Tailwind CSS v4 `@theme` tokens in `src/index.css`, mapped from the F
 ### Layout Patterns
 
 - **Auth pages** (Login, Signup, Onboarding): 60/40 split — navy gradient branding panel on the left, warm-bg form on the right. Mobile-responsive (branding panel hides on small screens).
-- **Admin layout**: Collapsible sidebar — expands to 256px with icons + labels, collapses to 72px icon rail. Main content reflows with the sidebar width. Chevron toggle at bottom.
+- **Admin layout**: Collapsible sidebar locked to viewport height (`h-screen`) — expands to 256px with icons + labels, collapses to 72px icon rail. Only the main content area scrolls. Collapse toggle and sign-out always pinned to the bottom.
 - **Family layout**: Navy header bar with logo and user info.
+
+### Animations & Glassmorphism
+
+Defined in `src/index.css`:
+- **`animate-fade-in-up`** — staggered entrance animation for dashboard cards and sections (`delay-100` through `delay-500`)
+- **`glass-panel`** — frosted-glass card effect with `backdrop-blur(16px)`, soft white border, and elevated shadow
+- **`glass-card-hover`** — hover lift effect (`translateY(-4px)`) with amplified shadow
 
 ### Icon Library
 
@@ -234,8 +258,12 @@ Defined as Tailwind CSS v4 `@theme` tokens in `src/index.css`, mapped from the F
 - Sign-out with token invalidation
 
 ### ✅ Admin Dashboard
-- **Overview**: 6 stat cards powered by `/admin/stats` — pending, active, completed today, total users, unresolved alerts, total requests
-- **Recent Items**: Recent requests and alerts cards with status/severity badges
+- **Overview**: 6 bold gradient KPI stat cards (`AdminStats.tsx`) with background icons, hover-lift animations, and staggered fade-in-up entrances. Cards show pending, active, completed, users, alerts, and total requests from `/admin/stats`
+- **Interactive Charts** (`DashboardCharts.tsx` powered by Recharts):
+  - **Weekly Activity Trend**: Sweeping `AreaChart` with gradient-filled request/alert lines, custom dot markers, and navy-themed tooltips
+  - **Request Categories**: Horizontal `BarChart` with cleaned-up API category labels (e.g., `EMERGENCY_ASSISTANCE/SOS` → `Sos`), color-coded bars, and interactive hover tooltips
+  - **User Distribution**: Donut `PieChart` with center total label, role-based color coding (Elderly/Family/Agents), and bottom legend
+- **Recent Items**: Recent requests and alerts in glassmorphic cards with hover-highlighted rows and severity/status badges
 - **Service Requests**: 6-tab filtered table (Pending → Assigned → Accepted → In Progress → Completed → Rejected)
 - **Assign Agent**: Modal to fetch available agents, filter by city, select and assign
 - **Alerts**: Filterable by severity/type/resolved, summary cards with alert counts, resolve buttons
@@ -244,16 +272,18 @@ Defined as Tailwind CSS v4 `@theme` tokens in `src/index.css`, mapped from the F
 - **AI Operations**: Daily summary (status badge, metrics grid, category breakdown table), weekly overview with mini bar chart, AI recommendations cards (priority-coded), system anomalies with threshold/actual metrics
 - **Rules Engine**: View, filter, test, and toggle dynamic behavior rules that govern AI agent decisions (e.g., auto-approvals, escalations) without code changes.
 - **AI Agent Config**: Visual dashboard to manage global limits (budgeting), configure working hours, and enforce category-specific bounds and manual approval triggers.
-- **Layout**: Collapsible sidebar (full ↔ icon rail) with 8 nav items and orange active indicators
+- **Layout**: Collapsible sidebar (full ↔ icon rail) with 8 nav items and orange active indicators. Sidebar pinned to viewport height; only main content scrolls.
 
 ### ✅ Family Module
 - **Signup**: 60/40 split registration page with feature pills
 - **Onboarding**: 2-step flow with visual step indicators (basic info → link elderly user)
 - **Guards**: Route guards for onboarding-in-progress vs. dashboard-ready states
-- **Dashboard**: Post-onboarding landing page
-
-### 🚧 Pending
-- **Family Dashboard**: Placeholder — needs additional family-specific endpoints
+- **Family Layout**: A dedicated dashboard layout featuring a collapsible frosted-glass sidebar (similar to the Admin dashboard) with nested modular routes and a persistent sign-out action.
+- **Overview Panel**: Real-time Recharts vitals (Heart rate & BP), ring-gauge risk score, actionable health alerts list, and an `ElderlyProfileCard` capturing key profile details and emergency contacts securely parsed from `/users/me`.
+- **Medications Tracker**: Read-only display of the elderly user's scheduled medications.
+- **Wallet Integration**: Visibility into the care wallet balance and transactions.
+- **SOS & Timeline Monitor**: Dedicated tracking capability for emergency SOS activations.
+- **Service Requests**: Read-only tracking showing the status of requests placed on behalf of the elderly loved one.
 
 ---
 

@@ -94,9 +94,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // For FAMILY role, fetch full profile to get real onboardingStep
                 if (restored?.role === 'FAMILY') {
                     try {
-                        const { data } = await api.get<{ onboardingStep: AuthUser['onboardingStep']; profileComplete: boolean }>('/users/me');
-                        restored.onboardingStep = data.onboardingStep;
-                        restored.profileComplete = data.profileComplete;
+                        const { data } = await api.get<any>('/users/me');
+                        const profile = data.user || data;
+                        restored.onboardingStep = profile.onboardingStep;
+                        restored.profileComplete = profile.profileComplete;
                     } catch {
                         // If profile fetch fails, proceed with defaults
                     }
@@ -123,7 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // For FAMILY role, fetch full profile after refresh
                 if (restored?.role === 'FAMILY') {
                     try {
-                        const { data: profile } = await api.get<{ onboardingStep: AuthUser['onboardingStep']; profileComplete: boolean }>('/users/me');
+                        const { data } = await api.get<any>('/users/me');
+                        const profile = data.user || data;
                         restored.onboardingStep = profile.onboardingStep;
                         restored.profileComplete = profile.profileComplete;
                     } catch {

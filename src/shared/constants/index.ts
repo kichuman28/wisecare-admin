@@ -19,6 +19,10 @@ export const ROUTES = {
     FAMILY_ONBOARDING_BASIC: '/family/onboarding/basic',
     FAMILY_ONBOARDING_LINK: '/family/onboarding/link',
     FAMILY_DASHBOARD: '/family',
+    FAMILY_TIMELINE: '/family/timeline',
+    FAMILY_MEDICATIONS: '/family/medications',
+    FAMILY_WALLET: '/family/wallet',
+    FAMILY_SERVICE_REQUESTS: '/family/service-requests',
 } as const;
 
 /** Maps a role to its default landing route after login */
