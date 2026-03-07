@@ -47,7 +47,7 @@ export function AdminLayout() {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-surface">
+        <div className="flex h-screen overflow-hidden bg-surface">
             {/* ── Sidebar ── */}
             <aside
                 className={`flex shrink-0 flex-col bg-gradient-to-b from-gradient-top to-gradient-bottom transition-all duration-300 ease-in-out ${collapsed ? 'w-[72px]' : 'w-64'
