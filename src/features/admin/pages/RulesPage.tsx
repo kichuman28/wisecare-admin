@@ -3,6 +3,9 @@ import { useRules, useToggleRule, useDeleteRule } from '../admin.hooks';
 import { LoadingState, EmptyState, RulesIcon } from '@/shared/components';
 import type { Rule, RuleCategory, RuleType, RulesFilters } from '../admin.types';
 
+import { RuleFormModal } from '../components/RuleFormModal';
+import { RuleTestModal } from '../components/RuleTestModal';
+
 // ---------------------------------------------------------------------------
 // Rule Card Component
 // ---------------------------------------------------------------------------
@@ -103,6 +106,10 @@ function RuleCard({
 
 export function RulesPage() {
     const [filters, setFilters] = useState<RulesFilters>({});
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [editingRule, setEditingRule] = useState<Rule | null>(null);
+    const [testingRule, setTestingRule] = useState<Rule | null>(null);
+
     const { data, isLoading } = useRules(filters);
 
     const toggleRuleMutation = useToggleRule();
@@ -132,7 +139,7 @@ export function RulesPage() {
                     </div>
                 </div>
                 <button
-                    onClick={() => alert('TODO: Open Create Rule Modal')}
+                    onClick={() => setIsCreateOpen(true)}
                     className="shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 >
                     + Create Rule
@@ -207,11 +214,22 @@ export function RulesPage() {
                             rule={rule}
                             onToggle={handleToggle}
                             onDelete={handleDelete}
-                            onEdit={() => alert('TODO: Edit Modal')}
-                            onTest={() => alert('TODO: Test Modal')}
+                            onEdit={() => setEditingRule(rule)}
+                            onTest={() => setTestingRule(rule)}
                         />
                     ))}
                 </div>
+            )}
+
+            {/* Modals */}
+            {isCreateOpen && (
+                <RuleFormModal onClose={() => setIsCreateOpen(false)} />
+            )}
+            {editingRule && (
+                <RuleFormModal initialData={editingRule} onClose={() => setEditingRule(null)} />
+            )}
+            {testingRule && (
+                <RuleTestModal rule={testingRule} onClose={() => setTestingRule(null)} />
             )}
         </div>
     );
