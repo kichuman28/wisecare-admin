@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useUsers, useToggleUserStatus } from '../admin.hooks';
-import { DataTable, LoadingState, EmptyState, UsersIcon, CustomSelect, Pagination } from '@/shared/components';
+import { DataTable, LoadingState, EmptyState, UsersIcon, CustomSelect, Pagination, RefreshButton } from '@/shared/components';
 import { CreateAgentModal } from '../components/CreateAgentModal';
 import { UserDetailDrawer } from '../components/UserDetailDrawer';
 import type { AdminUser, UserRole } from '../admin.types';
@@ -39,7 +39,7 @@ export function UsersPage() {
     const [pageSize, setPageSize] = useState(25);
 
     const activeFilter = statusFilter === '' ? undefined : statusFilter === 'true';
-    const { data, isLoading, isError } = useUsers(roleFilter, activeFilter);
+    const { data, isLoading, isError, refetch, isRefetching } = useUsers(roleFilter, activeFilter);
     const toggleStatus = useToggleUserStatus();
 
     // Reset pagination
@@ -115,11 +115,18 @@ export function UsersPage() {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-on-background">Users</h1>
-                    <p className="mt-1 text-sm text-text-muted">
-                        Manage all platform users — {totalUsers} total.
-                    </p>
+                <div className="flex items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-on-background">Users</h1>
+                        <p className="mt-1 text-sm text-text-muted">
+                            Manage all platform users — {totalUsers} total.
+                        </p>
+                    </div>
+                    <RefreshButton
+                        onClick={() => refetch()}
+                        isLoading={isLoading || isRefetching}
+                        className="mt-1"
+                    />
                 </div>
                 <button type="button" onClick={() => setShowCreateAgent(true)}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary/25 hover:bg-primary-hover">

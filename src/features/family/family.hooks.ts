@@ -40,6 +40,7 @@ export function useElderlyVitals(elderlyUserId: string | undefined) {
         queryKey: familyKeys.vitals(elderlyUserId!),
         queryFn: () => familyApi.getVitals(elderlyUserId!).then(r => r.data),
         enabled: !!elderlyUserId,
+        refetchInterval: 15000, // 15s
     });
 }
 
@@ -56,6 +57,7 @@ export function useElderlyAlerts(elderlyUserId: string | undefined) {
         queryKey: familyKeys.alerts(elderlyUserId!),
         queryFn: () => familyApi.getAlerts(elderlyUserId!).then(r => r.data),
         enabled: !!elderlyUserId,
+        refetchInterval: 10000, // 10s
     });
 }
 
@@ -64,6 +66,7 @@ export function useElderlyServiceRequests(elderlyUserId: string | undefined) {
         queryKey: familyKeys.serviceRequests(elderlyUserId!),
         queryFn: () => familyApi.getServiceRequests(elderlyUserId!).then(r => r.data),
         enabled: !!elderlyUserId,
+        refetchInterval: 30000, // 30s
     });
 }
 
@@ -106,6 +109,7 @@ export function useWallet(elderlyUserId: string | undefined) {
         queryKey: familyKeys.wallet(elderlyUserId!),
         queryFn: () => familyApi.getWallet(elderlyUserId!).then(r => r.data),
         enabled: !!elderlyUserId,
+        refetchInterval: 30000, // 30s
     });
 }
 

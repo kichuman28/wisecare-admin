@@ -57,8 +57,8 @@ export function FamilyLayout() {
             >
                 {/* Logo */}
                 <div className={`flex items-center border-b border-white/10 py-4 ${collapsed ? 'justify-center px-2' : 'gap-3 px-5'}`}>
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-icon-shield text-sm font-bold text-white shadow-lg">
-                        W
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-icon-shield shadow-lg">
+                        <img src="/wisecare_favicon.png" alt="WiseCare Logo" className="h-full w-full object-cover" />
                     </div>
                     {!collapsed && (
                         <>
@@ -153,8 +153,8 @@ export function FamilyLayout() {
                         <button onClick={() => setCollapsed(!collapsed)} className="text-white p-1">
                             <span className="text-xl">☰</span>
                         </button>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-icon-shield text-xs font-bold text-white">
-                            W
+                        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-icon-shield">
+                            <img src="/wisecare_favicon.png" alt="WiseCare Logo" className="h-full w-full object-cover" />
                         </div>
                     </div>
                     <div className="flex items-center gap-3">

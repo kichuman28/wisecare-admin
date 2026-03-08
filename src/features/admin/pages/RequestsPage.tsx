@@ -4,7 +4,7 @@ import { useRequests } from '../admin.hooks';
 import { RequestsTable } from '../components/RequestsTable';
 import { AssignAgentModal } from '../components/AssignAgentModal';
 import { RequestDetailModal } from '../components/RequestDetailModal';
-import { LoadingState, EmptyState, CustomSelect, Pagination } from '@/shared/components';
+import { LoadingState, EmptyState, CustomSelect, Pagination, RefreshButton } from '@/shared/components';
 import type { SelectOption } from '@/shared/components/CustomSelect';
 
 // ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ export function RequestsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
 
-    const { data, isLoading, isError } = useRequests(activeTab);
+    const { data, isLoading, isError, refetch, isRefetching } = useRequests(activeTab);
 
     // Reset page to 1 when any filter or tab changes
     useEffect(() => {
@@ -115,13 +115,20 @@ export function RequestsPage() {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-on-background">
-                        Service Requests
-                    </h1>
-                    <p className="mt-1 text-sm text-text-muted">
-                        Manage all service requests across elderly users.
-                    </p>
+                <div className="flex items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-on-background">
+                            Service Requests
+                        </h1>
+                        <p className="mt-1 text-sm text-text-muted">
+                            Manage all service requests across elderly users.
+                        </p>
+                    </div>
+                    <RefreshButton
+                        onClick={() => refetch()}
+                        isLoading={isLoading || isRefetching}
+                        className="mt-1"
+                    />
                 </div>
             </div>
 

@@ -3,7 +3,7 @@ import { ROUTES } from '@/shared/constants';
 import { AdminStats } from '../components/AdminStats';
 import { ActivityAreaChart, DistributionBarChart, UserDistributionChart } from '../components/DashboardCharts';
 import { useAdminStats } from '../admin.hooks';
-import { LoadingState, RequestsIcon, AlertIcon, AlertTriangleIcon } from '@/shared/components';
+import { LoadingState, RequestsIcon, AlertIcon, AlertTriangleIcon, RefreshButton } from '@/shared/components';
 import type { AdminStatsResponse } from '../admin.types';
 
 // ---------------------------------------------------------------------------
@@ -62,19 +62,26 @@ function RecentAlertRow({ a }: { a: AdminStatsResponse['recentAlerts'][number] }
 // ---------------------------------------------------------------------------
 
 export function AdminDashboard() {
-    const { data, isLoading, isError } = useAdminStats();
+    const { data, isLoading, isError, refetch, isRefetching } = useAdminStats();
 
     return (
         <div className="space-y-8 pb-8">
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in-up">
-                <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-on-background">
-                        Dashboard Overview
-                    </h1>
-                    <p className="mt-1 text-sm text-text-muted">
-                        Real-time platform analytics — requests, users, and alerts.
-                    </p>
+                <div className="flex items-center gap-4">
+                    <div>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-on-background">
+                            Dashboard Overview
+                        </h1>
+                        <p className="mt-1 text-sm text-text-muted">
+                            Real-time platform analytics — requests, users, and alerts.
+                        </p>
+                    </div>
+                    <RefreshButton
+                        onClick={() => refetch()}
+                        isLoading={isLoading || isRefetching}
+                        className="mt-1"
+                    />
                 </div>
                 <div className="flex gap-3">
                     <Link to={ROUTES.ADMIN_SERVICE_REQUESTS}

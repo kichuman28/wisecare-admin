@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useEscalations, useEscalationStats, useResolveEscalation } from '../admin.hooks';
-import { LoadingState, EmptyState, AlertTriangleIcon, CheckCircleIcon, CustomSelect, Pagination } from '@/shared/components';
+import { LoadingState, EmptyState, AlertTriangleIcon, CheckCircleIcon, CustomSelect, Pagination, RefreshButton } from '@/shared/components';
 import type { SelectOption } from '@/shared/components/CustomSelect';
 import type { Escalation, EscalationPriority, EscalationResolution } from '../admin.types';
 
@@ -132,8 +132,8 @@ export function EscalationsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
 
-    const { data, isLoading, isError } = useEscalations(priorityFilter);
-    const { data: stats } = useEscalationStats(statsPeriod);
+    const { data, isLoading, isError, refetch, isRefetching } = useEscalations(priorityFilter);
+    const { data: stats, refetch: refetchStats, isRefetching: isRefetchingStats } = useEscalationStats(statsPeriod);
 
     // Reset pagination
     useEffect(() => {
@@ -148,11 +148,21 @@ export function EscalationsPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-on-background">Escalations</h1>
-                <p className="mt-1 text-sm text-text-muted">
-                    Tasks the AI agent couldn't complete — needs your attention.
-                </p>
+            <div className="flex items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-on-background">Escalations</h1>
+                    <p className="mt-1 text-sm text-text-muted">
+                        Tasks the AI agent couldn't complete — needs your attention.
+                    </p>
+                </div>
+                <RefreshButton
+                    onClick={() => {
+                        refetch();
+                        refetchStats();
+                    }}
+                    isLoading={isLoading || isRefetching || isRefetchingStats}
+                    className="mt-1"
+                />
             </div>
 
             {/* Stats bar */}

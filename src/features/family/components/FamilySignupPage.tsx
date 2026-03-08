@@ -100,7 +100,9 @@ export function FamilySignupPage() {
             <div className="flex w-full flex-col justify-center bg-warm-bg px-6 py-8 lg:w-[40%] lg:px-16">
                 {/* Mobile header */}
                 <div className="mb-6 flex items-center gap-3 lg:hidden">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-icon-shield text-lg font-bold text-white shadow-lg">W</div>
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-icon-shield shadow-lg">
+                        <img src="/wisecare_favicon.png" alt="WiseCare Logo" className="h-full w-full object-cover" />
+                    </div>
                     <span className="text-xl font-bold text-on-background">WiseCare</span>
                 </div>
 

@@ -52,6 +52,7 @@ export function useAdminStats() {
     return useQuery({
         queryKey: adminKeys.stats,
         queryFn: () => adminApi.getStats().then((r) => r.data),
+        refetchInterval: 30000, // 30s
     });
 }
 
@@ -65,6 +66,7 @@ export function usePendingRequests() {
         queryKey: adminKeys.serviceRequests('PENDING'),
         queryFn: () =>
             adminApi.getServiceRequests('PENDING').then((r) => r.data),
+        refetchInterval: 15000, // 15s
     });
 }
 
@@ -74,6 +76,7 @@ export function useRequests(status?: ServiceRequestStatus) {
         queryKey: adminKeys.serviceRequests(status),
         queryFn: () =>
             adminApi.getServiceRequests(status).then((r) => r.data),
+        refetchInterval: 15000, // 15s
     });
 }
 
@@ -83,6 +86,7 @@ export function useInProgressRequests() {
         queryKey: adminKeys.serviceRequests('IN_PROGRESS'),
         queryFn: () =>
             adminApi.getServiceRequests('IN_PROGRESS').then((r) => r.data),
+        refetchInterval: 15000, // 15s
     });
 }
 
@@ -95,6 +99,7 @@ export function useAvailableAgents() {
     return useQuery({
         queryKey: adminKeys.availableAgents,
         queryFn: () => adminApi.getAvailableAgents().then((r) => r.data),
+        refetchInterval: 15000, // 15s
     });
 }
 
@@ -107,6 +112,7 @@ export function useAlerts(filters?: AlertFilters) {
     return useQuery({
         queryKey: adminKeys.alerts(filters),
         queryFn: () => adminApi.getAlerts(filters).then((r) => r.data),
+        refetchInterval: 10000, // 10s
     });
 }
 
@@ -119,6 +125,7 @@ export function useUsers(role?: UserRole, active?: boolean) {
     return useQuery({
         queryKey: adminKeys.users(role, active),
         queryFn: () => adminApi.getUsers(role, active).then((r) => r.data),
+        refetchInterval: 30000, // 30s
     });
 }
 
@@ -140,6 +147,7 @@ export function useEscalations(priority?: string) {
     return useQuery({
         queryKey: adminKeys.escalations(priority),
         queryFn: () => adminApi.getEscalations(undefined, priority).then((r) => r.data),
+        refetchInterval: 30000, // 30s
     });
 }
 
@@ -148,6 +156,7 @@ export function useEscalationStats(period?: string) {
     return useQuery({
         queryKey: adminKeys.escalationStats(period),
         queryFn: () => adminApi.getEscalationStats(period).then((r) => r.data),
+        refetchInterval: 60000, // 60s
     });
 }
 
@@ -160,6 +169,7 @@ export function useDailySummary(date?: string) {
     return useQuery({
         queryKey: adminKeys.dailySummary(date),
         queryFn: () => adminApi.getDailySummary(date).then((r) => r.data),
+        refetchInterval: 60000, // 60s
     });
 }
 
@@ -168,6 +178,7 @@ export function useWeeklySummary() {
     return useQuery({
         queryKey: adminKeys.weeklySummary,
         queryFn: () => adminApi.getWeeklySummary().then((r) => r.data),
+        refetchInterval: 60000, // 60s
     });
 }
 
@@ -176,6 +187,7 @@ export function useRecommendations() {
     return useQuery({
         queryKey: adminKeys.recommendations,
         queryFn: () => adminApi.getRecommendations().then((r) => r.data),
+        refetchInterval: 60000, // 60s
     });
 }
 
@@ -184,6 +196,7 @@ export function useAnomalies(hours?: number) {
     return useQuery({
         queryKey: adminKeys.anomalies(hours),
         queryFn: () => adminApi.getAnomalies(hours).then((r) => r.data),
+        refetchInterval: 30000, // 30s
     });
 }
 

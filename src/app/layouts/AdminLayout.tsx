@@ -55,8 +55,8 @@ export function AdminLayout() {
             >
                 {/* Logo */}
                 <div className={`flex items-center border-b border-white/10 py-4 ${collapsed ? 'justify-center px-2' : 'gap-3 px-5'}`}>
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-icon-shield text-sm font-bold text-white shadow-lg">
-                        W
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-icon-shield shadow-lg">
+                        <img src="/wisecare_favicon.png" alt="WiseCare Logo" className="h-full w-full object-cover" />
                     </div>
                     {!collapsed && (
                         <>

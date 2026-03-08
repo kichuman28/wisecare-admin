@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useAlerts } from '../admin.hooks';
 import { AlertsPanel } from '../components/AlertsPanel';
-import { LoadingState, EmptyState, AlertIcon, CustomSelect, Pagination } from '@/shared/components';
+import { LoadingState, EmptyState, AlertIcon, CustomSelect, Pagination, RefreshButton } from '@/shared/components';
 import type { SelectOption } from '@/shared/components/CustomSelect';
 import type { AlertFilters } from '../admin.types';
 
@@ -37,7 +37,7 @@ export function AlertsPage() {
         return f;
     }, [severity, type, showResolved]);
 
-    const { data, isLoading, isError } = useAlerts(filters);
+    const { data, isLoading, isError, refetch, isRefetching } = useAlerts(filters);
 
     // Reset pagination when filters change
     useEffect(() => {
@@ -55,11 +55,18 @@ export function AlertsPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-on-background">Alerts</h1>
-                <p className="mt-1 text-sm text-text-muted">
-                    Monitor and resolve health alerts across all elderly users.
-                </p>
+            <div className="flex items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-on-background">Alerts</h1>
+                    <p className="mt-1 text-sm text-text-muted">
+                        Monitor and resolve health alerts across all elderly users.
+                    </p>
+                </div>
+                <RefreshButton
+                    onClick={() => refetch()}
+                    isLoading={isLoading || isRefetching}
+                    className="mt-1"
+                />
             </div>
 
             {/* Summary cards */}
