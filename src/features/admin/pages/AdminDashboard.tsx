@@ -105,7 +105,7 @@ export function AdminDashboard() {
             {data && (
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 animate-fade-in-up delay-200">
                     <div className="lg:col-span-2">
-                        <ActivityAreaChart />
+                        <ActivityAreaChart data={data.activityTrend} />
                     </div>
                     <div>
                         <DistributionBarChart typeBreakdown={data.serviceRequests.typeBreakdown} />

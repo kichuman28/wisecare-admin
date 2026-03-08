@@ -85,8 +85,15 @@ export interface AssignAgentResponse {
 // Admin Stats (GET /admin/stats)
 // ---------------------------------------------------------------------------
 
+export interface ActivityTrendPoint {
+    name: string;
+    requests: number;
+    alerts: number;
+}
+
 export interface AdminStatsResponse {
     generatedAt: string;
+    activityTrend?: ActivityTrendPoint[];
     users: {
         total: number;
         elderly: number;

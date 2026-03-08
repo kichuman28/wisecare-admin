@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRules, useToggleRule, useDeleteRule } from '../admin.hooks';
-import { LoadingState, EmptyState, RulesIcon, ConfirmModal, CustomSelect } from '@/shared/components';
+import { LoadingState, EmptyState, RulesIcon, ConfirmModal, CustomSelect, Pagination } from '@/shared/components';
 import type { Rule, RuleCategory, RuleType, RulesFilters } from '../admin.types';
 
 import { RuleFormModal } from '../components/RuleFormModal';
@@ -109,12 +109,25 @@ export function RulesPage() {
     const [testingRule, setTestingRule] = useState<Rule | null>(null);
     const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+
     const { data, isLoading } = useRules(filters);
 
     const toggleRuleMutation = useToggleRule();
     const deleteRuleMutation = useDeleteRule();
 
     const rules = data?.rules ?? [];
+
+    // Reset pagination
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filters, pageSize]);
+
+    const paginatedRules = useMemo(() => {
+        return rules.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    }, [rules, currentPage, pageSize]);
 
     const handleToggle = (ruleId: string, current: boolean) => {
         toggleRuleMutation.mutate({ ruleId, data: { enabled: !current } });
@@ -221,17 +234,26 @@ export function RulesPage() {
                     description="There are no rules matching your criteria. Create a new rule to govern the AI agent."
                 />
             ) : (
-                <div className="grid grid-cols-1 gap-4">
-                    {rules.map((rule) => (
-                        <RuleCard
-                            key={rule.ruleId}
-                            rule={rule}
-                            onToggle={handleToggle}
-                            onDelete={handleDeleteClick}
-                            onEdit={() => setEditingRule(rule)}
-                            onTest={() => setTestingRule(rule)}
-                        />
-                    ))}
+                <div className="space-y-4">
+                    <Pagination
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalItems={rules.length}
+                        onPageChange={setCurrentPage}
+                        onPageSizeChange={setPageSize}
+                    />
+                    <div className="grid grid-cols-1 gap-4">
+                        {paginatedRules.map((rule) => (
+                            <RuleCard
+                                key={rule.ruleId}
+                                rule={rule}
+                                onToggle={handleToggle}
+                                onDelete={handleDeleteClick}
+                                onEdit={() => setEditingRule(rule)}
+                                onTest={() => setTestingRule(rule)}
+                            />
+                        ))}
+                    </div>
                 </div>
             )}
 

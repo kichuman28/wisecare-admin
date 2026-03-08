@@ -2,7 +2,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell, PieChart, Pie
 } from 'recharts';
-import type { AdminStatsResponse } from '../admin.types';
+import type { AdminStatsResponse, ActivityTrendPoint } from '../admin.types';
 
 // ---------------------------------------------------------------------------
 // Helper: clean up ugly API category keys into readable labels
@@ -34,7 +34,9 @@ const mockTrendData = [
 // Sweeping Area Chart — full width
 // ---------------------------------------------------------------------------
 
-export function ActivityAreaChart() {
+export function ActivityAreaChart({ data }: { data?: ActivityTrendPoint[] }) {
+    const trendData = (data && data.length > 0) ? data : mockTrendData;
+
     return (
         <div className="glass-panel glass-card-hover flex h-[400px] w-full flex-col rounded-2xl p-6">
             <div className="mb-5 flex items-center justify-between">
@@ -55,7 +57,7 @@ export function ActivityAreaChart() {
             </div>
             <div className="flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={mockTrendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                    <AreaChart data={trendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                         <defs>
                             <linearGradient id="gradRequests" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0%" stopColor="#FF6933" stopOpacity={0.4} />

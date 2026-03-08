@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useEscalations, useEscalationStats, useResolveEscalation } from '../admin.hooks';
-import { LoadingState, EmptyState, AlertTriangleIcon, CheckCircleIcon, CustomSelect } from '@/shared/components';
+import { LoadingState, EmptyState, AlertTriangleIcon, CheckCircleIcon, CustomSelect, Pagination } from '@/shared/components';
 import type { SelectOption } from '@/shared/components/CustomSelect';
 import type { Escalation, EscalationPriority, EscalationResolution } from '../admin.types';
 
@@ -128,8 +128,22 @@ export function EscalationsPage() {
     const [priorityFilter, setPriorityFilter] = useState<string | undefined>(undefined);
     const [statsPeriod, setStatsPeriod] = useState('7d');
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+
     const { data, isLoading, isError } = useEscalations(priorityFilter);
     const { data: stats } = useEscalationStats(statsPeriod);
+
+    // Reset pagination
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [priorityFilter, pageSize]);
+
+    const escalations = data?.escalations || [];
+    const paginatedEscalations = useMemo(() => {
+        return escalations.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    }, [escalations, currentPage, pageSize]);
 
     return (
         <div className="space-y-6">
@@ -190,14 +204,23 @@ export function EscalationsPage() {
                     Failed to load escalations.
                 </div>
             )}
-            {data && data.escalations.length === 0 && (
+            {data && escalations.length === 0 && (
                 <EmptyState title="No escalations" description="All clear — no pending escalations right now." icon="🎉" />
             )}
-            {data && data.escalations.length > 0 && (
+            {data && escalations.length > 0 && (
                 <div className="space-y-4">
-                    {data.escalations.map((e) => (
-                        <EscalationCard key={e.escalationId} escalation={e} />
-                    ))}
+                    <Pagination
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalItems={escalations.length}
+                        onPageChange={setCurrentPage}
+                        onPageSizeChange={setPageSize}
+                    />
+                    <div className="space-y-4">
+                        {paginatedEscalations.map((e) => (
+                            <EscalationCard key={e.escalationId} escalation={e} />
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
