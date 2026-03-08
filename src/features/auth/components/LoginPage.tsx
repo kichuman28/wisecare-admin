@@ -138,12 +138,31 @@ export function LoginPage() {
                             {signinMutation.isPending ? 'Signing in…' : 'Sign in'}
                         </button>
 
-                        <p className="text-center text-sm text-text-muted">
-                            Family member?{' '}
-                            <a href={ROUTES.FAMILY_SIGNUP} className="font-semibold text-primary hover:text-primary-hover">
-                                Create an account
-                            </a>
-                        </p>
+                        <div className="pt-6 border-t border-outline/50 mt-4 text-center">
+                            <p className="text-[10px] uppercase tracking-widest font-bold text-text-muted mb-3">Demo Accounts</p>
+                            <div className="flex gap-2 justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEmail('admin@wisecare.com');
+                                        setPassword('AdminPassword123!');
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg border border-outline bg-white text-xs font-semibold text-on-background hover:bg-surface transition-colors"
+                                >
+                                    Admin Demo
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEmail('jam@gmail.com');
+                                        setPassword('123456');
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg border border-outline bg-white text-xs font-semibold text-on-background hover:bg-surface transition-colors"
+                                >
+                                    Family Demo
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
