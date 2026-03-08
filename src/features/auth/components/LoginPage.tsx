@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuth } from '../use-auth';
 import { authApi } from '../auth.api';
-import { getDashboardRoute, getOnboardingRoute, ROUTES } from '@/shared/constants';
+import { getDashboardRoute, getOnboardingRoute } from '@/shared/constants';
 import type { AuthResponse } from '../auth.types';
 import type { ApiError } from '@/shared/types';
 import loginImage from '@/assets/login_image.png';
