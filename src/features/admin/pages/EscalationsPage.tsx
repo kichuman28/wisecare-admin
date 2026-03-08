@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useEscalations, useEscalationStats, useResolveEscalation } from '../admin.hooks';
-import { LoadingState, EmptyState, AlertTriangleIcon, CheckCircleIcon } from '@/shared/components';
+import { LoadingState, EmptyState, AlertTriangleIcon, CheckCircleIcon, CustomSelect } from '@/shared/components';
+import type { SelectOption } from '@/shared/components/CustomSelect';
 import type { Escalation, EscalationPriority, EscalationResolution } from '../admin.types';
 
 const PRIORITY_TABS: { label: string; value: string | undefined }[] = [
@@ -18,7 +19,7 @@ const PRIORITY_BADGE: Record<EscalationPriority, string> = {
     LOW: 'bg-gray-100 text-gray-700',
 };
 
-const RESOLUTION_OPTIONS: { label: string; value: EscalationResolution }[] = [
+const RESOLUTION_OPTIONS: SelectOption<EscalationResolution>[] = [
     { label: 'Approved', value: 'APPROVED' },
     { label: 'Rejected', value: 'REJECTED' },
     { label: 'Manual Completed', value: 'MANUAL_COMPLETED' },
@@ -46,8 +47,8 @@ function EscalationCard({ escalation }: { escalation: Escalation }) {
         <div className="rounded-xl border border-outline bg-card-surface p-5 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-start gap-3">
                 <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${escalation.priority === 'CRITICAL' ? 'bg-red-100' :
-                        escalation.priority === 'HIGH' ? 'bg-orange-100' :
-                            'bg-amber-100'
+                    escalation.priority === 'HIGH' ? 'bg-orange-100' :
+                        'bg-amber-100'
                     }`}>
                     <AlertTriangleIcon size={16} className={
                         escalation.priority === 'CRITICAL' ? 'text-red-500' :
@@ -95,10 +96,11 @@ function EscalationCard({ escalation }: { escalation: Escalation }) {
             {showResolve && (
                 <div className="mt-4 rounded-lg bg-warm-bg p-4">
                     <div className="flex flex-wrap gap-3">
-                        <select value={resolution} onChange={(e) => setResolution(e.target.value as EscalationResolution)}
-                            className="rounded-lg border border-outline bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-                            {RESOLUTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                        </select>
+                        <CustomSelect
+                            value={resolution}
+                            options={RESOLUTION_OPTIONS}
+                            onChange={(val) => setResolution(val as EscalationResolution)}
+                        />
                         <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
                             placeholder="Add notes…"
                             className="min-w-0 flex-1 rounded-lg border border-outline bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
@@ -144,12 +146,16 @@ export function EscalationsPage() {
                 <div className="flex flex-wrap items-center gap-4 rounded-xl bg-gradient-to-r from-navy to-gradient-bottom p-4 text-white">
                     <div>
                         <p className="text-xs text-white/60">Period</p>
-                        <select value={statsPeriod} onChange={(e) => setStatsPeriod(e.target.value)}
-                            className="mt-0.5 rounded bg-white/10 px-2 py-1 text-sm font-medium text-white focus:outline-none">
-                            <option value="24h">Last 24h</option>
-                            <option value="7d">Last 7 days</option>
-                            <option value="30d">Last 30 days</option>
-                        </select>
+                        <CustomSelect
+                            value={statsPeriod}
+                            options={[
+                                { label: 'Last 24h', value: '24h' },
+                                { label: 'Last 7 days', value: '7d' },
+                                { label: 'Last 30 days', value: '30d' },
+                            ]}
+                            onChange={setStatsPeriod}
+                            className="mt-0.5"
+                        />
                     </div>
                     <div className="h-8 w-px bg-white/20" />
                     <StatItem label="Total Escalations" value={stats.totalEscalations} />

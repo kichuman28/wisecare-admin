@@ -107,6 +107,9 @@ src/
 │   │   ├── EmptyState.tsx        # No-data placeholder
 │   │   ├── DataTable.tsx         # Generic typed table
 │   │   ├── AgentCard.tsx         # Agent info card (for assignment)
+│   │   ├── CustomSelect.tsx      # Fully custom themed dropdown
+│   │   ├── CustomDatePicker.tsx  # Fully custom date/month picker
+│   │   ├── Pagination.tsx        # Reusable pagination (pagesize + nav)
 │   │   └── index.ts              # Barrel export
 │   └── hooks/                    # (reserved for shared hooks)
 │
@@ -140,12 +143,12 @@ src/
 | Route | Page |
 |-------|------|
 | `/admin` | Dashboard — 6 stat cards, recent requests & alerts |
-| `/admin/service-requests` | Tabbed request management (6 status filters) |
-| `/admin/users` | User management — role tabs, create agent, activate/deactivate |
-| `/admin/alerts` | Alert monitoring with severity/type filters and resolve |
-| `/admin/escalations` | AI escalation queue with priority tabs and resolve |
-| `/admin/ai-operations` | Daily/weekly summary, recommendations, anomalies |
-| `/admin/rules` | Rules Engine — filter, toggle, and manage business rules |
+| `/admin/service-requests` | Tabbed request management — merged filters, top-placed pagination |
+| `/admin/users` | User management — role tabs, status filter, client-side pagination |
+| `/admin/alerts` | Alert monitoring — severity/type filters, client-side pagination |
+| `/admin/escalations` | AI escalation queue — priority tabs and resolve |
+| `/admin/ai-operations` | Daily/weekly summary, recommendations, anomalies with date picker |
+| `/admin/rules` | Rules Engine — filter, test, and manage business rules |
 | `/admin/ai-config` | AI Agent Config — manage bounds, categories, and hours |
 
 ### Family (`FAMILY` role required)
@@ -264,13 +267,13 @@ Defined in `src/index.css`:
   - **Request Categories**: Horizontal `BarChart` with cleaned-up API category labels (e.g., `EMERGENCY_ASSISTANCE/SOS` → `Sos`), color-coded bars, and interactive hover tooltips
   - **User Distribution**: Donut `PieChart` with center total label, role-based color coding (Elderly/Family/Agents), and bottom legend
 - **Recent Items**: Recent requests and alerts in glassmorphic cards with hover-highlighted rows and severity/status badges
-- **Service Requests**: 6-tab filtered table (Pending → Assigned → Accepted → In Progress → Completed → Rejected)
+- **Service Requests**: 6-tab filtered table (Pending → Assigned → Accepted → In Progress → Completed → Rejected). Refined UI with merged filters and custom pagination at the top.
 - **Assign Agent**: Modal to fetch available agents, filter by city, select and assign
-- **Alerts**: Filterable by severity/type/resolved, summary cards with alert counts, resolve buttons
-- **Users**: Role filter tabs (All/Elderly/Family/Agent/Admin), data table with activate/deactivate, user detail slide-in drawer (shows medications & memory summary for elderly), Create Agent modal with default password display
-- **Escalations**: Priority filter tabs, stats bar (escalation rate, trend, period selector), escalation cards with inline resolve forms (resolution type + notes)
-- **AI Operations**: Daily summary (status badge, metrics grid, category breakdown table), weekly overview with mini bar chart, AI recommendations cards (priority-coded), system anomalies with threshold/actual metrics
-- **Rules Engine**: View, filter, test, and toggle dynamic behavior rules that govern AI agent decisions (e.g., auto-approvals, escalations) without code changes.
+- **Alerts**: Filterable by severity/type/resolved, summary cards with alert counts. Implemented client-side pagination at the top.
+- **Users**: Role filter tabs (All/Elderly/Family/Agent/Admin), status filter (Active/Inactive), client-side pagination. data table with activate/deactivate, user detail slide-in drawer (shows medications & memory summary for elderly), Create Agent modal with default password display
+- **Escalations**: Priority filter tabs, stats bar (escalation rate, trend, period selector), escalation cards with inline resolve forms (resolution type + notes). Used `<CustomSelect>` for priority and sorting.
+- **AI Operations**: Daily summary (status badge, metrics grid, category breakdown table), weekly overview with mini bar chart, AI recommendations cards (priority-coded), system anomalies with threshold/actual metrics. Custom date picker for date-aware views.
+- **Rules Engine**: View, filter, test, and toggle dynamic behavior rules that govern AI agent decisions (e.g., auto-approvals, escalations) without code changes. Improved with custom dropdowns for rule logic.
 - **AI Agent Config**: Visual dashboard to manage global limits (budgeting), configure working hours, and enforce category-specific bounds and manual approval triggers.
 - **Layout**: Collapsible sidebar (full ↔ icon rail) with 8 nav items and orange active indicators. Sidebar pinned to viewport height; only main content scrolls.
 
@@ -343,3 +346,5 @@ npm run lint         # Run ESLint
 - React Query is configured with **5-minute stale time** and **10-minute garbage collection** — adjust in `lib/react-query/query-client.ts` if needed
 - The Axios instance handles **token refresh queuing** — concurrent 401s share a single refresh call
 - All path aliases use `@/` which maps to `src/` (configured in `vite.config.ts` and `tsconfig.json`)
+- **Client-side Pagination**: For Users and Alerts, pagination is implemented client-side as the backend currently returns the full dataset. This enables smooth, zero-latency navigation and filtering.
+- **Custom UI Components**: The app uses `CustomSelect`, `Pagination`, and `CustomDatePicker` to ensure a premium, Flutter-inspired design language across all browsers.

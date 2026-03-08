@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAlerts } from '../admin.hooks';
 import { AlertsPanel } from '../components/AlertsPanel';
-import { LoadingState, EmptyState, AlertIcon } from '@/shared/components';
+import { LoadingState, EmptyState, AlertIcon, CustomSelect, Pagination } from '@/shared/components';
+import type { SelectOption } from '@/shared/components/CustomSelect';
 import type { AlertFilters } from '../admin.types';
 
-const SEVERITY_OPTIONS = [
+const SEVERITY_OPTIONS: SelectOption<string>[] = [
     { label: 'All Severities', value: '' },
     { label: 'Critical', value: 'CRITICAL' },
     { label: 'High', value: 'HIGH' },
     { label: 'Medium', value: 'MEDIUM' },
 ];
 
-const TYPE_OPTIONS = [
+const TYPE_OPTIONS: SelectOption<string>[] = [
     { label: 'All Types', value: '' },
     { label: 'Fall Detected', value: 'FALL_DETECTED' },
     { label: 'High BP', value: 'HIGH_BP' },
@@ -24,14 +25,32 @@ export function AlertsPage() {
     const [type, setType] = useState('');
     const [showResolved, setShowResolved] = useState(false);
 
-    const filters: AlertFilters = {};
-    if (severity) filters.severity = severity as AlertFilters['severity'];
-    if (type) filters.type = type;
-    filters.resolved = showResolved;
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+
+    const filters: AlertFilters = useMemo(() => {
+        const f: AlertFilters = {};
+        if (severity) f.severity = severity as any;
+        if (type) f.type = type;
+        f.resolved = showResolved;
+        return f;
+    }, [severity, type, showResolved]);
 
     const { data, isLoading, isError } = useAlerts(filters);
 
-    const selectClasses = 'rounded-lg border border-outline bg-card-surface px-3 py-2 text-sm text-on-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [severity, type, showResolved, pageSize]);
+
+    const totalAlerts = data?.alerts.length || 0;
+    const paginatedAlerts = useMemo(() => {
+        if (!data?.alerts) return [];
+        return data.alerts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    }, [data?.alerts, currentPage, pageSize]);
+
+
 
     return (
         <div className="space-y-6">
@@ -61,16 +80,32 @@ export function AlertsPage() {
             )}
 
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-                <select value={severity} onChange={(e) => setSeverity(e.target.value)} className={selectClasses}>
-                    {SEVERITY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-                <select value={type} onChange={(e) => setType(e.target.value)} className={selectClasses}>
-                    {TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-                <label className="flex items-center gap-2 text-sm text-text-muted">
-                    <input type="checkbox" checked={showResolved} onChange={(e) => setShowResolved(e.target.checked)}
-                        className="h-4 w-4 rounded border-outline text-primary focus:ring-primary" />
+            <div className="flex flex-wrap items-center gap-4 rounded-xl bg-surface p-4 ring-1 ring-outline">
+                <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Severity</label>
+                    <CustomSelect
+                        value={severity}
+                        options={SEVERITY_OPTIONS}
+                        onChange={setSeverity}
+                    />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Type</label>
+                    <CustomSelect
+                        value={type}
+                        options={TYPE_OPTIONS}
+                        onChange={setType}
+                    />
+                </div>
+
+                <label className="flex items-center gap-2 text-sm font-medium text-text-muted cursor-pointer hover:text-on-background transition-colors">
+                    <input
+                        type="checkbox"
+                        checked={showResolved}
+                        onChange={(e) => setShowResolved(e.target.checked)}
+                        className="h-4 w-4 rounded border-outline text-primary focus:ring-primary"
+                    />
                     Show resolved
                 </label>
             </div>
@@ -88,8 +123,17 @@ export function AlertsPage() {
                 <EmptyState title="No alerts found" description="No alerts match the current filters." icon="🔔" />
             )}
 
-            {data && data.alerts.length > 0 && (
-                <AlertsPanel alerts={data.alerts} />
+            {data && totalAlerts > 0 && (
+                <div className="space-y-4">
+                    <Pagination
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalItems={totalAlerts}
+                        onPageChange={setCurrentPage}
+                        onPageSizeChange={setPageSize}
+                    />
+                    <AlertsPanel alerts={paginatedAlerts} />
+                </div>
             )}
         </div>
     );

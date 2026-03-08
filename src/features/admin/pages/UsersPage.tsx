@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useUsers, useToggleUserStatus } from '../admin.hooks';
-import { DataTable, LoadingState, EmptyState, UsersIcon } from '@/shared/components';
+import { DataTable, LoadingState, EmptyState, UsersIcon, CustomSelect, Pagination } from '@/shared/components';
 import { CreateAgentModal } from '../components/CreateAgentModal';
 import { UserDetailDrawer } from '../components/UserDetailDrawer';
 import type { AdminUser, UserRole } from '../admin.types';
 import type { Column } from '@/shared/components';
+import type { SelectOption } from '@/shared/components/CustomSelect';
 
 const ROLE_TABS: { label: string; value: UserRole | undefined }[] = [
     { label: 'All', value: undefined },
@@ -12,6 +13,12 @@ const ROLE_TABS: { label: string; value: UserRole | undefined }[] = [
     { label: 'Family', value: 'FAMILY' },
     { label: 'Agent', value: 'AGENT' },
     { label: 'Admin', value: 'ADMIN' },
+];
+
+const STATUS_OPTIONS: SelectOption<string>[] = [
+    { label: 'All Statuses', value: '' },
+    { label: 'Active Only', value: 'true' },
+    { label: 'Inactive Only', value: 'false' },
 ];
 
 const ROLE_BADGE: Record<UserRole, string> = {
@@ -23,11 +30,29 @@ const ROLE_BADGE: Record<UserRole, string> = {
 
 export function UsersPage() {
     const [roleFilter, setRoleFilter] = useState<UserRole | undefined>(undefined);
+    const [statusFilter, setStatusFilter] = useState('');
     const [showCreateAgent, setShowCreateAgent] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-    const { data, isLoading, isError } = useUsers(roleFilter);
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
+
+    const activeFilter = statusFilter === '' ? undefined : statusFilter === 'true';
+    const { data, isLoading, isError } = useUsers(roleFilter, activeFilter);
     const toggleStatus = useToggleUserStatus();
+
+    // Reset pagination
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [roleFilter, statusFilter, pageSize]);
+
+    const users = data?.users || [];
+    const totalUsers = data?.count || 0;
+
+    const paginatedUsers = useMemo(() => {
+        return users.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    }, [users, currentPage, pageSize]);
 
     const handleToggleActive = (user: AdminUser) => {
         toggleStatus.mutate({ userId: user.userId, data: { active: !user.active } });
@@ -93,7 +118,7 @@ export function UsersPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-on-background">Users</h1>
                     <p className="mt-1 text-sm text-text-muted">
-                        Manage all platform users — {data?.count ?? '…'} total.
+                        Manage all platform users — {totalUsers} total.
                     </p>
                 </div>
                 <button type="button" onClick={() => setShowCreateAgent(true)}
@@ -102,31 +127,53 @@ export function UsersPage() {
                 </button>
             </div>
 
-            {/* Role tabs */}
-            <div className="flex flex-wrap gap-1 rounded-xl bg-surface p-1 ring-1 ring-outline">
-                {ROLE_TABS.map((tab) => (
-                    <button key={tab.label} type="button"
-                        onClick={() => setRoleFilter(tab.value)}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${roleFilter === tab.value
-                            ? 'bg-primary text-white shadow-sm'
-                            : 'text-text-muted hover:text-on-background'}`}>
-                        {tab.label}
-                    </button>
-                ))}
+            {/* Filters Row */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                {/* Role tabs */}
+                <div className="flex flex-wrap gap-1 rounded-xl bg-surface p-1 ring-1 ring-outline">
+                    {ROLE_TABS.map((tab) => (
+                        <button key={tab.label} type="button"
+                            onClick={() => setRoleFilter(tab.value)}
+                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${roleFilter === tab.value
+                                ? 'bg-primary text-white shadow-sm'
+                                : 'text-text-muted hover:text-on-background'}`}>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Status</label>
+                    <CustomSelect
+                        value={statusFilter}
+                        options={STATUS_OPTIONS}
+                        onChange={setStatusFilter}
+                    />
+                </div>
             </div>
 
-            {/* Content */}
+            {/* Content states */}
             {isLoading && <LoadingState message="Loading users…" />}
             {isError && (
                 <div className="rounded-xl border border-red-200 bg-error-light p-4 text-sm text-error">
                     Failed to load users.
                 </div>
             )}
-            {data && data.users.length === 0 && (
+            {data && users.length === 0 && (
                 <EmptyState title="No users found" description="No users match the current filter." icon="👥" />
             )}
-            {data && data.users.length > 0 && (
-                <DataTable columns={columns} data={data.users} rowKey={(u) => u.userId} />
+
+            {data && users.length > 0 && (
+                <div className="space-y-4">
+                    <Pagination
+                        currentPage={currentPage}
+                        pageSize={pageSize}
+                        totalItems={users.length}
+                        onPageChange={setCurrentPage}
+                        onPageSizeChange={setPageSize}
+                    />
+                    <DataTable columns={columns} data={paginatedUsers} rowKey={(u) => u.userId} />
+                </div>
             )}
 
             {/* Modals */}

@@ -24,6 +24,8 @@ interface DataTableProps<T> {
     data: T[];
     /** Unique key extractor for each row */
     rowKey: (row: T) => string;
+    /** Optional handler when a row is clicked */
+    onRowClick?: (row: T) => void;
     className?: string;
 }
 
@@ -31,6 +33,7 @@ export function DataTable<T>({
     columns,
     data,
     rowKey,
+    onRowClick,
     className = '',
 }: DataTableProps<T>) {
     const alignClass = (align?: string) => {
@@ -58,7 +61,8 @@ export function DataTable<T>({
                     {data.map((row) => (
                         <tr
                             key={rowKey(row)}
-                            className="transition-colors hover:bg-warm-bg/50"
+                            onClick={onRowClick ? () => onRowClick(row) : undefined}
+                            className={`transition-colors hover:bg-warm-bg/50 ${onRowClick ? 'cursor-pointer hover:bg-primary/5 active:bg-primary/10' : ''}`}
                         >
                             {columns.map((col) => (
                                 <td

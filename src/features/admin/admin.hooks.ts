@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { adminApi } from './admin.api';
 import type {
     ServiceRequestStatus,
@@ -207,7 +208,9 @@ export function useAssignAgent() {
             queryClient.invalidateQueries({ queryKey: ['service-requests'] });
             queryClient.invalidateQueries({ queryKey: adminKeys.availableAgents });
             queryClient.invalidateQueries({ queryKey: adminKeys.stats });
+            toast.success('Agent assigned successfully');
         },
+        onError: () => toast.error('Failed to assign agent'),
     });
 }
 
@@ -227,7 +230,9 @@ export function useResolveAlert() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-alerts'] });
             queryClient.invalidateQueries({ queryKey: adminKeys.stats });
+            toast.success('Alert resolved');
         },
+        onError: () => toast.error('Failed to resolve alert'),
     });
 }
 
@@ -242,7 +247,9 @@ export function useCreateAgent() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-users'] });
             queryClient.invalidateQueries({ queryKey: adminKeys.stats });
+            toast.success('Agent created successfully');
         },
+        onError: () => toast.error('Failed to create agent'),
     });
 }
 
@@ -261,7 +268,9 @@ export function useToggleUserStatus() {
 
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+            toast.success('User status updated');
         },
+        onError: () => toast.error('Failed to update user status'),
     });
 }
 
@@ -281,7 +290,9 @@ export function useResolveEscalation() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-escalations'] });
             queryClient.invalidateQueries({ queryKey: ['admin-escalation-stats'] });
+            toast.success('Escalation resolved');
         },
+        onError: () => toast.error('Failed to resolve escalation'),
     });
 }
 
@@ -322,7 +333,11 @@ export function useCreateRule() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: RuleCreateRequest) => adminApi.createRule(data).then((r) => r.data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-rules'] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-rules'] });
+            toast.success('Rule created successfully');
+        },
+        onError: () => toast.error('Failed to create rule'),
     });
 }
 
@@ -334,7 +349,9 @@ export function useUpdateRule() {
         onSuccess: (_, { ruleId }) => {
             queryClient.invalidateQueries({ queryKey: ['admin-rules'] });
             queryClient.invalidateQueries({ queryKey: adminKeys.rule(ruleId) });
+            toast.success('Rule updated successfully');
         },
+        onError: () => toast.error('Failed to update rule'),
     });
 }
 
@@ -342,7 +359,11 @@ export function useDeleteRule() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (ruleId: string) => adminApi.deleteRule(ruleId).then((r) => r.data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-rules'] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-rules'] });
+            toast.success('Rule deleted successfully');
+        },
+        onError: () => toast.error('Failed to delete rule'),
     });
 }
 
@@ -354,13 +375,17 @@ export function useToggleRule() {
         onSuccess: (_, { ruleId }) => {
             queryClient.invalidateQueries({ queryKey: ['admin-rules'] });
             queryClient.invalidateQueries({ queryKey: adminKeys.rule(ruleId) });
+            toast.success('Rule status changed');
         },
+        onError: () => toast.error('Failed to toggle rule'),
     });
 }
 
 export function useTestRule() {
     return useMutation({
         mutationFn: (data: RuleTestRequest) => adminApi.testRule(data).then((r) => r.data),
+        onSuccess: () => toast.success('Rule tested against payload'),
+        onError: () => toast.error('Failed to test rule'),
     });
 }
 
@@ -373,7 +398,11 @@ export function useUpdateAIAgentConfig() {
     return useMutation({
         mutationFn: (data: AIAgentConfigUpdateRequest) =>
             adminApi.updateAIAgentConfig(data).then((r) => r.data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig });
+            toast.success('AI config updated');
+        },
+        onError: () => toast.error('Failed to update AI config'),
     });
 }
 
@@ -382,7 +411,11 @@ export function useToggleCategory() {
     return useMutation({
         mutationFn: ({ category, data }: { category: string; data: CategoryToggleRequest }) =>
             adminApi.toggleCategory(category, data).then((r) => r.data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: adminKeys.aiAgentConfig });
+            toast.success('Category settings updated');
+        },
+        onError: () => toast.error('Failed to update category'),
     });
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDailySummary, useWeeklySummary, useRecommendations, useAnomalies } from '../admin.hooks';
-import { LoadingState, ActivityIcon, AlertTriangleIcon, CheckCircleIcon } from '@/shared/components';
+import { LoadingState, ActivityIcon, AlertTriangleIcon, CheckCircleIcon, CustomDatePicker } from '@/shared/components';
 import type { DailyStatus, Recommendation, Anomaly } from '../admin.types';
 
 // ---------------------------------------------------------------------------
@@ -134,8 +134,10 @@ export function AIOperationsPage() {
             <section className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-on-background">Daily Summary</h2>
-                    <input type="date" value={summaryDate} onChange={(e) => setSummaryDate(e.target.value)}
-                        className="rounded-lg border border-outline bg-card-surface px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    <CustomDatePicker
+                        value={summaryDate}
+                        onChange={setSummaryDate}
+                    />
                 </div>
 
                 {loadingDaily && <LoadingState message="Loading daily summary…" />}
@@ -289,6 +291,6 @@ export function AIOperationsPage() {
                     </div>
                 )}
             </section>
-        </div>
+        </div >
     );
 }

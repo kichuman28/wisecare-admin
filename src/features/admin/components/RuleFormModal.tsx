@@ -1,5 +1,6 @@
 import { useState, type FormEvent, useEffect } from 'react';
 import { useCreateRule, useUpdateRule } from '../admin.hooks';
+import { CustomSelect } from '@/shared/components';
 import type {
     Rule,
     RuleCreateRequest,
@@ -170,17 +171,23 @@ export function RuleFormModal({ initialData, onClose }: RuleFormModalProps) {
                             <div className="grid gap-4 sm:grid-cols-3">
                                 <div>
                                     <label htmlFor="category" className="mb-1 block text-sm font-medium text-text-muted">Category</label>
-                                    <select id="category" disabled={isEditing} value={category} onChange={(e) => setCategory(e.target.value as RuleCategory)}
-                                        className={`${inputClasses} ${isEditing ? 'bg-gray-50 opacity-75' : ''}`}>
-                                        {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        options={CATEGORIES}
+                                        disabled={isEditing}
+                                        value={category}
+                                        onChange={(val) => setCategory(val as RuleCategory)}
+                                        className={isEditing ? 'opacity-75' : ''}
+                                    />
                                 </div>
                                 <div>
                                     <label htmlFor="type" className="mb-1 block text-sm font-medium text-text-muted">Type</label>
-                                    <select id="type" disabled={isEditing} value={ruleType} onChange={(e) => setRuleType(e.target.value as RuleType)}
-                                        className={`${inputClasses} ${isEditing ? 'bg-gray-50 opacity-75' : ''}`}>
-                                        {RULE_TYPES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        options={RULE_TYPES}
+                                        disabled={isEditing}
+                                        value={ruleType}
+                                        onChange={(val) => setRuleType(val as RuleType)}
+                                        className={isEditing ? 'opacity-75' : ''}
+                                    />
                                 </div>
                                 <div>
                                     <label htmlFor="priority" className="mb-1 block text-sm font-medium text-text-muted">Priority (Lower = First)</label>
@@ -203,10 +210,11 @@ export function RuleFormModal({ initialData, onClose }: RuleFormModalProps) {
                                             className={inputClasses} placeholder="Field (e.g. orderTotal)" required />
                                     </div>
                                     <div>
-                                        <select value={conditionOperator} onChange={(e) => setConditionOperator(e.target.value as RuleOperator)}
-                                            className={inputClasses}>
-                                            {OPERATORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                        </select>
+                                        <CustomSelect
+                                            options={OPERATORS}
+                                            value={conditionOperator}
+                                            onChange={(val) => setConditionOperator(val as RuleOperator)}
+                                        />
                                     </div>
                                     <div>
                                         <input type="text" value={conditionValue} onChange={(e) => setConditionValue(e.target.value)}
@@ -218,10 +226,11 @@ export function RuleFormModal({ initialData, onClose }: RuleFormModalProps) {
                             {/* Action */}
                             <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-outline">
                                 <p className="mb-2 text-xs font-bold uppercase tracking-wider text-text-muted">Then execute action</p>
-                                <select value={action} onChange={(e) => setAction(e.target.value as RuleActionType)}
-                                    className={inputClasses}>
-                                    {ACTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                </select>
+                                <CustomSelect
+                                    options={ACTIONS}
+                                    value={action}
+                                    onChange={(val) => setAction(val as RuleActionType)}
+                                />
                             </div>
                         </div>
                     </form>

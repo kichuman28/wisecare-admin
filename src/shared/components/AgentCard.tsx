@@ -19,15 +19,15 @@ export function AgentCard({ agent, selected, onSelect }: AgentCardProps) {
         >
             {/* Avatar */}
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-navy to-icon-shield text-sm font-bold text-white">
-                {agent.name.charAt(0).toUpperCase()}
+                {agent.name ? agent.name.charAt(0).toUpperCase() : '?'}
             </div>
 
             {/* Info */}
             <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-on-background">
-                    {agent.name}
+                    {agent.name || 'Unknown Agent'}
                 </p>
-                <p className="text-xs text-text-muted">{agent.city}</p>
+                <p className="text-xs text-text-muted">{agent.city || 'Unknown City'}</p>
             </div>
 
             {/* Stats */}

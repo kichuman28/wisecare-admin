@@ -5,11 +5,16 @@ import { AxiosError } from 'axios';
 import { useAuth } from '@/features/auth';
 import { familyApi } from '../family.api';
 import { ROUTES } from '@/shared/constants';
+import { CustomSelect } from '@/shared/components';
 import type { FamilyRelationship } from '../family.types';
 import type { ApiError } from '@/shared/types';
 
-const RELATIONSHIPS: FamilyRelationship[] = [
-    'Son', 'Daughter', 'Spouse', 'Sibling', 'Other',
+const RELATIONSHIPS: { value: FamilyRelationship; label: string }[] = [
+    { value: 'Son', label: 'Son' },
+    { value: 'Daughter', label: 'Daughter' },
+    { value: 'Spouse', label: 'Spouse' },
+    { value: 'Sibling', label: 'Sibling' },
+    { value: 'Other', label: 'Other' },
 ];
 
 export function FamilyBasicOnboardingPage() {
@@ -113,13 +118,12 @@ export function FamilyBasicOnboardingPage() {
                             <label htmlFor="relationship" className="mb-1.5 block text-sm font-medium text-on-background">
                                 Relationship to elderly
                             </label>
-                            <select id="relationship" value={relationship}
-                                onChange={(e) => setRelationship(e.target.value as FamilyRelationship)}
-                                className={inputClasses}>
-                                {RELATIONSHIPS.map((r) => (
-                                    <option key={r} value={r}>{r}</option>
-                                ))}
-                            </select>
+                            <CustomSelect
+                                options={RELATIONSHIPS}
+                                value={relationship}
+                                onChange={(val) => setRelationship(val as FamilyRelationship)}
+                                className="mt-1.5"
+                            />
                         </div>
 
                         <div>

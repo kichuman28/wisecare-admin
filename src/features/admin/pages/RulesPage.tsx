@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRules, useToggleRule, useDeleteRule } from '../admin.hooks';
-import { LoadingState, EmptyState, RulesIcon } from '@/shared/components';
+import { LoadingState, EmptyState, RulesIcon, ConfirmModal, CustomSelect } from '@/shared/components';
 import type { Rule, RuleCategory, RuleType, RulesFilters } from '../admin.types';
 
 import { RuleFormModal } from '../components/RuleFormModal';
@@ -87,9 +87,7 @@ function RuleCard({
                         Edit
                     </button>
                     <button
-                        onClick={() => {
-                            if (window.confirm('Delete this rule permanently?')) onDelete(rule.ruleId);
-                        }}
+                        onClick={() => onDelete(rule.ruleId)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
                     >
                         Delete
@@ -109,6 +107,7 @@ export function RulesPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingRule, setEditingRule] = useState<Rule | null>(null);
     const [testingRule, setTestingRule] = useState<Rule | null>(null);
+    const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
 
     const { data, isLoading } = useRules(filters);
 
@@ -121,8 +120,15 @@ export function RulesPage() {
         toggleRuleMutation.mutate({ ruleId, data: { enabled: !current } });
     };
 
-    const handleDelete = (ruleId: string) => {
-        deleteRuleMutation.mutate(ruleId);
+    const handleDeleteClick = (ruleId: string) => {
+        setDeletingRuleId(ruleId);
+    };
+
+    const confirmDelete = () => {
+        if (!deletingRuleId) return;
+        deleteRuleMutation.mutate(deletingRuleId, {
+            onSuccess: () => setDeletingRuleId(null)
+        });
     };
 
     return (
@@ -147,48 +153,56 @@ export function RulesPage() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-outline bg-card-surface p-4">
-                <select
-                    className="rounded-lg border border-outline bg-transparent px-3 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                    value={filters.category ?? ''}
-                    onChange={(e) => setFilters(f => ({ ...f, category: e.target.value as RuleCategory || undefined }))}
-                >
-                    <option value="">All Categories</option>
-                    <option value="GROCERY">Grocery</option>
-                    <option value="MEDICINE">Medicine</option>
-                    <option value="FOOD">Food</option>
-                    <option value="DOCTOR">Doctor</option>
-                    <option value="ALL">Global (All)</option>
-                </select>
+            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-outline bg-card-surface p-4">
+                <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Category</label>
+                    <CustomSelect
+                        value={filters.category ?? ''}
+                        options={[
+                            { label: 'All Categories', value: '' },
+                            { label: 'Grocery', value: 'GROCERY' },
+                            { label: 'Medicine', value: 'MEDICINE' },
+                            { label: 'Food', value: 'FOOD' },
+                            { label: 'Doctor', value: 'DOCTOR' },
+                            { label: 'Global (All)', value: 'ALL' },
+                        ]}
+                        onChange={(val) => setFilters(f => ({ ...f, category: (val as RuleCategory) || undefined }))}
+                    />
+                </div>
 
-                <select
-                    className="rounded-lg border border-outline bg-transparent px-3 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                    value={filters.ruleType ?? ''}
-                    onChange={(e) => setFilters(f => ({ ...f, ruleType: e.target.value as RuleType || undefined }))}
-                >
-                    <option value="">All Rule Types</option>
-                    <option value="APPROVAL">Approval</option>
-                    <option value="BUDGET">Budget</option>
-                    <option value="ESCALATION">Escalation</option>
-                </select>
+                <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Type</label>
+                    <CustomSelect
+                        value={filters.ruleType ?? ''}
+                        options={[
+                            { label: 'All Rule Types', value: '' },
+                            { label: 'Approval', value: 'APPROVAL' },
+                            { label: 'Budget', value: 'BUDGET' },
+                            { label: 'Escalation', value: 'ESCALATION' },
+                        ]}
+                        onChange={(val) => setFilters(f => ({ ...f, ruleType: (val as RuleType) || undefined }))}
+                    />
+                </div>
 
-                <select
-                    className="rounded-lg border border-outline bg-transparent px-3 py-1.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                    value={filters.enabled === undefined ? '' : String(filters.enabled)}
-                    onChange={(e) => {
-                        const val = e.target.value;
-                        setFilters(f => ({ ...f, enabled: val === '' ? undefined : val === 'true' }));
-                    }}
-                >
-                    <option value="">Any Status</option>
-                    <option value="true">Enabled Only</option>
-                    <option value="false">Disabled Only</option>
-                </select>
+                <div className="flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Status</label>
+                    <CustomSelect
+                        value={filters.enabled === undefined ? '' : String(filters.enabled)}
+                        options={[
+                            { label: 'Any Status', value: '' },
+                            { label: 'Enabled Only', value: 'true' },
+                            { label: 'Disabled Only', value: 'false' },
+                        ]}
+                        onChange={(val) => {
+                            setFilters(f => ({ ...f, enabled: val === '' ? undefined : val === 'true' }));
+                        }}
+                    />
+                </div>
 
                 {Object.keys(filters).length > 0 && (
                     <button
                         onClick={() => setFilters({})}
-                        className="text-xs font-semibold text-text-muted hover:text-primary"
+                        className="ml-auto text-xs font-bold uppercase tracking-widest text-primary hover:opacity-80 transition-opacity"
                     >
                         Clear Filters
                     </button>
@@ -213,7 +227,7 @@ export function RulesPage() {
                             key={rule.ruleId}
                             rule={rule}
                             onToggle={handleToggle}
-                            onDelete={handleDelete}
+                            onDelete={handleDeleteClick}
                             onEdit={() => setEditingRule(rule)}
                             onTest={() => setTestingRule(rule)}
                         />
@@ -230,6 +244,17 @@ export function RulesPage() {
             )}
             {testingRule && (
                 <RuleTestModal rule={testingRule} onClose={() => setTestingRule(null)} />
+            )}
+
+            {deletingRuleId && (
+                <ConfirmModal
+                    title="Delete Rule?"
+                    description="Are you sure you want to permanently delete this rule? This action cannot be undone and will immediately affect how the AI handles requests."
+                    confirmText="Delete Rule"
+                    confirmStyle="danger"
+                    onConfirm={confirmDelete}
+                    onCancel={() => setDeletingRuleId(null)}
+                />
             )}
         </div>
     );
