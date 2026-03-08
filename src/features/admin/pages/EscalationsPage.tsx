@@ -76,8 +76,8 @@ function EscalationCard({ escalation }: { escalation: Escalation }) {
 
                     <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-text-muted">
                         <span>User: <strong className="text-on-background">{escalation.userName}</strong> ({escalation.userCity})</span>
-                        <span>Cost: ${escalation.cost.toFixed(4)}</span>
-                        <span>Time: {escalation.executionTime.toFixed(1)}s</span>
+                        <span>Cost: ${escalation.cost?.toFixed(4) ?? '0.0000'}</span>
+                        <span>Time: {escalation.executionTime?.toFixed(1) ?? '0.0'}s</span>
                         {escalation.toolsUsed.length > 0 && (
                             <span>Tools: {escalation.toolsUsed.join(', ')}</span>
                         )}
@@ -184,7 +184,7 @@ export function EscalationsPage() {
                     <div className="h-8 w-px bg-white/20" />
                     <StatItem label="Total Escalations" value={stats.totalEscalations} />
                     <StatItem label="Total Tasks" value={stats.totalTasks} />
-                    <StatItem label="Escalation Rate" value={`${stats.escalationRate.toFixed(1)}%`} />
+                    <StatItem label="Escalation Rate" value={`${(stats.escalationRate ?? 0).toFixed(1)}%`} />
                     <StatItem label="Trend" value={stats.trend.charAt(0).toUpperCase() + stats.trend.slice(1)} />
                 </div>
             )}

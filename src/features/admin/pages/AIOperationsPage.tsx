@@ -189,7 +189,7 @@ export function AIOperationsPage() {
                                                     <td className="py-2 text-center text-green-600">{d?.completed ?? 0}</td>
                                                     <td className="py-2 text-center text-amber-600">{d?.escalated ?? 0}</td>
                                                     <td className="py-2 text-center">
-                                                        {(d?.total ?? 0) > 0 ? (((d?.completed ?? 0) / d.total) * 100).toFixed(0) : 0}%
+                                                        {(d?.total ?? 0) > 0 ? (((d?.completed ?? 0) / (d?.total ?? 1)) * 100).toFixed(0) : 0}%
                                                     </td>
                                                 </tr>
                                             ))}

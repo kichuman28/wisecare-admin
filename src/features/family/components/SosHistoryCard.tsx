@@ -58,7 +58,7 @@ export function SosHistoryCard({ elderlyUserId }: { elderlyUserId: string }) {
                             </div>
                             <div className="text-xs text-red-800/80 mt-1 flex items-start gap-1.5">
                                 <span className="pt-0.5">📍</span>
-                                <span>Location ID: {sos.location?.latitude.toFixed(4)}, {sos.location?.longitude.toFixed(4)}</span>
+                                <span>Location ID: {sos.location?.latitude?.toFixed(4) ?? '—'}, {sos.location?.longitude?.toFixed(4) ?? '—'}</span>
                             </div>
                             {sos.resolvedAt && (
                                 <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 w-fit px-2 py-0.5 rounded-md">
